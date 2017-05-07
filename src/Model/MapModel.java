@@ -11,8 +11,7 @@ import java.util.*;
  */
 public class MapModel implements EventHandler<KeyEvent> {
     private List<MapItem[]> map;
-    private int charx;
-    private int chary;
+    private Position player;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
@@ -25,7 +24,6 @@ public class MapModel implements EventHandler<KeyEvent> {
         try{
             sc = new Scanner(new FileReader(fin));
 
-            int i = 0;
             while(sc.hasNextLine()){
                 String line = sc.nextLine();
                 MapItem[] row = new MapItem[line.length()];
@@ -38,8 +36,7 @@ public class MapModel implements EventHandler<KeyEvent> {
                             break;
                         case 'c':
                             row[j] = MapItem.CHARACTER;
-                            chary = map.size();
-                            charx = j;
+                            player = new Position(j, map.size());
                             break;
                     }
                     j++;
@@ -47,8 +44,7 @@ public class MapModel implements EventHandler<KeyEvent> {
                 map.add(row);
             }
         }
-        catch(FileNotFoundException e)
-        {
+        catch(FileNotFoundException e) {
             System.err.println(String.format("File %s/%s not found",System.getProperty("user.dir") ,fin));
         }
         finally{
@@ -62,38 +58,59 @@ public class MapModel implements EventHandler<KeyEvent> {
         //KEY EVENT HANDLER
         MapUpdateInfo info = new MapUpdateInfo();
 
-        map.get(chary)[charx] = MapItem.EMPTY;
-        info.addCoordinate(chary, charx, MapItem.EMPTY);
+        int x = player.getX();
+        int y = player.getY();
+        Position oldPosition = new Position(x, y);
 
         switch (e.getCode()){
             case UP:
-                if (chary == 0) break;
-                chary--;
-                break;
+                y--; break;
             case DOWN:
-                if (chary == 5) break;
-                chary++;
-                break;
+                y++; break;
             case LEFT:
-                if (charx == 0) break;
-                charx--;
-                break;
+                x--; break;
             case RIGHT:
-                if (charx == 5) break;
-                charx++;
-                break;
+                x++; break;
         }
+        Position newPosition = new Position(x, y);
+        if (!validMove(newPosition)) {
+            return;
+        }
+        player = newPosition;
 
-        map.get(chary)[charx] = MapItem.CHARACTER;
-        info.addCoordinate(chary, charx, MapItem.CHARACTER);
+        info.addChange(oldPosition, MapItem.EMPTY);
+        setMapAt(oldPosition, MapItem.EMPTY);
 
-        for(ModelEventHandler listener : listeners) {
+        info.addChange(newPosition, MapItem.CHARACTER);
+        setMapAt(newPosition, MapItem.CHARACTER);
+
+        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.Handle(info);
         }
     }
 
-    public MapItem getMapAt(int r, int c){
-        return map.get(r)[c];
+    public boolean validMove(Position pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+
+        if (y == -1 || y == getHeight() || x == -1 || x == getWidth()) {
+            return false;
+        }
+
+        MapItem item = getMapAt(pos);
+        if (item == MapItem.WALL) {
+                return false;
+        }
+
+        return true;
+    }
+
+    public MapItem getMapAt(Position pos){
+        return map.get(pos.getY())[pos.getX()];
+    }
+
+    public void setMapAt(Position pos, MapItem item){
+        map.get(pos.getY())[pos.getX()] = item;
     }
 
     public int getHeight(){

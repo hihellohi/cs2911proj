@@ -8,6 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import static Model.MapItem.CHARACTER;
+
 public class WarehouseBoss extends Application implements ModelEventHandler<MapUpdateInfo>{
 
     private MapModel mapModel;
@@ -31,7 +33,7 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
         for(int r = 0; r < mapModel.getHeight(); r++){
             for(int c = 0; c < mapModel.getWidth(); c++){
                 ImageView tile = new ImageView();
-                switch(mapModel.getMapAt(r, c)) {
+                switch(mapModel.getMapAt(new Position(c, r))) {
                     case CHARACTER:
                         tile.setImage(white);
                         break;
@@ -47,7 +49,7 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
         Scene gameScene = new Scene(grid, width, height);
         gameScene.setOnKeyPressed(mapModel);
 
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Warehouse Boss");
         primaryStage.setScene(gameScene);
         primaryStage.show();
     }
@@ -55,15 +57,16 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
     public void Handle(MapUpdateInfo updateInfo){
         //MODEL UPDATE HANDLER
 
-        for(Triplet<Integer, Integer, MapItem> change: updateInfo.getCoordinates()) {
-            int r = change.getItem1().intValue();
-            int c = change.getItem2().intValue();
-            switch (change.getItem3()){
+        for(Pair<Position, MapItem> change: updateInfo.getCoordinates()) {
+            Position pos = change.first();
+            int x = pos.getX();
+            int y = pos.getY();
+            switch (change.second()){
                 case CHARACTER:
-                    tiles[r][c].setImage(white);
+                    tiles[y][x].setImage(white);
                     break;
                 default:
-                    tiles[r][c].setImage(black);
+                    tiles[y][x].setImage(black);
                     break;
             }
         }
