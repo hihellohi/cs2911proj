@@ -1,8 +1,8 @@
 package Model;
 
 /**
- * Created by Ni on 7/05/2017.
+ * @author Kevin Ni
  */
-public interface ModelEventHandler {
-    void Handle();
+public interface ModelEventHandler<T> {
+    void Handle(T updateInfo);
 }

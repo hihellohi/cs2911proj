@@ -10,15 +10,15 @@ import java.util.*;
  * @author Kevin Ni
  */
 public class MapModel implements EventHandler<KeyEvent> {
-    private char[][] map;
+    private List<MapItem[]> map;
     private int charx;
     private int chary;
 
-    private List<ModelEventHandler> listeners;
+    private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public MapModel(String fin){
-        map = new char[6][6];
-        listeners = new ArrayList<ModelEventHandler>();
+        map = new ArrayList<>();
+        listeners = new ArrayList<>();
 
         //read map from file
         Scanner sc = null;
@@ -28,11 +28,23 @@ public class MapModel implements EventHandler<KeyEvent> {
             int i = 0;
             while(sc.hasNextLine()){
                 String line = sc.nextLine();
-                if(line.contains("c")){
-                    chary = i;
-                    charx = line.indexOf('c');
+                MapItem[] row = new MapItem[line.length()];
+
+                int j = 0;
+                for(char c: line.toCharArray()){
+                    switch(c){
+                        case '.':
+                            row[j] = MapItem.EMPTY;
+                            break;
+                        case 'c':
+                            row[j] = MapItem.CHARACTER;
+                            chary = map.size();
+                            charx = j;
+                            break;
+                    }
+                    j++;
                 }
-                map[i++] = line.toCharArray();
+                map.add(row);
             }
         }
         catch(FileNotFoundException e)
@@ -48,7 +60,11 @@ public class MapModel implements EventHandler<KeyEvent> {
 
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
-        map[chary][charx] = '.';
+        MapUpdateInfo info = new MapUpdateInfo();
+
+        map.get(chary)[charx] = MapItem.EMPTY;
+        info.addCoordinate(chary, charx, MapItem.EMPTY);
+
         switch (e.getCode()){
             case UP:
                 chary--;
@@ -63,29 +79,31 @@ public class MapModel implements EventHandler<KeyEvent> {
                 charx++;
                 break;
             default:
-                map[chary][charx] = 'c';
+                map.get(chary)[charx] = MapItem.CHARACTER;
                 return;
         }
 
-        map[chary][charx] = 'c';
+        map.get(chary)[charx] = MapItem.CHARACTER;
+        info.addCoordinate(chary, charx, MapItem.CHARACTER);
+
         for(ModelEventHandler listener : listeners) {
-            listener.Handle();
+            listener.Handle(info);
         }
     }
 
-    public char getMapAt(int r, int c){
-        return map[r][c];
+    public MapItem getMapAt(int r, int c){
+        return map.get(r)[c];
     }
 
     public int getHeight(){
-        return map.length;
+        return map.size();
     }
 
     public int getWidth(){
-        return getHeight() == 0 ? 0 : map[0].length;
+        return getHeight() == 0 ? 0 : map.get(0).length;
     }
 
-    public void setOnModelUpdate(ModelEventHandler listener){
+    public void setOnModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
         listeners.add(listener);
     }
 }

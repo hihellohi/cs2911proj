@@ -1,16 +1,13 @@
 package View;
 
-import Model.ModelEventHandler;
+import Model.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import Model.MapModel;
 
-public class WarehouseBoss extends Application implements ModelEventHandler{
+public class WarehouseBoss extends Application implements ModelEventHandler<MapUpdateInfo>{
 
     private MapModel mapModel;
     private Label[][] labelgrid;
@@ -20,7 +17,6 @@ public class WarehouseBoss extends Application implements ModelEventHandler{
         mapModel = new MapModel("input1.txt");
         mapModel.setOnModelUpdate(this);
 
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -29,7 +25,15 @@ public class WarehouseBoss extends Application implements ModelEventHandler{
 
         for(int r = 0; r < mapModel.getHeight(); r++){
             for(int c = 0; c < mapModel.getWidth(); c++){
-                Label label = new Label(Character.toString(mapModel.getMapAt(r, c)));
+                Label label;
+                switch(mapModel.getMapAt(r, c)) {
+                    case CHARACTER:
+                        label = new Label("c");
+                        break;
+                    default:
+                        label = new Label(".");
+                        break;
+                }
                 labelgrid[r][c] = label;
                 grid.add(label, c, r);
             }
@@ -43,11 +47,19 @@ public class WarehouseBoss extends Application implements ModelEventHandler{
         primaryStage.show();
     }
 
-    public void Handle(){
+    public void Handle(MapUpdateInfo updateInfo){
         //MODEL UPDATE HANDLER
-        for(int r = 0; r < mapModel.getHeight(); r++){
-            for(int c = 0; c < mapModel.getWidth(); c++){
-                labelgrid[r][c].setText(Character.toString(mapModel.getMapAt(r, c)));
+
+        for(Triplet<Integer, Integer, MapItem> change: updateInfo.getCoordinates()) {
+            int r = change.getItem1().intValue();
+            int c = change.getItem2().intValue();
+            switch (change.getItem3()){
+                case CHARACTER:
+                    labelgrid[r][c].setText("c");
+                    break;
+                default:
+                    labelgrid[r][c].setText(".");
+                    break;
             }
         }
     }
