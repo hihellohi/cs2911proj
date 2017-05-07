@@ -3,14 +3,19 @@ package View;
 import Model.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class WarehouseBoss extends Application implements ModelEventHandler<MapUpdateInfo>{
 
     private MapModel mapModel;
-    private Label[][] labelgrid;
+    private ImageView[][] tiles;
+    private final static Image black = new Image("images/black_tile.png");
+    private final static Image white = new Image("images/white_tile.png");
+    private final static int width = (int) (black.getWidth() * 6) + 10 * 5;
+    private final static int height = (int) (black.getHeight() * 6) + 10 * 5;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -21,25 +26,25 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
         grid.setHgap(10);
         grid.setVgap(10);
 
-        labelgrid = new Label[mapModel.getHeight()][mapModel.getWidth()];
+        tiles = new ImageView[mapModel.getHeight()][mapModel.getWidth()];
 
         for(int r = 0; r < mapModel.getHeight(); r++){
             for(int c = 0; c < mapModel.getWidth(); c++){
-                Label label;
+                ImageView tile = new ImageView();
                 switch(mapModel.getMapAt(r, c)) {
                     case CHARACTER:
-                        label = new Label("c");
+                        tile.setImage(white);
                         break;
                     default:
-                        label = new Label(".");
+                        tile.setImage(black);
                         break;
                 }
-                labelgrid[r][c] = label;
-                grid.add(label, c, r);
+                tiles[r][c] = tile;
+                grid.add(tile, c, r);
             }
         }
 
-        Scene gameScene = new Scene(grid, 1000, 1000);
+        Scene gameScene = new Scene(grid, width, height);
         gameScene.setOnKeyPressed(mapModel);
 
         primaryStage.setTitle("Hello World");
@@ -55,10 +60,10 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
             int c = change.getItem2().intValue();
             switch (change.getItem3()){
                 case CHARACTER:
-                    labelgrid[r][c].setText("c");
+                    tiles[r][c].setImage(white);
                     break;
                 default:
-                    labelgrid[r][c].setText(".");
+                    tiles[r][c].setImage(black);
                     break;
             }
         }
