@@ -51,15 +51,19 @@ public class MapModel implements EventHandler<KeyEvent> {
         map[chary][charx] = '.';
         switch (e.getCode()){
             case UP:
+                if (chary == 0) break;
                 chary--;
                 break;
             case DOWN:
+                if (chary == 5) break;
                 chary++;
                 break;
             case LEFT:
+                if (charx == 0) break;
                 charx--;
                 break;
             case RIGHT:
+                if (charx == 5) break;
                 charx++;
                 break;
             default:
