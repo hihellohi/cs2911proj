@@ -10,54 +10,68 @@ import java.util.*;
  * @author Kevin Ni
  */
 public class MapModel implements EventHandler<KeyEvent> {
-    private List<MapItem[]> map;
+    private MapTile[][] map;
     private Position player;
+    private int goalsLeft;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public MapModel(String fin){
-        map = new ArrayList<>();
         listeners = new ArrayList<>();
+        goalsLeft = 0;
 
         //read map from file
         Scanner sc = null;
         try{
             sc = new Scanner(new FileReader(fin));
 
-            while(sc.hasNextLine()){
-                String line = sc.nextLine();
-                MapItem[] row = new MapItem[line.length()];
+            String[] dim = sc.nextLine().split("\\s");
+            int r = Integer.parseInt(dim[0]);
+            int c = Integer.parseInt(dim[1]);
 
-                int j = 0;
-                for(char c: line.toCharArray()){
-                    switch(c){
-                        case '.':
-                            row[j] = MapItem.GROUND;
-                            break;
+            map = new MapTile[r+2][c+2];
+
+            MapTile wallTile = new MapTile(false, MapTile.MapItem.WALL);
+
+            for(int j = 0; j <= c + 1; j++){
+                map[0][j] = wallTile;
+                map[r+1][j] = wallTile;
+            }
+
+            for(int i = 1; i <= r; i++){
+                map[i][0] = wallTile;
+                map[i][c + 1] = wallTile;
+                String line = sc.nextLine();
+
+                for(int j = 1; j <= c; j++){
+                    switch(line.charAt(j - 1)){
                         case 'p':
-                            row[j] = MapItem.PLAYER;
-                            player = new Position(j, map.size());
+                            map[i][j] = new MapTile(false, MapTile.MapItem.PLAYER);
+                            player = new Position(j, i);
                             break;
                         case 'b':
-                            row[j] = MapItem.BOX;
+                            map[i][j] = new MapTile(false, MapTile.MapItem.BOX);
                             break;
                         case 'w':
-                            row[j] = MapItem.WALL;
+                            map[i][j] = wallTile;
                             break;
                         case 'g':
-                            row[j] = MapItem.GOAL;
+                            map[i][j] = new MapTile(true, MapTile.MapItem.GROUND);
+                            goalsLeft++;
                             break;
                         case 'd':
-                            row[j] = MapItem.GOALBOX;
+                            map[i][j] = new MapTile(true, MapTile.MapItem.BOX);
+                            goalsLeft++;
+                            break;
+                        default:
+                            map[i][j] = new MapTile(false, MapTile.MapItem.GROUND);
                             break;
                     }
-                    j++;
                 }
-                map.add(row);
             }
         }
         catch(FileNotFoundException e) {
-            System.err.println(String.format("File %s/%s not found",System.getProperty("user.dir") ,fin));
+            System.err.println(String.format("File %s/%s not found", System.getProperty("user.dir"), fin));
         }
         finally{
             if (sc != null){
@@ -70,9 +84,11 @@ public class MapModel implements EventHandler<KeyEvent> {
         //KEY EVENT HANDLER
         MapUpdateInfo info = new MapUpdateInfo();
 
-        int x = player.getX();
-        int y = player.getY();
-        Position oldPosition = new Position(x, y);
+        int x = 0;
+        int y = 0;
+        int oldx = player.getX();
+        int oldy = player.getY();
+        Position oldPosition = player;
 
         switch (e.getCode()){
             case UP:
@@ -84,53 +100,66 @@ public class MapModel implements EventHandler<KeyEvent> {
             case RIGHT:
                 x++; break;
         }
-        Position newPosition = new Position(x, y);
-        if (!validMove(newPosition)) {
+        Position newPosition = new Position(oldx + x, oldy + y);
+        Position lookAhead = new Position(oldx + x + x, oldy + y + y);
+        if (!validMove(newPosition, lookAhead)) {
             return;
         }
+
         player = newPosition;
 
-        info.addChange(oldPosition, MapItem.GROUND);
-        setMapAt(oldPosition, MapItem.GROUND);
+        setMapAt(oldPosition, MapTile.MapItem.GROUND);
+        info.addChange(oldPosition, getMapAt(oldPosition));
 
-        info.addChange(newPosition, MapItem.PLAYER);
-        setMapAt(newPosition, MapItem.PLAYER);
+        if(getMapAt(newPosition).getItem() == MapTile.MapItem.BOX){
+            setMapAt(lookAhead, MapTile.MapItem.BOX);
+            info.addChange(lookAhead, getMapAt(lookAhead));
+        }
+
+        setMapAt(newPosition, MapTile.MapItem.PLAYER);
+        info.addChange(newPosition, getMapAt(newPosition));
 
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.handle(info);
         }
     }
 
-    public boolean validMove(Position pos) {
-        int x = pos.getX();
-        int y = pos.getY();
+    private boolean validMove(Position newPos, Position lookAhead) {
+        MapTile item = getMapAt(newPos);
 
-        if (y == -1 || y == getHeight() || x == -1 || x == getWidth()) {
-            return false;
-        }
-
-        MapItem item = getMapAt(pos);
-        if (item == MapItem.WALL) {
+        switch (item.getItem()){
+            case WALL:
                 return false;
+            case BOX:
+                return getMapAt(lookAhead).getItem() == MapTile.MapItem.GROUND;
+            default:
+                return true;
         }
-
-        return true;
     }
 
-    public MapItem getMapAt(Position pos){
-        return map.get(pos.getY())[pos.getX()];
+    private void setMapAt(Position pos, MapTile.MapItem item){
+        MapTile tile = map[pos.getY()][pos.getX()];
+
+        if(tile.getIsGoal() && tile.getItem() == MapTile.MapItem.BOX) {
+            goalsLeft++;
+        }
+        tile.setItem(item);
+
+        if(tile.getIsGoal() && tile.getItem() == MapTile.MapItem.BOX) {
+            goalsLeft--;
+        }
     }
 
-    public void setMapAt(Position pos, MapItem item){
-        map.get(pos.getY())[pos.getX()] = item;
+    public MapTile getMapAt(Position pos){
+        return map[pos.getY()][pos.getX()];
     }
 
     public int getHeight(){
-        return map.size();
+        return map.length;
     }
 
     public int getWidth(){
-        return getHeight() == 0 ? 0 : map.get(0).length;
+        return getHeight() == 0 ? 0 : map[0].length;
     }
 
     public void setOnModelUpdate(ModelEventHandler<MapUpdateInfo> listener){

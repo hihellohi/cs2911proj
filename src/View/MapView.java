@@ -18,7 +18,7 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     private MapModel model;
     private ImageView[][] tiles;
 
-    public MapView(MapModel model){
+    MapView(MapModel model){
         super();
 
         this.model = model;
@@ -29,54 +29,46 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
 
         for(int r = 0; r < model.getHeight(); r++){
             for(int c = 0; c < model.getWidth(); c++){
-                ImageView tile = new ImageView();
-                switch (model.getMapAt(new Position(c, r))) {
-                    case PLAYER:
-                        tile.setImage(player);
-                        break;
-                    case WALL:
-                        tile.setImage(wall);
-                        break;
-                    case GROUND:
-                        tile.setImage(ground);
-                        break;
-                    case BOX:
-                        tile.setImage(box);
-                        break;
-                    case GOALBOX:
-                        tile.setImage(goalBox);
-                        break;
-                    case GOAL:
-                        tile.setImage(goal);
-                        break;
-                }
-                tiles[r][c] = tile;
-                super.add(tile, c, r);
+                ImageView viewTile = new ImageView();
+                MapTile mapTile = model.getMapAt(new Position(c, r));
+                setTile(viewTile, mapTile);
+                tiles[r][c] = viewTile;
+                super.add(viewTile, c, r);
             }
         }
     }
 
-    public int mapHeight(){
+    int mapHeight(){
         return (int) (ground.getHeight() * model.getHeight());
     }
 
-    public int mapWidth(){
-        return (int) (ground.getWidth() * model.getHeight());
+    int mapWidth(){
+        return (int) (ground.getWidth() * model.getWidth());
     }
 
     public void handle(MapUpdateInfo updateInfo){
-        for(Pair<Position, MapItem> change: updateInfo.getCoordinates()) {
+        for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
             Position pos = change.first();
             int x = pos.getX();
             int y = pos.getY();
-            switch (change.second()){
-                case PLAYER:
-                    tiles[y][x].setImage(player);
-                    break;
-                default:
-                    tiles[y][x].setImage(ground);
-                    break;
-            }
+            setTile(tiles[y][x], change.second());
+        }
+    }
+
+    private void setTile(ImageView viewTile, MapTile mapTile){
+        switch (mapTile.getItem()) {
+            case PLAYER:
+                viewTile.setImage(player);
+                break;
+            case WALL:
+                viewTile.setImage(wall);
+                break;
+            case GROUND:
+                viewTile.setImage(mapTile.getIsGoal() ? goal : ground);
+                break;
+            case BOX:
+                viewTile.setImage(mapTile.getIsGoal() ? goalBox : box);
+                break;
         }
     }
 }
