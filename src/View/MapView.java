@@ -2,7 +2,10 @@ package View;
 
 import Model.*;
 import javafx.scene.image.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+
+import java.security.Key;
 
 /**
  * @author Kevin Ni
@@ -18,12 +21,13 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     private MapModel model;
     private ImageView[][] tiles;
 
-    MapView(MapModel model){
+    MapView(){
         super();
 
-        this.model = model;
+        model = new MapModel("input1.txt");
+        super.addEventHandler(KeyEvent.KEY_PRESSED, model);
 
-        model.setOnModelUpdate(this);
+        model.subscribeModelUpdate(this);
 
         tiles = new ImageView[model.getHeight()][model.getWidth()];
 
@@ -47,6 +51,10 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     }
 
     public void handle(MapUpdateInfo updateInfo){
+        if(updateInfo.isFinished()){
+            super.removeEventHandler(KeyEvent.KEY_PRESSED, model);
+        }
+
         for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
             Position pos = change.first();
             int x = pos.getX();

@@ -12,12 +12,11 @@ public class WarehouseBoss extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        MapModel mapModel = new MapModel("input1.txt");
 
-        MapView grid = new MapView(mapModel);
+        MapView grid = new MapView();
 
         Scene gameScene = new Scene(grid, grid.mapWidth(), grid.mapHeight());
-        gameScene.setOnKeyPressed(mapModel);
+        grid.requestFocus();
 
         primaryStage.setTitle("Warehouse Boss");
         primaryStage.setScene(gameScene);

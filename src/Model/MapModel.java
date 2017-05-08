@@ -82,8 +82,6 @@ public class MapModel implements EventHandler<KeyEvent> {
 
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
-        MapUpdateInfo info = new MapUpdateInfo();
-
         int x = 0;
         int y = 0;
         int oldx = player.getX();
@@ -102,22 +100,28 @@ public class MapModel implements EventHandler<KeyEvent> {
         }
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
-        if (!validMove(newPosition, lookAhead)) {
-            return;
+        if (validMove(newPosition, lookAhead)) {
+            broadcast(oldPosition, newPosition, lookAhead);
         }
+    }
 
+    private void broadcast(Position oldPosition, Position newPosition, Position lookAhead){
         player = newPosition;
 
-        setMapAt(oldPosition, MapTile.MapItem.GROUND);
-        info.addChange(oldPosition, getMapAt(oldPosition));
+        boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
 
-        if(getMapAt(newPosition).getItem() == MapTile.MapItem.BOX){
+        setMapAt(oldPosition, MapTile.MapItem.GROUND);
+        if(pushedBox){
             setMapAt(lookAhead, MapTile.MapItem.BOX);
+        }
+        setMapAt(newPosition, MapTile.MapItem.PLAYER);
+
+        MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+        info.addChange(newPosition, getMapAt(newPosition));
+        if(pushedBox) {
             info.addChange(lookAhead, getMapAt(lookAhead));
         }
-
-        setMapAt(newPosition, MapTile.MapItem.PLAYER);
-        info.addChange(newPosition, getMapAt(newPosition));
+        info.addChange(oldPosition, getMapAt(oldPosition));
 
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.handle(info);
@@ -162,7 +166,7 @@ public class MapModel implements EventHandler<KeyEvent> {
         return getHeight() == 0 ? 0 : map[0].length;
     }
 
-    public void setOnModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
+    public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
         listeners.add(listener);
     }
 }

@@ -6,3 +6,4 @@ package Model;
 public interface ModelEventHandler<T> {
     void handle(T updateInfo);
 }
+
