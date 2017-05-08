@@ -21,7 +21,7 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     private MapModel model;
     private ImageView[][] tiles;
 
-    MapView(){
+    public MapView(){
         super();
 
         model = new MapModel("input1.txt");
@@ -42,11 +42,11 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
         }
     }
 
-    int mapHeight(){
+    public int mapHeight(){
         return (int) (ground.getHeight() * model.getHeight());
     }
 
-    int mapWidth(){
+    public int mapWidth(){
         return (int) (ground.getWidth() * model.getWidth());
     }
 

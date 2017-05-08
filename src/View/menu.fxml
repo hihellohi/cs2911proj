@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Model.MenuController"
+            prefHeight="400.0" prefWidth="600.0" alignment="center" hgap="10" vgap="10">
+
+    <Label GridPane.rowIndex="1" text="Warehouse BOSS"/>
+    <Button GridPane.rowIndex="2" text="Play Game" onAction="#switchToGame" />
+    <Button GridPane.rowIndex="3" text="Exit" onAction="#closeGame" />
+</GridPane>

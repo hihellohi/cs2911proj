@@ -2,6 +2,8 @@ package View;
 
 import Model.*;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,13 +15,11 @@ public class WarehouseBoss extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        MapView grid = new MapView();
-
-        Scene gameScene = new Scene(grid, grid.mapWidth(), grid.mapHeight());
-        grid.requestFocus();
+        Parent root = FXMLLoader.load(getClass().getResource("menu.fxml"));
+        Scene scene = new Scene(root);
 
         primaryStage.setTitle("Warehouse Boss");
-        primaryStage.setScene(gameScene);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
