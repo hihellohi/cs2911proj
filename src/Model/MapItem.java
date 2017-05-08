@@ -4,9 +4,10 @@ package Model;
  * Created by Ni on 8/05/2017.
  */
 public enum MapItem {
-    EMPTY,
+    GROUND,
     PLAYER,
     WALL,
-    BLOCK,
+    BOX,
     GOAL,
+    GOALBOX,
 }

@@ -32,11 +32,23 @@ public class MapModel implements EventHandler<KeyEvent> {
                 for(char c: line.toCharArray()){
                     switch(c){
                         case '.':
-                            row[j] = MapItem.EMPTY;
+                            row[j] = MapItem.GROUND;
                             break;
-                        case 'c':
+                        case 'p':
                             row[j] = MapItem.PLAYER;
                             player = new Position(j, map.size());
+                            break;
+                        case 'b':
+                            row[j] = MapItem.BOX;
+                            break;
+                        case 'w':
+                            row[j] = MapItem.WALL;
+                            break;
+                        case 'g':
+                            row[j] = MapItem.GOAL;
+                            break;
+                        case 'd':
+                            row[j] = MapItem.GOALBOX;
                             break;
                     }
                     j++;
@@ -78,8 +90,8 @@ public class MapModel implements EventHandler<KeyEvent> {
         }
         player = newPosition;
 
-        info.addChange(oldPosition, MapItem.EMPTY);
-        setMapAt(oldPosition, MapItem.EMPTY);
+        info.addChange(oldPosition, MapItem.GROUND);
+        setMapAt(oldPosition, MapItem.GROUND);
 
         info.addChange(newPosition, MapItem.PLAYER);
         setMapAt(newPosition, MapItem.PLAYER);
