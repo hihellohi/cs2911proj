@@ -8,16 +8,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import static Model.MapItem.CHARACTER;
-
 public class WarehouseBoss extends Application implements ModelEventHandler<MapUpdateInfo>{
 
     private MapModel mapModel;
     private ImageView[][] tiles;
-    private final static Image black = new Image("images/black_tile.png");
-    private final static Image white = new Image("images/white_tile.png");
-    private final static int width = (int) (black.getWidth() * 6) + 10 * 5;
-    private final static int height = (int) (black.getHeight() * 6) + 10 * 5;
+    private final static Image ground = new Image("images/ground.png");
+    private final static Image player = new Image("images/player.png");
+    private final static Image crate = new Image("images/crate.png");
+    private final static Image goal = new Image("images/goal.png");
+    private final static Image wall = new Image("images/wall.png");
+    private final static int width = (int) (ground.getWidth() * 6) + 10 * 5;
+    private final static int height = (int) (ground.getHeight() * 6) + 10 * 5;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -34,11 +35,11 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
             for(int c = 0; c < mapModel.getWidth(); c++){
                 ImageView tile = new ImageView();
                 switch(mapModel.getMapAt(new Position(c, r))) {
-                    case CHARACTER:
-                        tile.setImage(white);
+                    case PLAYER:
+                        tile.setImage(player);
                         break;
                     default:
-                        tile.setImage(black);
+                        tile.setImage(ground);
                         break;
                 }
                 tiles[r][c] = tile;
@@ -55,18 +56,17 @@ public class WarehouseBoss extends Application implements ModelEventHandler<MapU
     }
 
     public void Handle(MapUpdateInfo updateInfo){
-        //MODEL UPDATE HANDLER
 
         for(Pair<Position, MapItem> change: updateInfo.getCoordinates()) {
             Position pos = change.first();
             int x = pos.getX();
             int y = pos.getY();
             switch (change.second()){
-                case CHARACTER:
-                    tiles[y][x].setImage(white);
+                case PLAYER:
+                    tiles[y][x].setImage(player);
                     break;
                 default:
-                    tiles[y][x].setImage(black);
+                    tiles[y][x].setImage(ground);
                     break;
             }
         }

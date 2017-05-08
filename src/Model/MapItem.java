@@ -5,8 +5,8 @@ package Model;
  */
 public enum MapItem {
     EMPTY,
-    CHARACTER,
+    PLAYER,
     WALL,
     BLOCK,
-    FINISH
+    GOAL,
 }

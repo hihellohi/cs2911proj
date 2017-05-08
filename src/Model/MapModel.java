@@ -35,7 +35,7 @@ public class MapModel implements EventHandler<KeyEvent> {
                             row[j] = MapItem.EMPTY;
                             break;
                         case 'c':
-                            row[j] = MapItem.CHARACTER;
+                            row[j] = MapItem.PLAYER;
                             player = new Position(j, map.size());
                             break;
                     }
@@ -81,8 +81,8 @@ public class MapModel implements EventHandler<KeyEvent> {
         info.addChange(oldPosition, MapItem.EMPTY);
         setMapAt(oldPosition, MapItem.EMPTY);
 
-        info.addChange(newPosition, MapItem.CHARACTER);
-        setMapAt(newPosition, MapItem.CHARACTER);
+        info.addChange(newPosition, MapItem.PLAYER);
+        setMapAt(newPosition, MapItem.PLAYER);
 
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.Handle(info);
