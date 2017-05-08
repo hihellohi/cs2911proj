@@ -97,7 +97,7 @@ public class MapModel implements EventHandler<KeyEvent> {
         setMapAt(newPosition, MapItem.PLAYER);
 
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.Handle(info);
+            listener.handle(info);
         }
     }
 
