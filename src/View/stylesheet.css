@@ -1,0 +1,17 @@
+.root {
+    -fx-background-color:lightgray;
+}
+
+#bigText {
+    -fx-font-size: 40px;
+}
+
+#playGameBtn {
+    -fx-font-size: 20px;
+}
+
+#closeGameBtn {
+    -fx-font-size: 20px;
+}
+
+

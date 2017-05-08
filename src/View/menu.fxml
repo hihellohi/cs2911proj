@@ -11,7 +11,9 @@
             fx:controller="Model.MenuController"
             prefHeight="400.0" prefWidth="600.0" alignment="center" hgap="10" vgap="10">
 
-    <Label GridPane.rowIndex="1" text="Warehouse BOSS"/>
-    <Button GridPane.rowIndex="2" text="Play Game" onAction="#switchToGame" />
-    <Button GridPane.rowIndex="3" text="Exit" onAction="#closeGame" />
+    <VBox spacing="10" alignment="CENTER">
+        <Label GridPane.rowIndex="1" text="Warehouse Boss" fx:id="bigText"/>
+        <Button GridPane.rowIndex="2" text="Play Game" onAction="#switchToGame" fx:id="playGameBtn"/>
+        <Button GridPane.rowIndex="3" text="Exit" onAction="#closeGame" fx:id="closeGameBtn"/>
+    </VBox>
 </GridPane>

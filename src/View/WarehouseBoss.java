@@ -17,6 +17,7 @@ public class WarehouseBoss extends Application{
 
         Parent root = FXMLLoader.load(getClass().getResource("menu.fxml"));
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
 
         primaryStage.setTitle("Warehouse Boss");
         primaryStage.setScene(scene);
