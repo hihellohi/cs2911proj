@@ -1,4 +1,4 @@
-package Model;
+package View;
 
 import View.*;
 import javafx.application.Platform;
@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 /**
  * Created by willi on 9/05/2017.
  */
-public class MenuController {
+public class UIController {
     public void switchToGame(ActionEvent actionEvent) {
         MapView grid = new MapView();
 
