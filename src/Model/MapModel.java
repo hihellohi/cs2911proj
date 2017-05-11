@@ -10,7 +10,7 @@ import java.util.concurrent.locks.*;
 /**
  * @author Kevin Ni
  */
-public class MapModel implements EventHandler<KeyEvent> {
+public class MapModel implements IMapModel {
     private MapTile[][] map;
     private Position player;
     private int goalsLeft;
@@ -84,13 +84,17 @@ public class MapModel implements EventHandler<KeyEvent> {
 
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
+        processInput(e.getCode());
+    }
+
+    public void processInput(KeyCode k){
         int x = 0;
         int y = 0;
         int oldx = player.getX();
         int oldy = player.getY();
         Position oldPosition = player;
 
-        switch (e.getCode()){
+        switch (k){
             case UP:
                 y--; break;
             case DOWN:

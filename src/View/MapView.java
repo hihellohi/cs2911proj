@@ -10,7 +10,7 @@ import java.security.Key;
 /**
  * @author Kevin Ni
  */
-public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
+class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private final static Image ground = new Image("images/ground.png");
     private final static Image player = new Image("images/player.png");
     private final static Image box = new Image("images/box.png");
@@ -18,10 +18,10 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     private final static Image goalBox = new Image("images/goalBox.png");
     private final static Image wall = new Image("images/wall.png");
 
-    private MapModel model;
+    private IMapModel model;
     private ImageView[][] tiles;
 
-    public MapView(MapModel model){
+    MapView(IMapModel model){
         super();
 
         this.model = model;
@@ -42,11 +42,11 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
         }
     }
 
-    public int mapHeight(){
+    int mapHeight(){
         return (int) (ground.getHeight() * model.getHeight());
     }
 
-    public int mapWidth(){
+    int mapWidth(){
         return (int) (ground.getWidth() * model.getWidth());
     }
 

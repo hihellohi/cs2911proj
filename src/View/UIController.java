@@ -56,14 +56,17 @@ public class UIController {
 
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         startGame(stage, model);
+        for(int i = 0; i < NPLAYERS; i++){
+            hosts[i].start();
+        }
     }
 
     public void startClient(ActionEvent actionEvent){
-        new NetworkClient(HOST, PORT);
-        while(true);
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        startGame(stage, new NetworkClient(HOST, PORT));
     }
 
-    private void startGame(Stage stage, MapModel model){
+    private void startGame(Stage stage, IMapModel model){
         MapView grid = new MapView(model);
 
         Scene gameScene = new Scene(grid, grid.mapWidth(), grid.mapHeight());
