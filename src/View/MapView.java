@@ -21,10 +21,10 @@ public class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo
     private MapModel model;
     private ImageView[][] tiles;
 
-    public MapView(){
+    public MapView(MapModel model){
         super();
 
-        model = new MapModel("input1.txt");
+        this.model = model;
         super.addEventHandler(KeyEvent.KEY_PRESSED, model);
 
         model.subscribeModelUpdate(this);

@@ -14,6 +14,8 @@
     <VBox spacing="10" alignment="CENTER">
         <Label GridPane.rowIndex="1" text="Warehouse Boss" fx:id="bigText"/>
         <Button GridPane.rowIndex="2" text="Play Game" onAction="#switchToGame" fx:id="playGameBtn"/>
-        <Button GridPane.rowIndex="3" text="Exit" onAction="#closeGame" fx:id="closeGameBtn"/>
+        <Button GridPane.rowIndex="3" text="Host Game" onAction="#startHost" fx:id="HostBtn"/>
+        <Button GridPane.rowIndex="4" text="Join Game" onAction="#startClient" fx:id="ClientBtn"/>
+        <Button GridPane.rowIndex="5" text="Exit" onAction="#closeGame" fx:id="closeGameBtn"/>
     </VBox>
 </GridPane>

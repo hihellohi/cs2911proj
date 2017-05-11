@@ -5,6 +5,7 @@ import javafx.scene.input.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 /**
  * @author Kevin Ni
@@ -13,11 +14,13 @@ public class MapModel implements EventHandler<KeyEvent> {
     private MapTile[][] map;
     private Position player;
     private int goalsLeft;
+    private Lock lock;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public MapModel(String fin){
         listeners = new ArrayList<>();
+        lock = new ReentrantLock();
         goalsLeft = 0;
 
         //read map from file
@@ -61,7 +64,6 @@ public class MapModel implements EventHandler<KeyEvent> {
                             break;
                         case 'd':
                             map[i][j] = new MapTile(true, MapTile.MapItem.BOX);
-                            goalsLeft++;
                             break;
                         default:
                             map[i][j] = new MapTile(false, MapTile.MapItem.GROUND);
@@ -100,31 +102,38 @@ public class MapModel implements EventHandler<KeyEvent> {
         }
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
-        if (validMove(newPosition, lookAhead)) {
-            broadcast(oldPosition, newPosition, lookAhead);
-        }
+        broadcast(oldPosition, newPosition, lookAhead);
     }
 
     private void broadcast(Position oldPosition, Position newPosition, Position lookAhead){
-        player = newPosition;
+        try{
+            lock.lock();
 
-        boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
+            if (validMove(newPosition, lookAhead)) {
+                player = newPosition;
 
-        setMapAt(oldPosition, MapTile.MapItem.GROUND);
-        if(pushedBox){
-            setMapAt(lookAhead, MapTile.MapItem.BOX);
+                boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
+
+                setMapAt(oldPosition, MapTile.MapItem.GROUND);
+                if(pushedBox){
+                    setMapAt(lookAhead, MapTile.MapItem.BOX);
+                }
+                setMapAt(newPosition, MapTile.MapItem.PLAYER);
+
+                MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+                info.addChange(newPosition, getMapAt(newPosition));
+                if(pushedBox) {
+                    info.addChange(lookAhead, getMapAt(lookAhead));
+                }
+                info.addChange(oldPosition, getMapAt(oldPosition));
+
+                for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
+                    listener.handle(info);
+                }
+            }
         }
-        setMapAt(newPosition, MapTile.MapItem.PLAYER);
-
-        MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
-        info.addChange(newPosition, getMapAt(newPosition));
-        if(pushedBox) {
-            info.addChange(lookAhead, getMapAt(lookAhead));
-        }
-        info.addChange(oldPosition, getMapAt(oldPosition));
-
-        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(info);
+        finally {
+            lock.unlock();
         }
     }
 
@@ -133,6 +142,7 @@ public class MapModel implements EventHandler<KeyEvent> {
 
         switch (item.getItem()){
             case WALL:
+            case PLAYER:
                 return false;
             case BOX:
                 return getMapAt(lookAhead).getItem() == MapTile.MapItem.GROUND;
