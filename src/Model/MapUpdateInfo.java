@@ -16,7 +16,7 @@ public class MapUpdateInfo {
         this.finished = finished;
     }
 
-    void addChange(Position pos, MapTile v){
+    public void addChange(Position pos, MapTile v){
         coordinates.add(new Pair<>(pos, v));
     }
 
@@ -26,5 +26,9 @@ public class MapUpdateInfo {
 
     public Iterable<Pair<Position, MapTile>> getCoordinates(){
         return coordinates;
+    }
+
+    public int size(){
+        return coordinates.size();
     }
 }

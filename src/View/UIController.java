@@ -1,6 +1,8 @@
 package View;
 
 import Model.*;
+import Netcode.NetworkClient;
+import Netcode.NetworkHost;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -36,7 +38,7 @@ public class UIController {
         }
         catch(IOException e){
             //THIS NEEDS TO BE GRACEFULLY HANDLED. IT CAN AND WILL HAPPEN
-            System.out.println(e);
+            System.out.println("Port already used! :(");
 
             for(int i = 0; i < NPLAYERS; i++){
                 if(hosts[i] != null){
@@ -50,6 +52,7 @@ public class UIController {
                     welcomingSocket.close();
                 }
                 catch (IOException e){
+                    e.printStackTrace();
                 }
             }
         }
@@ -63,7 +66,9 @@ public class UIController {
 
     public void startClient(ActionEvent actionEvent){
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        startGame(stage, new NetworkClient(HOST, PORT));
+        NetworkClient client = new NetworkClient(HOST, PORT);
+        startGame(stage, client);
+        client.start();
     }
 
     private void startGame(Stage stage, IMapModel model){

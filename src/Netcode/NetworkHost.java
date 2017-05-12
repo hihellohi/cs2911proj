@@ -1,4 +1,4 @@
-package View;
+package Netcode;
 
 import Model.*;
 import javafx.scene.input.KeyCode;
@@ -10,6 +10,9 @@ import java.net.*;
  * @author Kevin Ni
  */
 public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateInfo>{
+    private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
+    private static final KeyCode[] CODES = KeyCode.values();
+
     private MapModel model;
     private DataInputStream in;
     private DataOutputStream out;
@@ -36,11 +39,20 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
     @Override public void run(){
         while(!socket.isClosed()){
             try {
-                int i = in.readInt();
-                model.processInput(KeyCode.values()[i]);
+                switch(HEADERS[in.readByte()]){
+                    case MOVE_REQUEST:
+                        model.processInput(CODES[in.readInt()]);
+                        break;
+                }
             }
             catch (IOException ex){
-                System.out.println(ex);
+                close();
+                if(ex instanceof EOFException) {
+                    System.out.println("connection closed");
+                }
+                else{
+                    ex.printStackTrace();
+                }
             }
         }
     }
@@ -52,10 +64,29 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
             }
         }
         catch (IOException e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
     public void handle(MapUpdateInfo updateInfo){
+        try {
+            out.writeByte(ProtocolHeader.MOVE.ordinal());
+            out.writeInt(updateInfo.size());
+            for (Pair<Position, MapTile> change : updateInfo.getCoordinates()) {
+                Position pos = change.first();
+                MapTile tile = change.second();
+                out.writeInt(pos.getX());
+                out.writeInt(pos.getY());
+                out.writeBoolean(tile.getIsGoal());
+                out.writeInt(tile.getItem().ordinal());
+            }
+
+            if (updateInfo.isFinished()) {
+                close();
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 }
