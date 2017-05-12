@@ -23,6 +23,10 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+
+            out.writeInt(model.getWidth());
+            out.writeInt(model.getHeight());
+
             System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
         }
         catch(IOException e){
@@ -43,6 +47,12 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
                     case MOVE_REQUEST:
                         model.processInput(CODES[in.readInt()]);
                         break;
+                    case QUERY:
+                        query(new Position(in.readInt(), in.readInt()));
+                        break;
+                    default:
+                        System.out.println("unknown command!");
+                        break;
                 }
             }
             catch (IOException ex){
@@ -55,6 +65,13 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
                 }
             }
         }
+    }
+
+    private void query(Position pos) throws IOException{
+        MapTile tile = model.getMapAt(pos);
+        out.writeByte(ProtocolHeader.ANSWER.ordinal());
+        out.writeBoolean(tile.getIsGoal());
+        out.writeInt(tile.getItem().ordinal());
     }
 
     public void close(){

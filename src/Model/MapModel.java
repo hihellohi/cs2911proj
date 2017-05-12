@@ -14,13 +14,11 @@ public class MapModel implements IMapModel {
     private MapTile[][] map;
     private Position player;
     private int goalsLeft;
-    private Lock lock;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public MapModel(String fin){
         listeners = new ArrayList<>();
-        lock = new ReentrantLock();
         goalsLeft = 0;
 
         //read map from file
@@ -109,39 +107,32 @@ public class MapModel implements IMapModel {
         broadcast(oldPosition, newPosition, lookAhead);
     }
 
-    private void broadcast(Position oldPosition, Position newPosition, Position lookAhead){
-        try{
-            lock.lock();
+    private synchronized void broadcast(Position oldPosition, Position newPosition, Position lookAhead){
+        if (validMove(newPosition, lookAhead)) {
+            player = newPosition;
 
-            if (validMove(newPosition, lookAhead)) {
-                player = newPosition;
+            boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
 
-                boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
-
-                setMapAt(oldPosition, MapTile.MapItem.GROUND);
-                if(pushedBox){
-                    setMapAt(lookAhead, MapTile.MapItem.BOX);
-                }
-                setMapAt(newPosition, MapTile.MapItem.PLAYER);
-
-                MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
-                info.addChange(newPosition, getMapAt(newPosition));
-                if(pushedBox) {
-                    info.addChange(lookAhead, getMapAt(lookAhead));
-                }
-                info.addChange(oldPosition, getMapAt(oldPosition));
-
-                for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-                    listener.handle(info);
-                }
+            setMapAt(oldPosition, MapTile.MapItem.GROUND);
+            if(pushedBox){
+                setMapAt(lookAhead, MapTile.MapItem.BOX);
             }
-        }
-        finally {
-            lock.unlock();
+            setMapAt(newPosition, MapTile.MapItem.PLAYER);
+
+            MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+            info.addChange(newPosition, getMapAt(newPosition));
+            if(pushedBox) {
+                info.addChange(lookAhead, getMapAt(lookAhead));
+            }
+            info.addChange(oldPosition, getMapAt(oldPosition));
+
+            for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
+                listener.handle(info);
+            }
         }
     }
 
-    private boolean validMove(Position newPos, Position lookAhead) {
+    private synchronized boolean validMove(Position newPos, Position lookAhead) {
         MapTile item = getMapAt(newPos);
 
         switch (item.getItem()){

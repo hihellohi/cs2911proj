@@ -7,9 +7,10 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
- * Created by Ni on 11/05/2017.
+ * @author Kevin Ni
  */
 public class NetworkClient extends Thread implements IMapModel {
     private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
@@ -20,12 +21,22 @@ public class NetworkClient extends Thread implements IMapModel {
     private DataInputStream in;
     private DataOutputStream out;
 
+    private int width;
+    private int height;
+
+    private Semaphore semaphore;
+    private MapTile lastQuery;
+
     public NetworkClient(String host, int port){
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+
+            width = in.readInt();
+            height = in.readInt();
+
             System.out.println("Connected!");
         }
         catch(IOException e){
@@ -33,10 +44,11 @@ public class NetworkClient extends Thread implements IMapModel {
             close();
         }
         listeners = new ArrayList<>();
+        semaphore = new Semaphore(0);
     }
 
     public void close(){
-        MapUpdateInfo info = new MapUpdateInfo(false);
+        MapUpdateInfo info = new MapUpdateInfo(true);
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.handle(info);
         }
@@ -58,8 +70,13 @@ public class NetworkClient extends Thread implements IMapModel {
                     case MOVE:
                         broadcast();
                         break;
+                    case ANSWER:
+                        lastQuery = new MapTile(in.readBoolean(), TILES[in.readInt()]);
+                        semaphore.release();
+                        break;
                     default:
                         System.out.println("unknown command!");
+                        break;
                 }
             }
             catch (IOException ex){
@@ -99,15 +116,24 @@ public class NetworkClient extends Thread implements IMapModel {
     }
 
     public MapTile getMapAt(Position pos){
-        return new MapTile(false, MapTile.MapItem.GROUND);
+        try {
+            out.writeByte(ProtocolHeader.QUERY.ordinal());
+            out.writeInt(pos.getX());
+            out.writeInt(pos.getY());
+            semaphore.acquire();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return lastQuery;
     }
 
     public int getHeight(){
-        return 9;
+        return height;
     }
 
     public int getWidth(){
-        return 8;
+        return width;
     }
 
     public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){

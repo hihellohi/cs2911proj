@@ -67,8 +67,8 @@ public class UIController {
     public void startClient(ActionEvent actionEvent){
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         NetworkClient client = new NetworkClient(HOST, PORT);
-        startGame(stage, client);
         client.start();
+        startGame(stage, client);
     }
 
     private void startGame(Stage stage, IMapModel model){

@@ -6,4 +6,6 @@ package Netcode;
 public enum ProtocolHeader {
     MOVE,
     MOVE_REQUEST,
+    QUERY,
+    ANSWER
 }
