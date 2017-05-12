@@ -1,4 +1,4 @@
-package Netcode;
+package Model;
 
 /**
  * Created by Ni on 12/05/2017.

@@ -5,8 +5,6 @@ import javafx.scene.image.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
-import java.security.Key;
-
 /**
  * @author Kevin Ni
  */
@@ -18,10 +16,10 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private final static Image goalBox = new Image("images/goalBox.png");
     private final static Image wall = new Image("images/wall.png");
 
-    private IMapModel model;
+    private MapModel model;
     private ImageView[][] tiles;
 
-    MapView(IMapModel model){
+    MapView(MapModel model){
         super();
 
         this.model = model;

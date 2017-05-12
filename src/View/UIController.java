@@ -1,8 +1,7 @@
 package View;
 
 import Model.*;
-import Netcode.NetworkClient;
-import Netcode.NetworkHost;
+import Model.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -21,19 +20,19 @@ public class UIController {
     private static final String HOST = "localhost";
 
     public void switchToGame(ActionEvent actionEvent) {
-        MapModel model = new MapModel("input1.txt");
+        LocalMapModel model = new LocalMapModel("input1.txt");
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         startGame(stage, model);
     }
 
     public void startHost(ActionEvent actionEvent){
-        MapModel model = new MapModel("input1.txt");
-        NetworkHost[] hosts = new NetworkHost[NPLAYERS];
+        LocalMapModel model = new LocalMapModel("input1.txt");
+        ClientConnection[] hosts = new ClientConnection[NPLAYERS];
         ServerSocket welcomingSocket = null;
         try {
             welcomingSocket = new ServerSocket(PORT);
             for(int i = 0; i < NPLAYERS; i++){
-                hosts[i] = new NetworkHost(model, welcomingSocket.accept(), i);
+                hosts[i] = new ClientConnection(model, welcomingSocket.accept(), i);
             }
         }
         catch(IOException e){
@@ -66,12 +65,12 @@ public class UIController {
 
     public void startClient(ActionEvent actionEvent){
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        NetworkClient client = new NetworkClient(HOST, PORT);
+        RemoteMapModel client = new RemoteMapModel(HOST, PORT);
         client.start();
         startGame(stage, client);
     }
 
-    private void startGame(Stage stage, IMapModel model){
+    private void startGame(Stage stage, MapModel model){
         MapView grid = new MapView(model);
 
         Scene gameScene = new Scene(grid, grid.mapWidth(), grid.mapHeight());

@@ -1,6 +1,5 @@
-package Netcode;
+package Model;
 
-import Model.*;
 import javafx.scene.input.KeyEvent;
 
 import java.io.*;
@@ -12,7 +11,7 @@ import java.util.concurrent.Semaphore;
 /**
  * @author Kevin Ni
  */
-public class NetworkClient extends Thread implements IMapModel {
+public class RemoteMapModel extends Thread implements MapModel {
     private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
     private static final MapTile.MapItem[] TILES = MapTile.MapItem.values();
 
@@ -27,7 +26,7 @@ public class NetworkClient extends Thread implements IMapModel {
     private Semaphore semaphore;
     private MapTile lastQuery;
 
-    public NetworkClient(String host, int port){
+    public RemoteMapModel(String host, int port){
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));

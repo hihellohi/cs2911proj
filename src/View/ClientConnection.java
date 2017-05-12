@@ -1,6 +1,7 @@
-package Netcode;
+package View;
 
 import Model.*;
+import Model.ProtocolHeader;
 import javafx.scene.input.KeyCode;
 
 import java.io.*;
@@ -9,17 +10,17 @@ import java.net.*;
 /**
  * @author Kevin Ni
  */
-public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateInfo>{
+public class ClientConnection extends Thread implements ModelEventHandler<MapUpdateInfo>{
     private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
     private static final KeyCode[] CODES = KeyCode.values();
 
-    private MapModel model;
+    private LocalMapModel model;
     private DataInputStream in;
     private DataOutputStream out;
     private int player;
     private Socket socket;
 
-    public NetworkHost(MapModel model, Socket socket, int player){
+    public ClientConnection(LocalMapModel model, Socket socket, int player){
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
@@ -103,6 +104,7 @@ public class NetworkHost extends Thread implements ModelEventHandler<MapUpdateIn
             }
         }
         catch(IOException e){
+            close();
             e.printStackTrace();
         }
     }
