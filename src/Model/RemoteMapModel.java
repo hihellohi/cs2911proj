@@ -5,8 +5,6 @@ import javafx.scene.input.KeyEvent;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -16,7 +14,6 @@ import java.util.concurrent.Semaphore;
 public class RemoteMapModel extends Thread implements MapModel {
     private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
     private static final MapTile.MapItem[] TILES = MapTile.MapItem.values();
-    private final static DateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
 
     private Socket socket;
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
@@ -26,7 +23,7 @@ public class RemoteMapModel extends Thread implements MapModel {
     private int width;
     private int height;
     private int score;
-    private String time;
+    private long time;
 
     private Semaphore semaphore;
     private MapTile lastQuery;
@@ -41,7 +38,7 @@ public class RemoteMapModel extends Thread implements MapModel {
             width = in.readInt();
             height = in.readInt();
             score = 0;
-            time = "0:00";
+            time = 0;
 
             System.out.println("Connected!");
         }
@@ -140,11 +137,10 @@ public class RemoteMapModel extends Thread implements MapModel {
     }
 
     public void setTime(long time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(time);
-        this.time = TIME_FORMAT.format(cal.getTime());
+        this.time = time;
     }
-    public String getTime() {
+
+    public long getTime() {
         return time;
     }
 

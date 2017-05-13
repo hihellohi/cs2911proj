@@ -13,7 +13,7 @@ public interface MapModel extends EventHandler<KeyEvent> {
     void handle(KeyEvent e);
     MapTile getMapAt(Position pos);
     void setTime(long time);
-    String getTime();
+    long getTime();
     int getScore();
     int getHeight();
     int getWidth();

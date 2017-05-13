@@ -3,27 +3,23 @@ package Model;
 import javafx.scene.input.*;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
  * @author Kevin Ni
  */
 public class LocalMapModel implements MapModel {
-    private final static DateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
-
     private MapTile[][] map;
     private Position player;
     private int goalsLeft;
     private int score;
-    private String time;
+    private long time;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public LocalMapModel(String fin){
         listeners = new ArrayList<>();
-        time = "0:00";
+        time = 0;
         goalsLeft = 0;
         score = 0;
 
@@ -175,12 +171,10 @@ public class LocalMapModel implements MapModel {
     }
 
     public void setTime(long time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(time);
-        this.time = TIME_FORMAT.format(cal.getTime());
+        this.time = time;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 

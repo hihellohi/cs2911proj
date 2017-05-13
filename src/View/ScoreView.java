@@ -3,6 +3,7 @@ package View;
 import Model.MapModel;
 import Model.MapUpdateInfo;
 import Model.ModelEventHandler;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +16,8 @@ import javafx.scene.layout.VBox;
  * Created by willi on 13/05/2017.
  */
 public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdateInfo> {
+    private final static int TILE_SIZE = 100;
+    private final static int SIDE_PANEL_SIZE = 3;
     private Label scoreLbl;
     private ScoreTimer timeLbl;
     private MapModel model;
@@ -38,7 +41,7 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
 
         // time score
         Label timeHeader = new Label("TIME");
-        timeLbl = new ScoreTimer(model);
+        timeLbl = new ScoreTimer();
         vbox.getChildren().addAll(timeHeader, timeLbl);
 
         // add everything
@@ -50,15 +53,19 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
 
     @Override
     public void handle(MapUpdateInfo updateInfo) {
-        scoreLbl.setText(String.valueOf(model.getScore()));
+        if (updateInfo.isFinished())
+            timeLbl.stopTimer();
+
+        Platform.runLater(() -> scoreLbl.setText(String.valueOf(model.getScore())));
+        model.setTime(timeLbl.getTime());
     }
 
     public int sideHeight() {
-        return model.getHeight() * 100;
+        return model.getHeight() * TILE_SIZE;
 
     }
     public int sideWidth() {
-        return (model.getWidth() * 100) / 3;
+        return (model.getWidth() * TILE_SIZE) / SIDE_PANEL_SIZE;
 
     }
 }
