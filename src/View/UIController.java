@@ -8,7 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -85,9 +87,14 @@ public class UIController {
     }
 
     private void startGame(Stage stage, MapModel model){
+        BorderPane root = new BorderPane();
         MapView grid = new MapView(model);
+        ScoreView sv = new ScoreView(model);
 
-        Scene gameScene = new Scene(grid, grid.mapWidth(), grid.mapHeight());
+        root.setLeft(grid);
+        root.setRight(sv);
+
+        Scene gameScene = new Scene(root, grid.mapWidth() + sv.sideWidth(), grid.mapHeight());
         grid.requestFocus();
 
         stage.setScene(gameScene);

@@ -9,12 +9,12 @@ import javafx.scene.layout.GridPane;
  * @author Kevin Ni
  */
 class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
-    private final static Image ground = new Image("images/ground.png");
-    private final static Image player = new Image("images/player.png");
-    private final static Image box = new Image("images/box.png");
-    private final static Image goal = new Image("images/goal.png");
-    private final static Image goalBox = new Image("images/goalBox.png");
-    private final static Image wall = new Image("images/wall.png");
+    private final static Image GROUND = new Image("images/ground.png");
+    private final static Image PLAYER = new Image("images/player.png");
+    private final static Image BOX = new Image("images/box.png");
+    private final static Image GOAL = new Image("images/goal.png");
+    private final static Image GOAL_BOX = new Image("images/goalBox.png");
+    private final static Image WALL = new Image("images/wall.png");
 
     private MapModel model;
     private ImageView[][] tiles;
@@ -41,11 +41,11 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     }
 
     int mapHeight(){
-        return (int) (ground.getHeight() * model.getHeight());
+        return (int) (GROUND.getHeight() * model.getHeight());
     }
 
     int mapWidth(){
-        return (int) (ground.getWidth() * model.getWidth());
+        return (int) (GROUND.getWidth() * model.getWidth());
     }
 
     public void handle(MapUpdateInfo updateInfo){
@@ -64,16 +64,16 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
             case PLAYER:
-                viewTile.setImage(player);
+                viewTile.setImage(PLAYER);
                 break;
             case WALL:
-                viewTile.setImage(wall);
+                viewTile.setImage(WALL);
                 break;
             case GROUND:
-                viewTile.setImage(mapTile.getIsGoal() ? goal : ground);
+                viewTile.setImage(mapTile.getIsGoal() ? GOAL : GROUND);
                 break;
             case BOX:
-                viewTile.setImage(mapTile.getIsGoal() ? goalBox : box);
+                viewTile.setImage(mapTile.getIsGoal() ? GOAL_BOX : BOX);
                 break;
         }
     }
