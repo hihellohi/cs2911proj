@@ -4,10 +4,11 @@ import Model.*;
 import Model.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -68,6 +69,19 @@ public class UIController {
         RemoteMapModel client = new RemoteMapModel(HOST, PORT);
         client.start();
         startGame(stage, client);
+    }
+
+    public void switchToSettings(ActionEvent actionEvent) throws IOException {
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+
+        Parent root = FXMLLoader.load(getClass().getResource("Settings.fxml"));
+
+        Scene settingsScene = new Scene(root);
+        settingsScene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
+
+        stage.setScene(settingsScene);
+        stage.show();
+
     }
 
     private void startGame(Stage stage, MapModel model){
