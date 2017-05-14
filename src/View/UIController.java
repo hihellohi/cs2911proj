@@ -1,17 +1,14 @@
 package View;
 
 import Model.*;
-import Model.Netcode.LobbyModel;
 import Model.Netcode.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 /**
  * Created by willi on 9/05/2017.

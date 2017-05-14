@@ -12,9 +12,10 @@ import javafx.scene.layout.GridPane;
 class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private final static Image GROUND = new Image("images/ground.png");
     private final static Image PLAYER = new Image("images/player.png");
-    private final static Image BOX = new Image("images/box.png");
+    private final static Image BOX = new Image("images/box.png", 100, 100, true, true);
     private final static Image GOAL = new Image("images/goal.png");
     private final static Image GOAL_BOX = new Image("images/goalBox.png");
+    private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png");
     private final static Image WALL = new Image("images/wall.png");
 
     private MapModel model;
@@ -67,7 +68,7 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
             case PLAYER:
-                viewTile.setImage(PLAYER);
+                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER);
                 break;
             case WALL:
                 viewTile.setImage(WALL);
