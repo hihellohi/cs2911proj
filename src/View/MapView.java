@@ -1,6 +1,7 @@
 package View;
 
 import Model.*;
+import javafx.application.Platform;
 import javafx.scene.image.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -53,12 +54,14 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
             super.removeEventHandler(KeyEvent.KEY_PRESSED, model);
         }
 
-        for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
-            Position pos = change.first();
-            int x = pos.getX();
-            int y = pos.getY();
-            setTile(tiles[y][x], change.second());
-        }
+        Platform.runLater(() ->{
+            for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
+                Position pos = change.first();
+                int x = pos.getX();
+                int y = pos.getY();
+                setTile(tiles[y][x], change.second());
+            }
+        });
     }
 
     private void setTile(ImageView viewTile, MapTile mapTile){

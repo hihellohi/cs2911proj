@@ -16,8 +16,7 @@ import javafx.scene.layout.VBox;
  * Created by willi on 13/05/2017.
  */
 public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdateInfo> {
-    private final static int TILE_SIZE = 100;
-    private final static int SIDE_PANEL_SIZE = 3;
+    private final static int SIDE_PANEL_SIZE = 150;
     private Label scoreLbl;
     private ScoreTimer timeLbl;
     private MapModel model;
@@ -30,7 +29,7 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
         this.model = model ;
         model.subscribeModelUpdate(this);
 
-        super.setPrefSize(sideWidth(), sideHeight());
+        super.setPrefWidth(sideWidth());
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
 
@@ -57,15 +56,10 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
             timeLbl.stopTimer();
 
         Platform.runLater(() -> scoreLbl.setText(String.valueOf(model.getScore())));
-        model.setTime(timeLbl.getTime());
+        model.setTime(timeLbl.getTime()); //consider changing this in the future (map shouldn't care about the score)
     }
 
-    public int sideHeight() {
-        return model.getHeight() * TILE_SIZE;
-
-    }
     public int sideWidth() {
-        return (model.getWidth() * TILE_SIZE) / SIDE_PANEL_SIZE;
-
+        return SIDE_PANEL_SIZE;
     }
 }

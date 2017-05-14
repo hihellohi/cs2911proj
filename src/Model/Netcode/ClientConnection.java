@@ -1,7 +1,6 @@
-package View;
+package Model.Netcode;
 
 import Model.*;
-import Model.ProtocolHeader;
 import javafx.scene.input.KeyCode;
 
 import java.io.*;
@@ -10,7 +9,7 @@ import java.net.*;
 /**
  * @author Kevin Ni
  */
-public class ClientConnection extends Thread implements ModelEventHandler<MapUpdateInfo>{
+public class ClientConnection extends Thread implements ModelEventHandler<MapUpdateInfo> {
     private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
     private static final KeyCode[] CODES = KeyCode.values();
 
@@ -25,13 +24,10 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            out.writeInt(model.getWidth());
-            out.writeInt(model.getHeight());
-
             System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
         }
         catch(IOException e){
-            System.out.println(e);
+            e.printStackTrace();
             close();
         }
 
@@ -42,6 +38,15 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
     }
 
     @Override public void run(){
+        try {
+            out.writeInt(model.getWidth());
+            out.writeInt(model.getHeight());
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+            close();
+        }
+
         while(!socket.isClosed()){
             try {
                 switch(HEADERS[in.readByte()]){
@@ -56,14 +61,13 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                         break;
                 }
             }
+            catch (SocketException | EOFException ex){
+                close();
+                System.out.println("Connection closed");
+            }
             catch (IOException ex){
                 close();
-                if(ex instanceof EOFException) {
-                    System.out.println("connection closed");
-                }
-                else{
-                    ex.printStackTrace();
-                }
+                ex.printStackTrace();
             }
         }
     }

@@ -1,10 +1,10 @@
-package Model;
+package Model.Netcode;
 
+import Model.*;
 import javafx.scene.input.KeyEvent;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -82,14 +82,13 @@ public class RemoteMapModel extends Thread implements MapModel {
                         break;
                 }
             }
+            catch (SocketException | EOFException ex){
+                close();
+                System.out.println("Connection closed");
+            }
             catch (IOException ex){
                 close();
-                if(ex instanceof EOFException) {
-                    System.out.println("connection closed");
-                }
-                else{
-                    ex.printStackTrace();
-                }
+                ex.printStackTrace();
             }
         }
     }
@@ -121,6 +120,7 @@ public class RemoteMapModel extends Thread implements MapModel {
 
     public MapTile getMapAt(Position pos){
         try {
+            //THIS IS NOT OPTIMAL CHANGE THIS
             out.writeByte(ProtocolHeader.QUERY.ordinal());
             out.writeInt(pos.getX());
             out.writeInt(pos.getY());

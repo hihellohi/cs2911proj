@@ -1,4 +1,4 @@
-package Model;
+package Model.Netcode;
 
 /**
  * Created by Ni on 12/05/2017.
