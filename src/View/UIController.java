@@ -1,6 +1,7 @@
 package View;
 
 import Model.*;
+import Model.GameMenuBar;
 import Model.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -90,9 +91,11 @@ public class UIController {
         BorderPane root = new BorderPane();
         MapView grid = new MapView(model);
         ScoreView sv = new ScoreView(model);
+        GameMenuBar menuBar = new GameMenuBar(model);
 
         root.setLeft(grid);
         root.setRight(sv);
+        root.setTop(menuBar);
 
         Scene gameScene = new Scene(root, grid.mapWidth() + sv.sideWidth(), grid.mapHeight());
         grid.requestFocus();

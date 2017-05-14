@@ -7,6 +7,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static Model.MapTile.MapItem.*;
+
 /**
  * @author Kevin Ni
  */
@@ -14,37 +16,67 @@ public class LocalMapModel implements MapModel {
     private final static DateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
 
     private MapTile[][] map;
+    private MapTile[][] startingMap;
     private Position player;
     private int goalsLeft;
     private int score;
     private String time;
+    private List<MapUpdateInfo> moves;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
     public LocalMapModel(String fin){
         listeners = new ArrayList<>();
         time = "0:00";
+        generateMap();
+    }
+
+    private void generateMap() {
+        int width = 10;
+        int height = 10;
+        int g = new Random().nextInt();
+//        int g = -895268333;
+        System.out.println(g);
+        MapGenerator generator = new MapGenerator(g);
+        setUpMap(generator.generateMap(width, height));
+    }
+
+    private void setUpMap(MapTile[][] map) {
+        moves = new ArrayList<>();
         goalsLeft = 0;
         score = 0;
 //        loadFromFile(fin);
-        int g = new Random().nextInt();
-//        int g = -526316897;
-        System.out.println(g);
-        MapGenerator generator = new MapGenerator(g);
-        map = generator.generateMap(10, 10);
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (map[y][x].getItem() == MapTile.MapItem.PLAYER) {
-                   player = new Position(x, y);
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[0].length; x++) {
+                if (map[y][x].getItem() == PLAYER) {
+                    player = new Position(x, y);
                 }
-                else if (map[y][x].getIsGoal()) {
-                   goalsLeft++;
+                if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
+                    goalsLeft++;
                 }
             }
         }
+        this.map = map;
+        this.map = copyMap();
+        this.startingMap = copyMap();
     }
 
-    public void loadFromFile(String fin) {
+    private MapTile[][] copyMap() {
+        MapTile[][] map = new MapTile[getHeight()][getWidth()];
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (this.map[y][x].getIsGoal()) {
+                    map[y][x] = new MapTile(true, this.map[y][x].getItem());
+                }
+                else {
+                    map[y][x] = new MapTile(false, this.map[y][x].getItem());
+                }
+            }
+        }
+        return map;
+    }
+
+    private void loadFromFile(String fin) {
         //read map from file
         Scanner sc = null;
         try{
@@ -56,7 +88,7 @@ public class LocalMapModel implements MapModel {
 
             map = new MapTile[r+2][c+2];
 
-            MapTile wallTile = new MapTile(false, MapTile.MapItem.WALL);
+            MapTile wallTile = new MapTile(false, WALL);
 
             for(int j = 0; j <= c + 1; j++){
                 map[0][j] = wallTile;
@@ -71,24 +103,24 @@ public class LocalMapModel implements MapModel {
                 for(int j = 1; j <= c; j++){
                     switch(line.charAt(j - 1)){
                         case 'p':
-                            map[i][j] = new MapTile(false, MapTile.MapItem.PLAYER);
+                            map[i][j] = new MapTile(false, PLAYER);
                             player = new Position(j, i);
                             break;
                         case 'b':
-                            map[i][j] = new MapTile(false, MapTile.MapItem.BOX);
+                            map[i][j] = new MapTile(false, BOX);
                             break;
                         case 'w':
                             map[i][j] = wallTile;
                             break;
                         case 'g':
-                            map[i][j] = new MapTile(true, MapTile.MapItem.GROUND);
+                            map[i][j] = new MapTile(true, GROUND);
                             goalsLeft++;
                             break;
                         case 'd':
-                            map[i][j] = new MapTile(true, MapTile.MapItem.BOX);
+                            map[i][j] = new MapTile(true, BOX);
                             break;
                         default:
-                            map[i][j] = new MapTile(false, MapTile.MapItem.GROUND);
+                            map[i][j] = new MapTile(false, GROUND);
                             break;
                     }
                 }
@@ -106,7 +138,47 @@ public class LocalMapModel implements MapModel {
 
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
-        processInput(e.getCode());
+        switch (e.getCode()) {
+            case U:
+                undo();
+                break;
+            case R:
+                reset();
+                break;
+            case N:
+                generateNewMap();
+                break;
+            default:
+                processInput(e.getCode());
+        }
+    }
+
+    public void undo() {
+
+    }
+
+    public synchronized void generateNewMap() {
+        generateMap();
+        broadcastReset();
+    }
+
+    private synchronized void broadcastReset() {
+        MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                Position pos = new Position(x, y);
+                info.addChange(pos, getMapAt(pos));
+            }
+        }
+
+        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
+            listener.handle(info);
+        }
+    }
+    public void reset() {
+        setUpMap(startingMap);
+        broadcastReset();
+        System.out.println("Reset map");
     }
 
     public void processInput(KeyCode k){
@@ -136,13 +208,13 @@ public class LocalMapModel implements MapModel {
             player = newPosition;
             score++;
 
-            boolean pushedBox = getMapAt(newPosition).getItem() == MapTile.MapItem.BOX;
+            boolean pushedBox = getMapAt(newPosition).getItem() == BOX;
 
-            setMapAt(oldPosition, MapTile.MapItem.GROUND);
+            setMapAt(oldPosition, GROUND);
             if(pushedBox){
-                setMapAt(lookAhead, MapTile.MapItem.BOX);
+                setMapAt(lookAhead, BOX);
             }
-            setMapAt(newPosition, MapTile.MapItem.PLAYER);
+            setMapAt(newPosition, PLAYER);
 
             MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
             info.addChange(newPosition, getMapAt(newPosition));
@@ -165,7 +237,7 @@ public class LocalMapModel implements MapModel {
             case PLAYER:
                 return false;
             case BOX:
-                return getMapAt(lookAhead).getItem() == MapTile.MapItem.GROUND;
+                return getMapAt(lookAhead).getItem() == GROUND;
             default:
                 return true;
         }
@@ -174,12 +246,12 @@ public class LocalMapModel implements MapModel {
     private void setMapAt(Position pos, MapTile.MapItem item){
         MapTile tile = map[pos.getY()][pos.getX()];
 
-        if(tile.getIsGoal() && tile.getItem() == MapTile.MapItem.BOX) {
+        if(tile.getIsGoal() && tile.getItem() == BOX) {
             goalsLeft++;
         }
         tile.setItem(item);
 
-        if(tile.getIsGoal() && tile.getItem() == MapTile.MapItem.BOX) {
+        if(tile.getIsGoal() && tile.getItem() == BOX) {
             goalsLeft--;
         }
     }

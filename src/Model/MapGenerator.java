@@ -67,7 +67,7 @@ public class MapGenerator {
             Position lookAhead = positions.second();
             if (indexes.contains(i) &&
                     (getMapAt(map, newPosition).getItem() == MapTile.MapItem.GROUND) &&
-                    (!newPosition.equals(start)) && (!boxPositions.contains(newPosition)) &&
+                    !boxPositions.contains(newPosition) &&
                     !path.contains(newPosition)) {
                 setMapAt(map, newPosition, MapTile.MapItem.BOX);
                 boxPositions.add(newPosition);
@@ -80,7 +80,6 @@ public class MapGenerator {
             }
         }
         setMapAt(map, player, MapTile.MapItem.GROUND);
-        setMapAt(map, start, MapTile.MapItem.PLAYER);
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
                 Position pos = new Position(x, y);
@@ -92,9 +91,19 @@ public class MapGenerator {
                 }
             }
         }
+        setMapAt(map, start, MapTile.MapItem.PLAYER);
         for (Position pos: boxPositions) {
             setMapAt(map, pos, MapTile.MapItem.BOX);
         }
+//        for (int y = 1; y < height - 1; y++) {
+//            for (int x = 1; x < width - 1; x++) {
+//                Position pos = new Position(x, y);
+//                MapTile tile = getMapAt(map, pos);
+//                if (tile.getItem() == MapTile.MapItem.BOX && tile.getIsGoal()) {
+//                    setMapAt(map, pos, MapTile.MapItem.WALL);
+//                }
+//            }
+//        }
         return map;
     }
 

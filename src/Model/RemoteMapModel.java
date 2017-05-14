@@ -159,4 +159,12 @@ public class RemoteMapModel extends Thread implements MapModel {
     public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
         listeners.add(listener);
     }
+
+    public void generateNewMap() {
+
+    }
+
+    public void reset() {
+
+    }
 }
