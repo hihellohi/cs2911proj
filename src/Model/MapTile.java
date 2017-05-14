@@ -22,6 +22,10 @@ public class MapTile{
         return item;
     }
 
+    void setGoal(boolean goal){
+        this.isGoal = goal;
+    }
+
     void setItem(MapItem item){
         this.item = item;
     }

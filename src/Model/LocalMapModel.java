@@ -26,7 +26,25 @@ public class LocalMapModel implements MapModel {
         time = "0:00";
         goalsLeft = 0;
         score = 0;
+//        loadFromFile(fin);
+        int g = new Random().nextInt();
+//        int g = -526316897;
+        System.out.println(g);
+        MapGenerator generator = new MapGenerator(g);
+        map = generator.generateMap(10, 10);
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                if (map[y][x].getItem() == MapTile.MapItem.PLAYER) {
+                   player = new Position(x, y);
+                }
+                else if (map[y][x].getIsGoal()) {
+                   goalsLeft++;
+                }
+            }
+        }
+    }
 
+    public void loadFromFile(String fin) {
         //read map from file
         Scanner sc = null;
         try{
