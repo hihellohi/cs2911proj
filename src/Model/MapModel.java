@@ -7,7 +7,7 @@ import javafx.util.Duration;
 
 
 /**
- * Created by Ni on 11/05/2017.
+ * @author Kevin Ni
  */
 public interface MapModel extends EventHandler<KeyEvent> {
     void handle(KeyEvent e);

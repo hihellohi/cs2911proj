@@ -51,9 +51,11 @@ public class RemoteMapModel extends Thread implements MapModel {
     }
 
     public void close(){
-        MapUpdateInfo info = new MapUpdateInfo(true);
-        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(info);
+        if(listeners != null) {
+            MapUpdateInfo info = new MapUpdateInfo(true);
+            for (ModelEventHandler<MapUpdateInfo> listener : listeners) {
+                listener.handle(info);
+            }
         }
 
         try {

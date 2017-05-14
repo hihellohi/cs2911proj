@@ -26,25 +26,17 @@ public class UIController {
     }
 
     public void startHost(ActionEvent actionEvent){
-        LocalMapModel model = new LocalMapModel("input1.txt");
 
-        Semaphore sem = new Semaphore(0);
-        LobbyModel lobby;
         try {
-            lobby = new LobbyModel();
-            lobby.subscribe((s) -> {
-                sem.release();
-            });
-            lobby.start();
-            sem.acquire(2);
+            LobbyController controller = new LobbyController();
+
+            Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            stage.setScene(controller.getScene());
+            stage.show();
         }
-        catch (Exception ex){
+        catch (IOException ex){
             return;
         }
-
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        startGame(stage, model);
-        lobby.finish(model);
     }
 
     public void startClient(ActionEvent actionEvent){

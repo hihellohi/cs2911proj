@@ -1,7 +1,7 @@
 package Model.Netcode;
 
 /**
- * Created by Ni on 12/05/2017.
+ * @author Kevin Ni
  */
 public enum ProtocolHeader {
     MOVE,

@@ -2,6 +2,8 @@ package Model.Netcode;
 
 import Model.LocalMapModel;
 import Model.ModelEventHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,11 +20,11 @@ public class LobbyModel extends Thread{
     private static final int PORT = 1337;
 
     private ServerSocket welcomingSocket;
-    private List<Socket> connectionSockets;
+    private ObservableList<Socket> connectionSockets;
     private List<ModelEventHandler<Socket>> listeners;
 
     public LobbyModel() throws IOException{
-        connectionSockets = new ArrayList<>();
+        connectionSockets  = FXCollections.observableList(new ArrayList<>());
         welcomingSocket = new ServerSocket(PORT);
         listeners = new ArrayList<>();
     }
@@ -81,7 +83,17 @@ public class LobbyModel extends Thread{
         close();
     }
 
-    public void subscribe(ModelEventHandler<Socket> listener){
-        listeners.add(listener);
+    public ObservableList<Socket> getObservable(){
+        return connectionSockets;
+    }
+
+    public void kick(Socket currentSocket) {
+        connectionSockets.remove(currentSocket);
+        try {
+            currentSocket.close();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 }
