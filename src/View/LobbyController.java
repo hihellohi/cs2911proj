@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.Socket;
 
 /**
@@ -31,26 +32,31 @@ public class LobbyController {
     private LobbyModel model;
     private Scene scene;
 
-    EventHandler<ActionEvent> StartEvent = new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event) {
-            LocalMapModel mapModel = new LocalMapModel("input1.txt");
-            BorderPane root = new BorderPane();
-            MapView grid = new MapView(mapModel);
-            ScoreView sv = new ScoreView(mapModel);
+    private EventHandler<ActionEvent> startEvent = (event) -> {
+        LocalMapModel mapModel = new LocalMapModel("input1.txt");
+        GameView view = new GameView(mapModel);
 
-            root.setLeft(grid);
-            root.setRight(sv);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        view.switchScene(stage);
 
-            Scene gameScene = new Scene(root, grid.mapWidth() + sv.sideWidth(), grid.mapHeight());
-            grid.requestFocus();
+        model.finish(mapModel);
+    };
+
+    private EventHandler<ActionEvent> backEvent = (event) -> {
+        try {
+            model.abort();
+
+            Parent root = FXMLLoader.load(getClass().getResource("menu.fxml"));
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(gameScene);
+            stage.setTitle("Warehouse Boss");
+            stage.setScene(scene);
             stage.show();
-
-            model.finish(mapModel);
+        }
+        catch (IOException ex){
+            throw new UncheckedIOException(ex);
         }
     };
 
@@ -76,6 +82,8 @@ public class LobbyController {
         listView.setItems(model.getObservable());
         listView.setCellFactory((param) -> new LobbyItem(model));
 
-        startBtn.setOnAction(StartEvent);
+        startBtn.setOnAction(startEvent);
+
+        backBtn.setOnAction(backEvent);
     }
 }

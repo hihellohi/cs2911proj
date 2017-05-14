@@ -83,6 +83,11 @@ public class LobbyModel extends Thread{
         close();
     }
 
+    public void abort(){
+        closeConnections();
+        close();
+    }
+
     public ObservableList<Socket> getObservable(){
         return connectionSockets;
     }

@@ -18,6 +18,7 @@ import java.util.concurrent.Semaphore;
  */
 public class UIController {
     private static final String HOST = "localhost";
+    private Stage stage;
 
     public void switchToGame(ActionEvent actionEvent) {
         LocalMapModel model = new LocalMapModel("input1.txt");
@@ -35,7 +36,7 @@ public class UIController {
             stage.show();
         }
         catch (IOException ex){
-            return;
+            System.out.println("port already occupied");
         }
     }
 
@@ -60,18 +61,8 @@ public class UIController {
     }
 
     private void startGame(Stage stage, MapModel model){
-        BorderPane root = new BorderPane();
-        MapView grid = new MapView(model);
-        ScoreView sv = new ScoreView(model);
-
-        root.setLeft(grid);
-        root.setRight(sv);
-
-        Scene gameScene = new Scene(root, grid.mapWidth() + sv.sideWidth(), grid.mapHeight());
-        grid.requestFocus();
-
-        stage.setScene(gameScene);
-        stage.show();
+        GameView view = new GameView(model);
+        view.switchScene(stage);
     }
 
     public void closeGame(ActionEvent actionEvent) {
