@@ -49,10 +49,10 @@ public class MapGenerator {
         List<Integer> all = new ArrayList<>();
         Set<Integer> indexes = new HashSet<>();
         // easy (40, 10) harder (40, 30)
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 20; i++) {
             all.add(i);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 20; i++) {
             int index = generator.nextInt(all.size());
             indexes.add(all.get(index));
             all.remove(index);
@@ -60,7 +60,7 @@ public class MapGenerator {
         List<Position> boxPositions = new ArrayList<>();
         List<Position> path = new ArrayList<>();
         path.add(start);
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 30; i++) {
             KeyCode move = directions[generator.nextInt(4)];
             Pair<Position, Position> positions = getPositions(move, player);
             Position newPosition = positions.first();
@@ -108,21 +108,17 @@ public class MapGenerator {
     }
 
     private boolean isMapGood(MapTile[][] map, int width, int height) {
-        boolean nonGoalBox = false;
-        int numBoxes = 0;
+        int nonGoalBoxes = 0;
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
                 Position pos = new Position(x, y);
                 MapTile tile = getMapAt(map, pos);
-                if (tile.getItem() == MapTile.MapItem.BOX) {
-                    numBoxes++;
-                    if (!tile.getIsGoal()) {
-                        nonGoalBox = true;
-                    }
+                if (tile.getItem() == MapTile.MapItem.BOX && !tile.getIsGoal()) {
+                    nonGoalBoxes++;
                 }
             }
         }
-        if (!nonGoalBox || numBoxes < 3) {
+        if (nonGoalBoxes < 3) {
             return false;
         }
         return true;
