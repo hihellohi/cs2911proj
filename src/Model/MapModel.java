@@ -17,5 +17,7 @@ public interface MapModel extends EventHandler<KeyEvent> {
     int getScore();
     int getHeight();
     int getWidth();
+    void generateNewMap();
+    void reset();
     void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener);
 }
