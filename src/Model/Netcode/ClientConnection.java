@@ -20,9 +20,12 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
     private Socket socket;
 
     public ClientConnection(LocalMapModel model, Socket socket, int player){
+        super();
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            out.writeInt(model.getWidth());
+            out.writeInt(model.getHeight());
 
             System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
         }
@@ -35,17 +38,11 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
         this.player = player;
         this.model = model;
         model.subscribeModelUpdate(this);
+
+        super.start();
     }
 
     @Override public void run(){
-        try {
-            out.writeInt(model.getWidth());
-            out.writeInt(model.getHeight());
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
-            close();
-        }
 
         while(!socket.isClosed()){
             try {
@@ -101,10 +98,6 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                 out.writeInt(pos.getY());
                 out.writeBoolean(tile.getIsGoal());
                 out.writeInt(tile.getItem().ordinal());
-            }
-
-            if (updateInfo.isFinished()) {
-                close();
             }
         }
         catch(IOException e){
