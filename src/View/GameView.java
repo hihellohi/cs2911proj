@@ -1,19 +1,26 @@
 package View;
 
-import Model.GameMenuBar;
+import View.GameMenuBar;
 import Model.MapModel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 /**
  * @author Kevin Ni
  */
 public class GameView extends BorderPane {
 
+    private Stage stage;
     private MapView grid;
     private ScoreView sv;
     private GameMenuBar menuBar;
+    private Button backToMain;
 
     public GameView(MapModel model) {
         super();
@@ -28,6 +35,8 @@ public class GameView extends BorderPane {
     }
 
     public void switchHere(Stage stage){
+        this.stage = stage;
+        menuBar.setStage(stage);
         Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight() + menuBar.getHeight());
 
         grid.requestFocus();
