@@ -178,6 +178,10 @@ public class LocalMapModel implements MapModel {
     }
 
     public void processInput(KeyCode k){
+        if(goalsLeft == 0){
+            return;
+        }
+
         int x = 0;
         int y = 0;
         int oldx = player.getX();

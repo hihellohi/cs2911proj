@@ -32,15 +32,13 @@ public class LobbyController {
     private Stage stage;
 
     public LobbyController() throws IOException {
-        this.model = new LobbyModel();
 
+        this.model = new LobbyModel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Lobby.fxml"));
         loader.setController(this);
         Parent parent = loader.load();
         scene = new Scene(parent);
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
-
-        model.start();
     }
 
     @FXML
@@ -56,11 +54,12 @@ public class LobbyController {
 
     private EventHandler<ActionEvent> startEvent = (event) -> {
         LocalMapModel mapModel = new LocalMapModel("input1.txt");
+
+        model.finish(mapModel);
         GameView view = new GameView(mapModel);
 
         view.switchHere(stage);
 
-        model.finish(mapModel);
     };
 
     private EventHandler<ActionEvent> backEvent = (event) -> {

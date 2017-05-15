@@ -29,6 +29,7 @@ public class RemoteMapModel extends Thread implements MapModel {
     private MapTile lastQuery;
 
     public RemoteMapModel(String host, int port) throws IOException{
+        super();
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));

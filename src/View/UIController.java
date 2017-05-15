@@ -65,6 +65,8 @@ public class UIController {
             new LobbyController().switchHere(stage);
         }
         catch (IOException ex){
+            //TODO Socket used
+            ex.printStackTrace();
             System.out.println("port already occupied");
         }
     };

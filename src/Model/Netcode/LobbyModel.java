@@ -5,8 +5,7 @@ import Model.ModelEventHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -21,12 +20,12 @@ public class LobbyModel extends Thread{
 
     private ServerSocket welcomingSocket;
     private ObservableList<Socket> connectionSockets;
-    private List<ModelEventHandler<Socket>> listeners;
 
     public LobbyModel() throws IOException{
+        super();
         connectionSockets  = FXCollections.observableList(new ArrayList<>());
         welcomingSocket = new ServerSocket(PORT);
-        listeners = new ArrayList<>();
+        super.start();
     }
 
     @Override public void run(){
@@ -34,32 +33,13 @@ public class LobbyModel extends Thread{
             try{
                 Socket newConnection = welcomingSocket.accept();
                 connectionSockets.add(newConnection);
-
-                for(ModelEventHandler<Socket> listener : listeners){
-                    listener.handle(newConnection);
-                }
             }
             catch (SocketException | EOFException ex){
                 System.out.println("Welcoming socket closed, lobby thread ending...");
             }
             catch (IOException ex) {
-                closeConnections();
-                close();
+                abort();
                 ex.printStackTrace();
-            }
-        }
-    }
-
-    private void closeConnections(){
-        for (Socket socket : connectionSockets)
-        {
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    socket.close();
-                }
-                catch (IOException ex){
-                    ex.printStackTrace();
-                }
             }
         }
     }
@@ -78,13 +58,23 @@ public class LobbyModel extends Thread{
     public void finish(LocalMapModel model){
         int i = 1;
         for(Socket socket : connectionSockets) {
-            new ClientConnection(model, socket, i++).start();
+            new ClientConnection(model, socket, i++);
         }
         close();
     }
 
     public void abort(){
-        closeConnections();
+        for (Socket socket : connectionSockets)
+        {
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                }
+                catch (IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
         close();
     }
 

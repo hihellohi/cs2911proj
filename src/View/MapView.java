@@ -51,10 +51,6 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     }
 
     public void handle(MapUpdateInfo updateInfo){
-        if(updateInfo.isFinished()){
-            super.removeEventHandler(KeyEvent.KEY_PRESSED, model);
-        }
-
         Platform.runLater(() ->{
             for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
                 Position pos = change.first();
