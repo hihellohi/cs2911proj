@@ -13,7 +13,7 @@ import static Model.MapTile.MapItem.*;
 public class LocalMapModel implements MapModel {
     private MapTile[][] map;
     private MapTile[][] startingMap;
-    private Position player;
+    private Position[] players;
     private int goalsLeft;
     private int score;
     private long time;
@@ -21,17 +21,30 @@ public class LocalMapModel implements MapModel {
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
-    public LocalMapModel(String fin){
+    public LocalMapModel(String fin, int nplayers){
         listeners = new ArrayList<>();
         time = 0;
-        generateMap();
+        players = new Position[nplayers];
+        loadFromFile(fin);
+    }
+
+    public LocalMapModel(int seed){
+        listeners = new ArrayList<>();
+        time = 0;
+        generateMap(seed);
+    }
+
+    public LocalMapModel(){
+        this(new Random().nextInt());
     }
 
     private void generateMap() {
+        generateMap(new Random().nextInt());
+    }
+
+    private void generateMap(int g) {
         int width = 8;
         int height = 8;
-        int g = new Random().nextInt();
-//        int g = -895268333;
         System.out.println(g);
         MapGenerator generator = new MapGenerator(g, Settings.getInstance().getDifficulty());
         setUpMap(generator.generateMap(width, height));
@@ -45,7 +58,7 @@ public class LocalMapModel implements MapModel {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
                 if (map[y][x].getItem() == PLAYER) {
-                    player = new Position(x, y);
+                    players[0] = new Position(x, y);
                 }
                 if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
                     goalsLeft++;
@@ -76,6 +89,7 @@ public class LocalMapModel implements MapModel {
         //read map from file
         Scanner sc = null;
         try{
+            int p = 0;
             sc = new Scanner(new FileReader(fin));
 
             String[] dim = sc.nextLine().split("\\s");
@@ -100,7 +114,7 @@ public class LocalMapModel implements MapModel {
                     switch(line.charAt(j - 1)){
                         case 'p':
                             map[i][j] = new MapTile(false, PLAYER);
-                            player = new Position(j, i);
+                            players[p++] = new Position(j, i);
                             break;
                         case 'b':
                             map[i][j] = new MapTile(false, BOX);
@@ -145,7 +159,7 @@ public class LocalMapModel implements MapModel {
                 generateNewMap();
                 break;
             default:
-                processInput(e.getCode());
+                processInput(e.getCode(), 0);
         }
     }
 
@@ -177,16 +191,16 @@ public class LocalMapModel implements MapModel {
         System.out.println("Reset map");
     }
 
-    public void processInput(KeyCode k){
+    public void processInput(KeyCode k, int p){
         if(goalsLeft == 0){
             return;
         }
 
         int x = 0;
         int y = 0;
-        int oldx = player.getX();
-        int oldy = player.getY();
-        Position oldPosition = player;
+        int oldx = players[p].getX();
+        int oldy = players[p].getY();
+        Position oldPosition = players[p];
 
         switch (k){
             case UP:
@@ -200,12 +214,12 @@ public class LocalMapModel implements MapModel {
         }
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
-        broadcast(oldPosition, newPosition, lookAhead);
+        broadcastMove(oldPosition, newPosition, lookAhead, p);
     }
 
-    private synchronized void broadcast(Position oldPosition, Position newPosition, Position lookAhead){
+    private synchronized void broadcastMove(Position oldPosition, Position newPosition, Position lookAhead, int p){
         if (validMove(newPosition, lookAhead)) {
-            player = newPosition;
+            players[p] = newPosition;
             score++;
 
             boolean pushedBox = getMapAt(newPosition).getItem() == BOX;

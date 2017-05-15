@@ -3,12 +3,10 @@ package View;
 import Model.LocalMapModel;
 import Model.Netcode.ClientConnection;
 import Model.Netcode.LobbyModel;
-import Model.Settings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,7 +16,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.Socket;
 
 /**
  * @author Kevin Ni
@@ -55,12 +52,12 @@ public class LobbyController {
     }
 
     private EventHandler<ActionEvent> startEvent = (event) -> {
-        LocalMapModel mapModel = new LocalMapModel("input1.txt");
+        model.close();
+
+        LocalMapModel mapModel = new LocalMapModel("input1.txt", model.nPlayers() + 1);
 
         model.finish(mapModel);
-        GameView view = new GameView(mapModel);
-
-        view.switchHere(stage);
+        new GameView(mapModel).switchHere(stage);
 
     };
 

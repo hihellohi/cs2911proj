@@ -45,7 +45,7 @@ public class LobbyModel extends Thread{
         }
     }
 
-    private void close(){
+    public void close(){
         if(!welcomingSocket.isClosed()) {
             try {
                 welcomingSocket.close();
@@ -67,7 +67,6 @@ public class LobbyModel extends Thread{
                 connection.close();
             }
         }
-        close();
     }
 
     public void abort(){
@@ -79,5 +78,9 @@ public class LobbyModel extends Thread{
 
     public ObservableList<ClientConnection> getObservable(){
         return connectionSockets;
+    }
+
+    public int nPlayers(){
+        return connectionSockets.size();
     }
 }

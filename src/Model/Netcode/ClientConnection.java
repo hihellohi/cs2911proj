@@ -56,7 +56,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             try {
                 switch(Constants.HEADERS[in.readByte()]){
                     case MOVE_REQUEST:
-                        model.processInput(Constants.CODES[in.readInt()]);
+                        model.processInput(Constants.CODES[in.readInt()], player);
                         break;
                     case QUERY:
                         query(new Position(in.readInt(), in.readInt()));
