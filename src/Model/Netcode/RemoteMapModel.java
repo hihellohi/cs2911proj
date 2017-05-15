@@ -26,11 +26,11 @@ public class RemoteMapModel extends Thread implements MapModel {
     private Semaphore semaphore;
     private MapTile lastQuery;
 
-    public RemoteMapModel(String host, int port) throws IOException{
+    public RemoteMapModel(String host) throws IOException{
         super();
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(host, port));
+            socket.connect(new InetSocketAddress(host, Constants.PORT));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 

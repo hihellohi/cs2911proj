@@ -29,6 +29,7 @@ public class LocalMapModel implements MapModel {
     }
 
     public LocalMapModel(int seed){
+        players = new Position[1];
         listeners = new ArrayList<>();
         time = 0;
         generateMap(seed);

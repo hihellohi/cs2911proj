@@ -73,7 +73,7 @@ public class UIController {
 
     private EventHandler<ActionEvent> startClient = (e) -> {
         try {
-            RemoteMapModel client = new RemoteMapModel(HOST, 1337);
+            RemoteMapModel client = new RemoteMapModel(HOST);
             client.start();
             GameView view = new GameView(client);
             view.switchHere(stage);
