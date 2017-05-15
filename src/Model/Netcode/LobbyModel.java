@@ -40,7 +40,7 @@ public class LobbyModel extends Thread{
                 }
             }
             catch (SocketException | EOFException ex){
-                System.out.println("Socket closed, lobby thread ending...");
+                System.out.println("Welcoming socket closed, lobby thread ending...");
             }
             catch (IOException ex) {
                 closeConnections();

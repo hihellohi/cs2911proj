@@ -1,7 +1,6 @@
 package View;
 
 import Model.LocalMapModel;
-import Model.MapModel;
 import Model.Netcode.LobbyModel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,34 +29,7 @@ public class LobbyController {
 
     private LobbyModel model;
     private Scene scene;
-
-    private EventHandler<ActionEvent> startEvent = (event) -> {
-        LocalMapModel mapModel = new LocalMapModel("input1.txt");
-        GameView view = new GameView(mapModel);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        view.switchScene(stage);
-
-        model.finish(mapModel);
-    };
-
-    private EventHandler<ActionEvent> backEvent = (event) -> {
-        try {
-            model.abort();
-
-            Parent root = FXMLLoader.load(getClass().getResource("menu.fxml"));
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setTitle("Warehouse Boss");
-            stage.setScene(scene);
-            stage.show();
-        }
-        catch (IOException ex){
-            throw new UncheckedIOException(ex);
-        }
-    };
+    private Stage stage;
 
     public LobbyController() throws IOException {
         this.model = new LobbyModel();
@@ -72,10 +43,6 @@ public class LobbyController {
         model.start();
     }
 
-    public Scene getScene(){
-        return scene;
-    }
-
     @FXML
     public void initialize(){
         listView.setPlaceholder(new Label("Nobody has joined and you have no friends :("));
@@ -85,5 +52,30 @@ public class LobbyController {
         startBtn.setOnAction(startEvent);
 
         backBtn.setOnAction(backEvent);
+    }
+
+    private EventHandler<ActionEvent> startEvent = (event) -> {
+        LocalMapModel mapModel = new LocalMapModel("input1.txt");
+        GameView view = new GameView(mapModel);
+
+        view.switchHere(stage);
+
+        model.finish(mapModel);
+    };
+
+    private EventHandler<ActionEvent> backEvent = (event) -> {
+        try {
+            model.abort();
+            new UIController().switchHere(stage);
+        }
+        catch (IOException ex){
+            throw new UncheckedIOException(ex);
+        }
+    };
+
+    public void switchHere(Stage stage){
+        this.stage = stage;
+        stage.setScene(scene);
+        stage.show();
     }
 }

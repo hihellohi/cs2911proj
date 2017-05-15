@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <GridPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="View.UIController"
-            prefHeight="400.0" prefWidth="600.0" alignment="center" hgap="10" vgap="10">
+            prefHeight="400.0" prefWidth="600.0" alignment="center" hgap="10" vgap="10" fx:id="root">
 
     <VBox spacing="10" alignment="CENTER">
         <Label GridPane.rowIndex="1" text="Warehouse Boss" fx:id="bigText"/>
-        <Button GridPane.rowIndex="2" text="Play Game" onAction="#switchToGame" fx:id="playGameBtn"/>
-        <Button GridPane.rowIndex="3" text="Host Game" onAction="#startHost" fx:id="HostBtn"/>
-        <Button GridPane.rowIndex="4" text="Join Game" onAction="#startClient" fx:id="ClientBtn"/>
-        <Button GridPane.rowIndex="5" text="Settings" onAction="#switchToSettings" fx:id="settingsBtn"/>
-        <Button GridPane.rowIndex="6" text="Exit" onAction="#closeGame" fx:id="closeGameBtn"/>
+        <Button GridPane.rowIndex="2" text="Play Game" fx:id="playGameBtn"/>
+        <Button GridPane.rowIndex="3" text="Host Game" fx:id="hostBtn"/>
+        <Button GridPane.rowIndex="4" text="Join Game" fx:id="clientBtn"/>
+        <Button GridPane.rowIndex="5" text="Settings" fx:id="settingsBtn"/>
+        <Button GridPane.rowIndex="6" text="Exit" fx:id="closeGameBtn"/>
     </VBox>
 </GridPane>

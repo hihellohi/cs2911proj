@@ -28,7 +28,7 @@ public class RemoteMapModel extends Thread implements MapModel {
     private Semaphore semaphore;
     private MapTile lastQuery;
 
-    public RemoteMapModel(String host, int port){
+    public RemoteMapModel(String host, int port) throws IOException{
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));
@@ -43,8 +43,8 @@ public class RemoteMapModel extends Thread implements MapModel {
             System.out.println("Connected!");
         }
         catch(IOException e){
-            System.out.println(e);
             close();
+            throw e;
         }
         listeners = new ArrayList<>();
         semaphore = new Semaphore(0);
@@ -122,7 +122,7 @@ public class RemoteMapModel extends Thread implements MapModel {
 
     public MapTile getMapAt(Position pos){
         try {
-            //THIS IS NOT OPTIMAL CHANGE THIS
+            //TODO THIS IS NOT OPTIMAL CHANGE THIS
             out.writeByte(ProtocolHeader.QUERY.ordinal());
             out.writeInt(pos.getX());
             out.writeInt(pos.getY());

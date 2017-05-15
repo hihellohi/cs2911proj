@@ -7,9 +7,9 @@
 
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.SettingsController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ChoiceBox layoutX="140.0" layoutY="45.0" prefWidth="150.0" onAction="#chooseDifficulty" fx:id="choiceBox">
+      <ChoiceBox layoutX="140.0" layoutY="45.0" prefWidth="150.0" fx:id="choiceBox">
           <items>
               <FXCollections fx:factory="observableArrayList">
                   <String fx:value = "Easy" />
@@ -18,7 +18,7 @@
               </FXCollections>
           </items>
       </ChoiceBox>
-      <Button layoutX="140.0" layoutY="89.0" mnemonicParsing="false" onAction="#exitSettings" text="Save and Exit" fx:id="exitSettingsBtn"/>
+      <Button layoutX="140.0" layoutY="89.0" mnemonicParsing="false" text="Save and Exit" fx:id="exitSettingsBtn"/>
       <Label layoutX="72.0" layoutY="50.0" text="Difficulty" />
    </children>
 </AnchorPane>

@@ -11,9 +11,10 @@ import javafx.stage.Stage;
  */
 public class GameView extends BorderPane {
 
-    MapView grid;
-    ScoreView sv;
-    GameMenuBar menuBar;
+    private MapView grid;
+    private ScoreView sv;
+    private GameMenuBar menuBar;
+
     public GameView(MapModel model) {
         super();
 
@@ -26,8 +27,8 @@ public class GameView extends BorderPane {
         super.setTop(menuBar);
     }
 
-    public void switchScene(Stage stage){
-        Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight());
+    public void switchHere(Stage stage){
+        Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight() + menuBar.getHeight());
 
         grid.requestFocus();
 

@@ -4,65 +4,100 @@ import Model.*;
 import Model.Netcode.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.ConnectException;
 
 /**
  * Created by willi on 9/05/2017.
  */
 public class UIController {
+
+    @FXML private Button playGameBtn;
+    @FXML private Button hostBtn;
+    @FXML private Button clientBtn;
+    @FXML private Button settingsBtn;
+    @FXML private Button closeGameBtn;
+
+    private Scene scene;
     private static final String HOST = "localhost";
     private Stage stage;
 
-    public void switchToGame(ActionEvent actionEvent) {
-        LocalMapModel model = new LocalMapModel("input1.txt");
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        startGame(stage, model);
+    public UIController() throws IOException{
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
+        loader.setController(this);
+        Parent parent = loader.load();
+        scene = new Scene(parent);
+        scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
     }
 
-    public void startHost(ActionEvent actionEvent){
+    @FXML
+    public void initialize(){
+        playGameBtn.setOnAction(switchToGame);
+        hostBtn.setOnAction(startHost);
+        clientBtn.setOnAction(startClient);
+        settingsBtn.setOnAction(switchToSettings);
+        closeGameBtn.setOnAction(closeGame);
+    }
 
+    public void switchHere(Stage stage){
+        this.stage = stage;
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private EventHandler<ActionEvent> switchToGame = (e) -> {
+        //TODO THROW EXCEPTION
+        LocalMapModel model = new LocalMapModel("input1.txt");
+        GameView view = new GameView(model);
+        view.switchHere(stage);
+    };
+
+    private EventHandler<ActionEvent> startHost = (e) -> {
         try {
-            LobbyController controller = new LobbyController();
-
-            Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            stage.setScene(controller.getScene());
-            stage.show();
+            new LobbyController().switchHere(stage);
         }
         catch (IOException ex){
             System.out.println("port already occupied");
         }
-    }
+    };
 
-    public void startClient(ActionEvent actionEvent){
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        RemoteMapModel client = new RemoteMapModel(HOST, 1337);
-        client.start();
-        startGame(stage, client);
-    }
+    private EventHandler<ActionEvent> startClient = (e) -> {
+        try {
+            RemoteMapModel client = new RemoteMapModel(HOST, 1337);
+            client.start();
+            GameView view = new GameView(client);
+            view.switchHere(stage);
+        }
+        catch (EOFException ex){
+            System.out.println("you got kicked lol");
+        }
+        catch(ConnectException ex){
+            System.out.println("host not found");
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
+    };
 
-    public void switchToSettings(ActionEvent actionEvent) throws IOException {
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+    private EventHandler<ActionEvent> switchToSettings = (e) -> {
 
-        Parent root = FXMLLoader.load(getClass().getResource("Settings.fxml"));
+        try {
+            new SettingsController().switchHere(stage);
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
+    };
 
-        Scene settingsScene = new Scene(root);
-        settingsScene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
-
-        stage.setScene(settingsScene);
-        stage.show();
-
-    }
-
-    private void startGame(Stage stage, MapModel model){
-        GameView view = new GameView(model);
-        view.switchScene(stage);
-    }
-
-    public void closeGame(ActionEvent actionEvent) {
+    private EventHandler<ActionEvent> closeGame = (e) -> {
         Platform.exit();
-    }
+    };
 }
