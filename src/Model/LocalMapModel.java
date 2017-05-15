@@ -28,13 +28,11 @@ public class LocalMapModel implements MapModel {
     }
 
     private void generateMap() {
-        int width = 8;
-        int height = 8;
         int g = new Random().nextInt();
 //        int g = -895268333;
         System.out.println(g);
         MapGenerator generator = new MapGenerator(g, Settings.getInstance().getDifficulty());
-        setUpMap(generator.generateMap(width, height));
+        setUpMap(generator.generateMap());
     }
 
     private void setUpMap(MapTile[][] map) {

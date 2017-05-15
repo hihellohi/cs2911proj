@@ -18,15 +18,44 @@ public class MapGenerator {
         this.difficulty = difficulty;
     }
 
-    public MapTile[][] generateMap(int width, int height) {
+    public MapTile[][] generateMap() {
         MapTile[][] map;
         do {
-            map = makeMap(width, height);
-        } while (!isMapGood(map, width, height));
+            map = makeMap();
+        } while (!isMapGood(map));
         return map;
     }
 
-    private MapTile[][] makeMap(int width, int height) {
+    private MapTile[][] makeMap() {
+        int walkLength = 0;
+        int maxNumberOfBoxes = 0;
+        int maxGeneratingPoint = 0;
+        int width = 0;
+        int height = 0;
+        switch (difficulty) {
+            case EASY:
+                walkLength = 40;
+                maxNumberOfBoxes = 10;
+                maxGeneratingPoint = 20;
+                width = 7;
+                height = 7;
+                break;
+            case MEDIUM:
+                walkLength = 40;
+                maxNumberOfBoxes = 20;
+                maxGeneratingPoint = 20;
+                width = 8;
+                height = 8;
+                break;
+            case HARD:
+                walkLength = 60;
+                maxNumberOfBoxes = 30;
+                maxGeneratingPoint = 30;
+                width = 10;
+                height = 10;
+                break;
+        }
+
         System.out.println(difficulty);
         MapTile[][] map = initializeEmptyMap(width, height);
 
@@ -36,27 +65,6 @@ public class MapGenerator {
         // generate the points on the path that we will drop the boxes
         List<Integer> all = new ArrayList<>();
         Set<Integer> indexes = new HashSet<>();
-
-        int walkLength = 0;
-        int maxNumberOfBoxes = 0;
-        int maxGeneratingPoint = 0;
-        switch (difficulty) {
-            case EASY:
-                walkLength = 30;
-                maxNumberOfBoxes = 10;
-                maxGeneratingPoint = 20;
-                break;
-            case MEDIUM:
-                walkLength = 30;
-                maxNumberOfBoxes = 20;
-                maxGeneratingPoint = 20;
-                break;
-            case HARD:
-                walkLength = 30;
-                maxNumberOfBoxes = 30;
-                maxGeneratingPoint = 30;
-                break;
-        }
 
         for (int i = 0; i < maxGeneratingPoint; i++) {
             all.add(i);
@@ -116,7 +124,9 @@ public class MapGenerator {
         return map;
     }
 
-    private boolean isMapGood(MapTile[][] map, int width, int height) {
+    private boolean isMapGood(MapTile[][] map) {
+        int height = map.length;
+        int width = map[0].length;
         int nonGoalBoxes = 0;
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
@@ -127,7 +137,16 @@ public class MapGenerator {
                 }
             }
         }
-        if (nonGoalBoxes < 3) {
+        int requiredNonGoalBoxes = 0;
+        switch (difficulty) {
+            case EASY:
+                requiredNonGoalBoxes = 3; break;
+            case MEDIUM:
+                requiredNonGoalBoxes = 3; break;
+            case HARD:
+                requiredNonGoalBoxes = 6; break;
+        }
+        if (nonGoalBoxes < requiredNonGoalBoxes) {
             return false;
         }
         return true;
