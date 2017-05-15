@@ -28,8 +28,8 @@ public class LocalMapModel implements MapModel {
     }
 
     private void generateMap() {
-        int width = 10;
-        int height = 10;
+        int width = 8;
+        int height = 8;
         int g = new Random().nextInt();
 //        int g = -895268333;
         System.out.println(g);
