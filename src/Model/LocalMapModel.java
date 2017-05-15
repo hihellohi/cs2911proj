@@ -33,7 +33,7 @@ public class LocalMapModel implements MapModel {
         int g = new Random().nextInt();
 //        int g = -895268333;
         System.out.println(g);
-        MapGenerator generator = new MapGenerator(g);
+        MapGenerator generator = new MapGenerator(g, Settings.getInstance().getDifficulty());
         setUpMap(generator.generateMap(width, height));
     }
 
