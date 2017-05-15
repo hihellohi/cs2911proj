@@ -43,11 +43,9 @@ public class LocalMapModel implements MapModel {
     }
 
     private void generateMap(int g) {
-        int width = 8;
-        int height = 8;
         System.out.println(g);
         MapGenerator generator = new MapGenerator(g, Settings.getInstance().getDifficulty());
-        setUpMap(generator.generateMap(width, height));
+        setUpMap(generator.generateMap());
     }
 
     private void setUpMap(MapTile[][] map) {

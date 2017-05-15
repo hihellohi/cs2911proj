@@ -14,6 +14,7 @@ public class WarehouseBoss extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        primaryStage.setTitle("Warehouse Boss");
         new UIController().switchHere(primaryStage);
     }
 
