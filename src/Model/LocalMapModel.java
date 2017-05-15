@@ -21,43 +21,36 @@ public class LocalMapModel implements MapModel {
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
-    public LocalMapModel(String fin, int nplayers){
-        listeners = new ArrayList<>();
-        time = 0;
-        players = new Position[nplayers];
-        loadFromFile(fin);
-    }
-
-    public LocalMapModel(int seed){
-        players = new Position[1];
+    public LocalMapModel(int seed, int nPlayers){
+        players = new Position[nPlayers];
         listeners = new ArrayList<>();
         time = 0;
         generateMap(seed);
     }
 
-    public LocalMapModel(){
-        this(new Random().nextInt());
+    public LocalMapModel(int nPlayers){
+        this(new Random().nextInt(), nPlayers);
     }
 
     private void generateMap() {
         generateMap(new Random().nextInt());
     }
 
-    private void generateMap(int g) {
-        System.out.println(g);
-        MapGenerator generator = new MapGenerator(g, Settings.getInstance().getDifficulty());
-        setUpMap(generator.generateMap());
+    private void generateMap(int seed) {
+        System.out.println(seed);
+        MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
+        setUpMap(generator.generateMap(players.length));
     }
 
     private void setUpMap(MapTile[][] map) {
         moves = new ArrayList<>();
         goalsLeft = 0;
         score = 0;
-//        loadFromFile(fin);
+        int p = 0;
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
                 if (map[y][x].getItem() == PLAYER) {
-                    players[0] = new Position(x, y);
+                    players[p++] = new Position(x, y);
                 }
                 if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
                     goalsLeft++;

@@ -18,14 +18,6 @@ public class Position extends Pair<Integer, Integer> {
         return second;
     }
 
-    public void setX(int x) {
-        first = x;
-    }
-
-    public void setY(int y) {
-        second = y;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(this.first, this.second);
