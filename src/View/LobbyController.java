@@ -2,6 +2,7 @@ package View;
 
 import Model.LocalMapModel;
 import Model.Netcode.LobbyModel;
+import Model.Settings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

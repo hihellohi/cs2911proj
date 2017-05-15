@@ -11,9 +11,11 @@ import static javafx.scene.input.KeyCode.*;
  */
 public class MapGenerator {
     private Random generator;
+    private Settings.Difficulty difficulty;
 
-    public MapGenerator(long seed) {
+    public MapGenerator(long seed, Settings.Difficulty difficulty) {
         this.generator = new Random(seed);
+        this.difficulty = difficulty;
     }
 
     public MapTile[][] generateMap(int width, int height) {
@@ -25,6 +27,7 @@ public class MapGenerator {
     }
 
     private MapTile[][] makeMap(int width, int height) {
+        System.out.println(difficulty);
         MapTile[][] map = initializeEmptyMap(width, height);
 
         Position player = placePlayer(map);
@@ -33,11 +36,32 @@ public class MapGenerator {
         // generate the points on the path that we will drop the boxes
         List<Integer> all = new ArrayList<>();
         Set<Integer> indexes = new HashSet<>();
-        // easy (40, 10) harder (40, 30)
-        for (int i = 0; i < 20; i++) {
+
+        int walkLength = 0;
+        int maxNumberOfBoxes = 0;
+        int maxGeneratingPoint = 0;
+        switch (difficulty) {
+            case EASY:
+                walkLength = 30;
+                maxNumberOfBoxes = 10;
+                maxGeneratingPoint = 20;
+                break;
+            case MEDIUM:
+                walkLength = 30;
+                maxNumberOfBoxes = 20;
+                maxGeneratingPoint = 20;
+                break;
+            case HARD:
+                walkLength = 30;
+                maxNumberOfBoxes = 30;
+                maxGeneratingPoint = 30;
+                break;
+        }
+
+        for (int i = 0; i < maxGeneratingPoint; i++) {
             all.add(i);
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < maxNumberOfBoxes; i++) {
             int index = generator.nextInt(all.size());
             indexes.add(all.get(index));
             all.remove(index);
@@ -48,7 +72,7 @@ public class MapGenerator {
         List<Position> path = new ArrayList<>();
         path.add(start);
         KeyCode[] directions = {UP, DOWN, LEFT, RIGHT};
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < walkLength; i++) {
             KeyCode move = directions[generator.nextInt(4)];
             Pair<Position, Position> positions = getPositions(move, player);
             Position newPosition = positions.first();

@@ -1,5 +1,6 @@
 package View;
 
+import Model.Settings;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,11 +25,12 @@ public class SettingsController {
     private Scene scene;
 
     public SettingsController() throws IOException{
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("settings.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Settings.fxml"));
         loader.setController(this);
         Parent parent = loader.load();
         scene = new Scene(parent);
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
+        choiceBox.setValue(Settings.getInstance().getDifficultyString());
     }
 
     @FXML
@@ -40,7 +42,24 @@ public class SettingsController {
 
     private EventHandler<ActionEvent> chooseDifficulty = (e) -> {
         string = choiceBox.getSelectionModel().getSelectedItem();
+        if (string == null) {
+            string = Settings.getInstance().getDifficultyString();
+        }
         choiceBox.setValue(string);
+        Settings.Difficulty difficulty;
+        switch (string) {
+            case "Easy":
+                difficulty = Settings.Difficulty.EASY;
+                break;
+            case "Medium":
+            default:
+                difficulty = Settings.Difficulty.MEDIUM;
+                break;
+            case "Hard":
+                difficulty = Settings.Difficulty.HARD;
+                break;
+        }
+        Settings.getInstance().setDifficulty(difficulty);
     };
 
     private EventHandler<ActionEvent> exitSettings = (e) -> {

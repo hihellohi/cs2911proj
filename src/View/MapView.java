@@ -10,13 +10,13 @@ import javafx.scene.layout.GridPane;
  * @author Kevin Ni
  */
 class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
-    private final static Image GROUND = new Image("images/ground.png");
-    private final static Image PLAYER = new Image("images/player.png");
-    private final static Image BOX = new Image("images/box.png", 100, 100, true, true);
-    private final static Image GOAL = new Image("images/goal.png");
-    private final static Image GOAL_BOX = new Image("images/goalBox.png");
-    private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png");
-    private final static Image WALL = new Image("images/wall.png");
+    private final static Image GROUND = new Image("images/ground.png", 100, 100, false, false);
+    private final static Image PLAYER = new Image("images/player.png", 100, 100, false, false);
+    private final static Image BOX = new Image("images/box.png", 100, 100, false, false);
+    private final static Image GOAL = new Image("images/goal.png", 100, 100, false, false);
+    private final static Image GOAL_BOX = new Image("images/goalBox.png", 100, 100, false, false);
+    private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png", 100, 100, false, false);
+    private final static Image WALL = new Image("images/wall.png", 100, 100, false, false);
 
     private MapModel model;
     private ImageView[][] tiles;

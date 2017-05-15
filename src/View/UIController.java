@@ -31,7 +31,7 @@ public class UIController {
     private Stage stage;
 
     public UIController() throws IOException{
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Menu.fxml"));
         loader.setController(this);
         Parent parent = loader.load();
         scene = new Scene(parent);
@@ -90,7 +90,6 @@ public class UIController {
     };
 
     private EventHandler<ActionEvent> switchToSettings = (e) -> {
-
         try {
             new SettingsController().switchHere(stage);
         }
