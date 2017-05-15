@@ -1,7 +1,7 @@
 package Model.Netcode;
 
 import Model.LocalMapModel;
-import Model.ModelEventHandler;
+import com.sun.deploy.util.SessionState;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -10,28 +10,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Kevin Ni
  */
 public class LobbyModel extends Thread{
-    private static final int PORT = 1337;
 
     private ServerSocket welcomingSocket;
-    private ObservableList<Socket> connectionSockets;
+    private ObservableList<ClientConnection> connectionSockets;
 
     public LobbyModel() throws IOException{
         super();
         connectionSockets  = FXCollections.observableList(new ArrayList<>());
-        welcomingSocket = new ServerSocket(PORT);
+        welcomingSocket = new ServerSocket(Constants.PORT);
         super.start();
     }
 
     @Override public void run(){
         while(!welcomingSocket.isClosed()){
             try{
-                Socket newConnection = welcomingSocket.accept();
+                ClientConnection newConnection = new ClientConnection(welcomingSocket.accept(), (con) -> {
+                    connectionSockets.remove(con);
+                });
+
                 connectionSockets.add(newConnection);
             }
             catch (SocketException | EOFException ex){
@@ -45,7 +46,7 @@ public class LobbyModel extends Thread{
     }
 
     private void close(){
-        if(welcomingSocket != null && !welcomingSocket.isClosed()) {
+        if(!welcomingSocket.isClosed()) {
             try {
                 welcomingSocket.close();
             }
@@ -57,38 +58,26 @@ public class LobbyModel extends Thread{
 
     public void finish(LocalMapModel model){
         int i = 1;
-        for(Socket socket : connectionSockets) {
-            new ClientConnection(model, socket, i++);
-        }
-        close();
-    }
-
-    public void abort(){
-        for (Socket socket : connectionSockets)
-        {
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    socket.close();
-                }
-                catch (IOException ex){
-                    ex.printStackTrace();
-                }
+        for(ClientConnection connection : connectionSockets) {
+            try {
+                connection.StartGame(model, i++);
+            }
+            catch (IOException ex){
+                ex.printStackTrace();
+                connection.close();
             }
         }
         close();
     }
 
-    public ObservableList<Socket> getObservable(){
-        return connectionSockets;
+    public void abort(){
+        new ArrayList<>(connectionSockets).forEach((conn)->{
+            conn.close();
+        });
+        close();
     }
 
-    public void kick(Socket currentSocket) {
-        connectionSockets.remove(currentSocket);
-        try {
-            currentSocket.close();
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
-        }
+    public ObservableList<ClientConnection> getObservable(){
+        return connectionSockets;
     }
 }

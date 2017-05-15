@@ -12,8 +12,6 @@ import java.util.concurrent.Semaphore;
  * @author Kevin Ni
  */
 public class RemoteMapModel extends Thread implements MapModel {
-    private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
-    private static final MapTile.MapItem[] TILES = MapTile.MapItem.values();
 
     private Socket socket;
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
@@ -60,7 +58,7 @@ public class RemoteMapModel extends Thread implements MapModel {
         }
 
         try {
-            if(socket != null && !socket.isClosed()) {
+            if(!socket.isClosed()) {
                 socket.close();
             }
         }
@@ -72,12 +70,12 @@ public class RemoteMapModel extends Thread implements MapModel {
     @Override public void run(){
         while(!socket.isClosed()){
             try {
-                switch(HEADERS[in.readByte()]){
+                switch(Constants.HEADERS[in.readByte()]){
                     case MOVE:
                         broadcast();
                         break;
                     case ANSWER:
-                        lastQuery = new MapTile(in.readBoolean(), TILES[in.readInt()]);
+                        lastQuery = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
                         semaphore.release();
                         break;
                     default:
@@ -101,7 +99,7 @@ public class RemoteMapModel extends Thread implements MapModel {
         MapUpdateInfo info = new MapUpdateInfo(false);
         for(int i = 0; i < n; i++){
             Position position = new Position(in.readInt(), in.readInt());
-            MapTile mapTile = new MapTile(in.readBoolean(), TILES[in.readInt()]);
+            MapTile mapTile = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
             info.addChange(position, mapTile);
         }
         score++;

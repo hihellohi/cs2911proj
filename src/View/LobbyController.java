@@ -1,6 +1,7 @@
 package View;
 
 import Model.LocalMapModel;
+import Model.Netcode.ClientConnection;
 import Model.Netcode.LobbyModel;
 import Model.Settings;
 import javafx.event.ActionEvent;
@@ -24,7 +25,7 @@ import java.net.Socket;
  */
 public class LobbyController {
 
-    @FXML private ListView<Socket> listView;
+    @FXML private ListView<ClientConnection> listView;
     @FXML private Button startBtn;
     @FXML private Button backBtn;
 
@@ -46,7 +47,7 @@ public class LobbyController {
     public void initialize(){
         listView.setPlaceholder(new Label("Nobody has joined and you have no friends :("));
         listView.setItems(model.getObservable());
-        listView.setCellFactory((param) -> new LobbyItem(model));
+        listView.setCellFactory((param) -> new LobbyItem());
 
         startBtn.setOnAction(startEvent);
 

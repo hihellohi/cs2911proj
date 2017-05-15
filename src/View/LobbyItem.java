@@ -1,9 +1,8 @@
 package View;
 
+import Model.Netcode.ClientConnection;
 import Model.Netcode.LobbyModel;
-import com.sun.javafx.font.freetype.HBGlyphLayout;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -11,24 +10,22 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
-import java.net.Socket;
-
 /**
  * @author Kevin Ni
  */
-public class LobbyItem extends ListCell<Socket> {
+public class LobbyItem extends ListCell<ClientConnection> {
     private HBox hBox;
     private Label ipLabel;
-    private Socket currentSocket;
+    private ClientConnection currentConnection;
 
-    public LobbyItem(LobbyModel model){
+    public LobbyItem(){
         super();
 
         super.setPrefHeight(30);
 
         hBox = new HBox();
         ipLabel = new Label();
-        currentSocket = null;
+        currentConnection = null;
 
         Pane pane = new Pane();
         Button button = new Button("Kick");
@@ -38,22 +35,22 @@ public class LobbyItem extends ListCell<Socket> {
         hBox.getChildren().addAll(ipLabel, pane, button);
         HBox.setHgrow(pane, Priority.ALWAYS);
         button.setOnAction((e)->{
-            model.kick(currentSocket);
+            currentConnection.close();
         });
     }
 
-    @Override protected void updateItem(Socket socket, boolean empty){
-        super.updateItem(socket, empty);
+    @Override protected void updateItem(ClientConnection connection, boolean empty){
+        super.updateItem(connection, empty);
 
-        if(empty || socket == null){
-            currentSocket = null;
+        if(empty || connection == null){
+            currentConnection = null;
             Platform.runLater(() ->{
                 super.setGraphic(null);
             });
         }
         else{
-            currentSocket = socket;
-            ipLabel.setText(socket.getInetAddress().getHostAddress());
+            currentConnection = connection;
+            ipLabel.setText(connection.getHostAddress());
             Platform.runLater(() ->{
                 super.setGraphic(hBox);
             });

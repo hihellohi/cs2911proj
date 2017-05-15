@@ -5,27 +5,29 @@ import javafx.scene.input.KeyCode;
 
 import java.io.*;
 import java.net.*;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
  */
 public class ClientConnection extends Thread implements ModelEventHandler<MapUpdateInfo> {
-    private static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
-    private static final KeyCode[] CODES = KeyCode.values();
 
     private LocalMapModel model;
     private DataInputStream in;
     private DataOutputStream out;
     private int player;
     private Socket socket;
+    private Consumer<ClientConnection> lobbyRemover;
 
-    public ClientConnection(LocalMapModel model, Socket socket, int player){
+    public ClientConnection(Socket socket, Consumer<ClientConnection> lobbyRemover){
         super();
+
+        this.lobbyRemover = lobbyRemover;
+        this.socket = socket;
+
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            out.writeInt(model.getWidth());
-            out.writeInt(model.getHeight());
 
             System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
         }
@@ -34,21 +36,27 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             close();
         }
 
-        this.socket = socket;
-        this.player = player;
-        this.model = model;
-        model.subscribeModelUpdate(this);
-
         super.start();
     }
 
-    @Override public void run(){
+    public void StartGame(LocalMapModel model, int player) throws IOException{
+        out.writeInt(model.getWidth());
+        out.writeInt(model.getHeight());
 
+        this.player = player;
+        this.model = model;
+
+        lobbyRemover = null;
+
+        model.subscribeModelUpdate(this);
+    }
+
+    @Override public void run(){
         while(!socket.isClosed()){
             try {
-                switch(HEADERS[in.readByte()]){
+                switch(Constants.HEADERS[in.readByte()]){
                     case MOVE_REQUEST:
-                        model.processInput(CODES[in.readInt()]);
+                        model.processInput(Constants.CODES[in.readInt()]);
                         break;
                     case QUERY:
                         query(new Position(in.readInt(), in.readInt()));
@@ -77,14 +85,20 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
     }
 
     public void close(){
+
         try {
-            if(socket != null && !socket.isClosed()) {
+            if(!socket.isClosed()) {
                 socket.close();
+            }
+
+            if(lobbyRemover != null){
+                lobbyRemover.accept(this);
             }
         }
         catch (IOException e){
             e.printStackTrace();
         }
+
     }
 
     public void handle(MapUpdateInfo updateInfo){
@@ -104,5 +118,9 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             close();
             e.printStackTrace();
         }
+    }
+
+    public String getHostAddress(){
+        return socket.getInetAddress().getHostAddress();
     }
 }
