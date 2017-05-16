@@ -65,9 +65,9 @@ public class JoinGameController{
 
     private Consumer<RemoteMapModel> startEvent = (model) -> {
         finder.close();
-        GameView view = new GameView(model);
-
         Platform.runLater(() -> {
+            GameView view = new GameView(model);
+
             view.switchHere(stage);
         });
     };

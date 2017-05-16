@@ -24,8 +24,7 @@ public class RemoteMapModel implements MapModel {
 
     private int width;
     private int height;
-    private int score;
-    private long time;
+    private int numMoves;
 
     private Semaphore semaphore;
 
@@ -35,8 +34,7 @@ public class RemoteMapModel implements MapModel {
         this.startGame = startGame;
         this.host = new InetSocketAddress(host, Constants.TCP_PORT);
 
-        score = 0;
-        time = 0;
+        numMoves = 0;
 
         listeners = new ArrayList<>();
         semaphore = new Semaphore(0);
@@ -60,7 +58,7 @@ public class RemoteMapModel implements MapModel {
 
     public void close(){
         if(listeners != null) {
-            MapUpdateInfo info = new MapUpdateInfo(true);
+            MapUpdateInfo info = new MapUpdateInfo(false, false, true);
             for (ModelEventHandler<MapUpdateInfo> listener : listeners) {
                 listener.handle(info);
             }
@@ -118,13 +116,12 @@ public class RemoteMapModel implements MapModel {
 
     private void broadcast() throws IOException{
         int n = in.readInt();
-        MapUpdateInfo info = new MapUpdateInfo(false);
+        MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), false,false);
         for(int i = 0; i < n; i++){
             Position position = new Position(in.readInt(), in.readInt());
             MapTile mapTile = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
             info.addChange(position, mapTile);
         }
-        score++;
 
         for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
             listener.handle(info);
@@ -139,18 +136,6 @@ public class RemoteMapModel implements MapModel {
         catch (IOException ex){
             ex.printStackTrace();
         }
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getTime() {
-        return time;
     }
 
     public int getHeight(){

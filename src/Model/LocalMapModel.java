@@ -15,8 +15,6 @@ public class LocalMapModel implements MapModel {
     private MapTile[][] startingMap;
     private Position[] players;
     private int goalsLeft;
-    private int score;
-    private long time;
     private List<MapUpdateInfo> moves;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
@@ -26,7 +24,6 @@ public class LocalMapModel implements MapModel {
     public LocalMapModel(int seed, int nPlayers){
         players = new Position[nPlayers];
         listeners = new ArrayList<>();
-        time = 0;
         generateMap(seed);
     }
 
@@ -47,7 +44,6 @@ public class LocalMapModel implements MapModel {
     private void setUpMap(MapTile[][] map) {
         moves = new ArrayList<>();
         goalsLeft = 0;
-        score = 0;
         int p = 0;
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
@@ -143,6 +139,10 @@ public class LocalMapModel implements MapModel {
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
         switch (e.getCode()) {
+            case P:
+            case ESCAPE:
+                pause();
+                break;
             case U:
                 undo();
                 break;
@@ -157,6 +157,14 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    public void pause() {
+        MapUpdateInfo info = new MapUpdateInfo(false, true, goalsLeft == 0);
+
+        for (ModelEventHandler<MapUpdateInfo> listener : listeners) {
+            listener.handle(info);
+        }
+    }
+
     public void undo() {
 
     }
@@ -167,7 +175,7 @@ public class LocalMapModel implements MapModel {
     }
 
     public void broadcastMap() {
-        MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+        MapUpdateInfo info = new MapUpdateInfo(true, false, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
                 Position pos = new Position(x, y);
@@ -215,7 +223,6 @@ public class LocalMapModel implements MapModel {
     private synchronized void broadcastMove(Position oldPosition, Position newPosition, Position lookAhead, int p){
         if (validMove(newPosition, lookAhead)) {
             players[p] = newPosition;
-            score++;
 
             boolean pushedBox = getMapAt(newPosition).getItem() == BOX;
 
@@ -225,7 +232,7 @@ public class LocalMapModel implements MapModel {
             }
             setMapAt(newPosition, PLAYER);
 
-            MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
+            MapUpdateInfo info = new MapUpdateInfo(false, false, goalsLeft == 0);
             info.addChange(newPosition, getMapAt(newPosition));
             if(pushedBox) {
                 info.addChange(lookAhead, getMapAt(lookAhead));
@@ -267,18 +274,6 @@ public class LocalMapModel implements MapModel {
 
     public MapTile getMapAt(Position pos){
         return map[pos.getY()][pos.getX()];
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getTime() {
-        return time;
     }
 
     public int getHeight(){

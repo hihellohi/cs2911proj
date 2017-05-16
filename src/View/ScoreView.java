@@ -4,9 +4,7 @@ import Model.MapModel;
 import Model.MapUpdateInfo;
 import Model.ModelEventHandler;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -20,13 +18,14 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
     private Label scoreLbl;
     private ScoreTimer timeLbl;
     private MapModel model;
-    private Button resetBtn;
+    private int score;
 
     public ScoreView(MapModel model) {
         super();
         super.addEventHandler(KeyEvent.KEY_PRESSED, model);
 
-        this.model = model ;
+        this.model = model;
+        score = 0;
         model.subscribeModelUpdate(this);
 
         super.setPrefWidth(sideWidth());
@@ -47,16 +46,34 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
         super.setTop(vbox);
     }
 
-    public void resetGame(ActionEvent actionEvent) {
-    }
-
     @Override
     public void handle(MapUpdateInfo updateInfo) {
-        if (updateInfo.isFinished())
+        if (updateInfo.isFinished()) {
             timeLbl.stopTimer();
+        }
+        else if (updateInfo.isNewMap()) {
+            score = 0;
+            timeLbl.resetTimer();
+        }
+        else if (updateInfo.isPaused()) {
+            timeLbl.pauseTimer();
+        }
+        else {
+            score++;
+        }
+        Platform.runLater(() -> scoreLbl.setText(String.valueOf(score)));
+    }
 
-        Platform.runLater(() -> scoreLbl.setText(String.valueOf(model.getScore())));
-        model.setTime(timeLbl.getTime()); //consider changing this in the future (map shouldn't care about the score)
+    public void startTimer() {
+        timeLbl.startTimer();
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public String getTime() {
+        return timeLbl.timeToString();
     }
 
     public int sideWidth() {
