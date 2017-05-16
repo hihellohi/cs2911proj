@@ -6,6 +6,7 @@ import Model.ModelEventHandler;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -56,16 +57,11 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
             timeLbl.resetTimer();
         }
         else if (updateInfo.isPaused()) {
-            timeLbl.pauseTimer();
         }
         else {
             score++;
         }
         Platform.runLater(() -> scoreLbl.setText(String.valueOf(score)));
-    }
-
-    public void startTimer() {
-        timeLbl.startTimer();
     }
 
     public int getScore() {
