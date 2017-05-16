@@ -139,10 +139,6 @@ public class LocalMapModel implements MapModel {
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
         switch (e.getCode()) {
-            case P:
-            case ESCAPE:
-                pause();
-                break;
             case U:
                 undo();
                 break;
@@ -157,14 +153,6 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    public void pause() {
-        MapUpdateInfo info = new MapUpdateInfo(false, true, goalsLeft == 0);
-
-        for (ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(info);
-        }
-    }
-
     public void undo() {
 
     }
@@ -175,7 +163,7 @@ public class LocalMapModel implements MapModel {
     }
 
     public void broadcastMap() {
-        MapUpdateInfo info = new MapUpdateInfo(true, false, goalsLeft == 0);
+        MapUpdateInfo info = new MapUpdateInfo(true, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
                 Position pos = new Position(x, y);
@@ -232,7 +220,7 @@ public class LocalMapModel implements MapModel {
             }
             setMapAt(newPosition, PLAYER);
 
-            MapUpdateInfo info = new MapUpdateInfo(false, false, goalsLeft == 0);
+            MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
             info.addChange(newPosition, getMapAt(newPosition));
             if(pushedBox) {
                 info.addChange(lookAhead, getMapAt(lookAhead));

@@ -24,9 +24,6 @@ public class RemoteMapModel implements MapModel {
 
     private int width;
     private int height;
-    private int numMoves;
-
-    private Semaphore semaphore;
 
     public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
         super();
@@ -34,10 +31,7 @@ public class RemoteMapModel implements MapModel {
         this.startGame = startGame;
         this.host = new InetSocketAddress(host, Constants.TCP_PORT);
 
-        numMoves = 0;
-
         listeners = new ArrayList<>();
-        semaphore = new Semaphore(0);
     }
 
     public void connect() throws IOException {
@@ -108,7 +102,7 @@ public class RemoteMapModel implements MapModel {
     };
 
     private void broadcast() throws IOException{
-        MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), false, in.readBoolean());
+        MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), in.readBoolean());
         int n = in.readInt();
         for(int i = 0; i < n; i++){
             Position position = new Position(in.readInt(), in.readInt());

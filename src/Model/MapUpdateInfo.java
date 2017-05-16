@@ -10,13 +10,11 @@ public class MapUpdateInfo {
 
     private List<Pair<Position, MapTile>> coordinates;
     private boolean newMap;
-    private boolean paused;
     private boolean finished;
 
-    public MapUpdateInfo(boolean newMap, boolean paused, boolean finished){
+    public MapUpdateInfo(boolean newMap, boolean finished){
         coordinates = new ArrayList<>();
         this.newMap = newMap;
-        this.paused = paused;
         this.finished = finished;
     }
 
@@ -26,10 +24,6 @@ public class MapUpdateInfo {
 
     public boolean isNewMap() {
         return newMap;
-    }
-
-    public boolean isPaused() {
-        return paused;
     }
 
     public boolean isFinished(){

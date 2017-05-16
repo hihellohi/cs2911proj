@@ -61,10 +61,6 @@ public class ScoreTimer extends Label {
         timeline.stop();
     }
 
-    public void pauseTimer() {
-        timeline.pause();
-    }
-
     public String timeToString() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timeScore);
