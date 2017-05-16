@@ -52,15 +52,17 @@ public class BeaconFinder extends Thread {
             InetAddress localhost = Inet4Address.getLocalHost();
             NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localhost);
 
-            for(InterfaceAddress address : networkInterface.getInterfaceAddresses()){
-                if(address.getBroadcast() != null) {
-                    System.out.println(address.getBroadcast().toString());
-                    DatagramPacket packet = new DatagramPacket(
-                            Constants.BEACON_MESSAGE.getBytes(),
-                            Constants.BEACON_MESSAGE.length(),
-                            address.getBroadcast(),
-                            Constants.UDP_PORT);
-                    socket.send(packet);
+            if(networkInterface != null) {
+                for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
+                    if (address.getBroadcast() != null) {
+                        System.out.println(address.getBroadcast().toString());
+                        DatagramPacket packet = new DatagramPacket(
+                                Constants.BEACON_MESSAGE.getBytes(),
+                                Constants.BEACON_MESSAGE.length(),
+                                address.getBroadcast(),
+                                Constants.UDP_PORT);
+                        socket.send(packet);
+                    }
                 }
             }
         }
