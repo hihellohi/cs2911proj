@@ -1,9 +1,8 @@
 package View;
 
-import Model.LocalMapModel;
 import Model.Netcode.BeaconFinder;
-import Model.Netcode.ClientConnection;
-import Model.Netcode.LobbyModel;
+import Model.Netcode.RemoteMapModel;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,15 +17,20 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.management.PlatformLoggingMXBean;
+import java.net.InetAddress;
+import java.rmi.Remote;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
  */
 public class JoinGameController{
 
-    @FXML private ListView<String> listView;
+    @FXML private ListView<RemoteMapModel> listView;
     @FXML private Button backBtn;
     @FXML private Button searchBtn;
+    @FXML private Button refreshBtn;
     @FXML private TextField ipField;
 
     private Scene scene;
@@ -35,7 +39,7 @@ public class JoinGameController{
 
     public JoinGameController() throws IOException {
 
-        finder = new BeaconFinder();
+        finder = new BeaconFinder(startEvent);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("JoinGame.fxml"));
         loader.setController(this);
         Parent parent = loader.load();
@@ -51,9 +55,20 @@ public class JoinGameController{
         listView.setCellFactory((param) -> new JoinGameItem());
 
         searchBtn.setOnAction(searchEvent);
-
         backBtn.setOnAction(backEvent);
+        refreshBtn.setOnAction(refreshEvent);
     }
+
+    private EventHandler<ActionEvent> refreshEvent = (event) -> {
+        finder.broadcast();
+    };
+
+    private Consumer<RemoteMapModel> startEvent = (model) -> {
+        finder.close();
+        Platform.runLater(() -> {
+            new GameView(model).switchHere(stage);
+        });
+    };
 
     private EventHandler<ActionEvent> searchEvent = (event) -> {
         finder.target(ipField.getText());
@@ -61,11 +76,11 @@ public class JoinGameController{
 
     private EventHandler<ActionEvent> backEvent = (event) -> {
         try {
-            finder.close();
+            finder.abort();
             new UIController().switchHere(stage);
         }
         catch (IOException ex){
-            throw new UncheckedIOException(ex);
+            ex.printStackTrace();
         }
     };
 

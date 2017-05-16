@@ -8,21 +8,24 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
  */
 public class BeaconFinder extends Thread {
     private DatagramSocket socket;
-    private ObservableList<String> responses;
+    private ObservableList<RemoteMapModel> observableList;
     private Set<String> seenAddresses;
+    private Consumer<RemoteMapModel> onGameStart;
 
-    public BeaconFinder() throws SocketException {
+    public BeaconFinder(Consumer<RemoteMapModel> onGameStart) throws SocketException {
         super();
         socket = new DatagramSocket();
         socket.setBroadcast(true);
-        responses = FXCollections.observableList(new ArrayList<String>());
+        observableList = FXCollections.observableList(new ArrayList<RemoteMapModel>());
         seenAddresses = new HashSet<>();
+        this.onGameStart = onGameStart;
         super.start();
     }
 
@@ -76,9 +79,11 @@ public class BeaconFinder extends Thread {
             try {
                 socket.receive(recv);
                 String string = new String(recv.getData()).trim();
-                if(string.equals(Constants.BEACON_MESSAGE) && !seenAddresses.contains(string)){
-                    responses.add(recv.getAddress().getHostName());
-                    seenAddresses.add(string);
+                InetAddress address = recv.getAddress();
+                String hostAddress = address.getHostAddress();
+                if(string.equals(Constants.BEACON_MESSAGE) && !seenAddresses.contains(hostAddress)){
+                    observableList.add(new RemoteMapModel(address, onGameStart));
+                    seenAddresses.add(hostAddress);
                 }
             }
             catch(IOException ex){
@@ -87,13 +92,20 @@ public class BeaconFinder extends Thread {
         }
     }
 
-    public ObservableList<String> getObservable(){
-        return responses;
+    public ObservableList<RemoteMapModel> getObservable(){
+        return observableList;
     }
 
     public void close(){
         if(!socket.isClosed()) {
             socket.close();
         }
+    }
+
+    public void abort(){
+        new ArrayList<>(observableList).forEach((conn)->{
+            conn.close();
+        });
+        close();
     }
 }

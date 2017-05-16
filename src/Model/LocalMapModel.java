@@ -21,6 +21,8 @@ public class LocalMapModel implements MapModel {
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
+    //TODO close to notify connections. also take in a close notification from connections
+
     public LocalMapModel(int seed, int nPlayers){
         players = new Position[nPlayers];
         listeners = new ArrayList<>();

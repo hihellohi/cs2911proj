@@ -23,6 +23,7 @@ public class GameMenuBar extends MenuBar {
         MenuItem switchToMainMenu = new MenuItem("Go back to Main Menu");
         switchToMainMenu.setOnAction(event -> {
             try {
+                //TODO graceful exit notify clientconnection
                 new UIController().switchHere(stage);
             }
             catch(IOException ex){

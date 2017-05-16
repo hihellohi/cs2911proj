@@ -7,16 +7,20 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
  */
-public class RemoteMapModel extends Thread implements MapModel {
+public class RemoteMapModel implements MapModel {
 
     private Socket socket;
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
     private DataInputStream in;
     private DataOutputStream out;
+    private InetSocketAddress host;
+
+    private Consumer<RemoteMapModel> startGame;
 
     private int width;
     private int height;
@@ -26,17 +30,23 @@ public class RemoteMapModel extends Thread implements MapModel {
     private Semaphore semaphore;
     private MapTile lastQuery;
 
-    public RemoteMapModel(String host) throws IOException{
+    public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
         super();
+
+        this.startGame = startGame;
+        this.host = new InetSocketAddress(host, Constants.TCP_PORT);
+
         score = 0;
         time = 0;
 
         listeners = new ArrayList<>();
         semaphore = new Semaphore(0);
+    }
 
+    public void connect() throws IOException {
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(host, Constants.TCP_PORT));
+            socket.connect(host);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
@@ -46,7 +56,7 @@ public class RemoteMapModel extends Thread implements MapModel {
             close();
             throw e;
         }
-        super.start();
+        new Thread(listen).start();
     }
 
     public void close(){
@@ -58,8 +68,9 @@ public class RemoteMapModel extends Thread implements MapModel {
         }
 
         try {
-            if(!socket.isClosed()) {
+            if(socket != null && !socket.isClosed()) {
                 socket.close();
+                socket = null;
             }
         }
         catch (IOException e){
@@ -67,8 +78,24 @@ public class RemoteMapModel extends Thread implements MapModel {
         }
     }
 
-    @Override public void run(){
-        while(!socket.isClosed()){
+    private Runnable listen = () -> {
+        if(socket == null){
+            return;
+        }
+
+        try {
+            width = in.readInt();
+            height = in.readInt();
+        }
+        catch (IOException ex){
+            close();
+            return;
+        }
+
+        startGame.accept(this);
+        startGame = null;
+
+        while(socket != null && !socket.isClosed()){
             try {
                 switch(Constants.HEADERS[in.readByte()]){
                     case MOVE:
@@ -92,7 +119,7 @@ public class RemoteMapModel extends Thread implements MapModel {
                 ex.printStackTrace();
             }
         }
-    }
+    };
 
     private void broadcast() throws IOException{
         int n = in.readInt();
@@ -151,6 +178,14 @@ public class RemoteMapModel extends Thread implements MapModel {
 
     public int getWidth(){
         return width;
+    }
+
+    public String getHostName(){
+        return host.getAddress().getHostName();
+    }
+
+    public boolean isConnected(){
+        return socket != null && socket.isConnected();
     }
 
     public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
