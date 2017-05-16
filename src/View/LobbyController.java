@@ -54,7 +54,7 @@ public class LobbyController {
     private EventHandler<ActionEvent> startEvent = (event) -> {
         model.close();
 
-        LocalMapModel mapModel = new LocalMapModel("input1.txt", model.nPlayers() + 1);
+        LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1);
 
         model.finish(mapModel);
         new GameView(mapModel).switchHere(stage);

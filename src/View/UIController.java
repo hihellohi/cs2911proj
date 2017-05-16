@@ -55,7 +55,7 @@ public class UIController {
 
     private EventHandler<ActionEvent> switchToGame = (e) -> {
         //TODO THROW EXCEPTION
-        LocalMapModel model = new LocalMapModel();
+        LocalMapModel model = new LocalMapModel(1);
         GameView view = new GameView(model);
         view.switchHere(stage);
     };

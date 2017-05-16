@@ -18,15 +18,15 @@ public class MapGenerator {
         this.difficulty = difficulty;
     }
 
-    public MapTile[][] generateMap() {
+    public MapTile[][] generateMap(int numPlayers) {
         MapTile[][] map;
         do {
-            map = makeMap();
+            map = makeMap(numPlayers);
         } while (!isMapGood(map));
         return map;
     }
 
-    private MapTile[][] makeMap() {
+    private MapTile[][] makeMap(int numPlayers) {
         int walkLength = 0;
         int maxNumberOfBoxes = 0;
         int maxGeneratingPoint = 0;
@@ -59,8 +59,9 @@ public class MapGenerator {
         System.out.println(difficulty);
         MapTile[][] map = initializeEmptyMap(width, height);
 
-        Position player = placePlayer(map);
-        Position start = new Position(player.getX(), player.getY());
+        List<Position> players = placePlayers(map, numPlayers);
+        // copy over the starting positions of each player
+        List<Position> startingPositions = new ArrayList<>(players);
 
         // generate the points on the path that we will drop the boxes
         List<Integer> all = new ArrayList<>();
@@ -78,13 +79,17 @@ public class MapGenerator {
         // walk randomly around and drop boxes randomly in front of player
         List<Position> boxPositions = new ArrayList<>();
         List<Position> path = new ArrayList<>();
-        path.add(start);
+        path.addAll(startingPositions);
         KeyCode[] directions = {UP, DOWN, LEFT, RIGHT};
         for (int i = 0; i < walkLength; i++) {
+            int playerIndex = generator.nextInt(numPlayers);
+            Position player = players.get(playerIndex);
             KeyCode move = directions[generator.nextInt(4)];
+
             Pair<Position, Position> positions = getPositions(move, player);
             Position newPosition = positions.first();
             Position lookAhead = positions.second();
+
             if (indexes.contains(i) &&
                     (getMapAt(map, newPosition).getItem() == MapTile.MapItem.GROUND) &&
                     !boxPositions.contains(newPosition) &&
@@ -95,12 +100,14 @@ public class MapGenerator {
 
             if (isValidMove(map, newPosition, lookAhead)) {
                 makeMove(map, player, newPosition, lookAhead);
-                player = newPosition;
+                players.set(playerIndex, newPosition);
                 path.add(newPosition);
             }
         }
 
-        setMapAt(map, player, MapTile.MapItem.GROUND);
+        for (Position player: players) {
+            setMapAt(map, player, MapTile.MapItem.GROUND);
+        }
 
         // the final position of boxes will be their goal states
         for (int y = 1; y < height - 1; y++) {
@@ -115,7 +122,9 @@ public class MapGenerator {
             }
         }
 
-        setMapAt(map, start, MapTile.MapItem.PLAYER);
+        for (Position start: startingPositions) {
+            setMapAt(map, start, MapTile.MapItem.PLAYER);
+        }
 
         // reset the position of boxes at where they were initially placed
         for (Position pos: boxPositions) {
@@ -213,10 +222,8 @@ public class MapGenerator {
         }
 
         // initialize the map to empty ground everywhere
-        List<Position> freePositions = new ArrayList<>();
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
-                freePositions.add(new Position(x, y));
                 map[y][x] = new MapTile(false, MapTile.MapItem.GROUND);
             }
         }
@@ -232,13 +239,22 @@ public class MapGenerator {
         tile.setItem(item);
     }
 
-    private Position placePlayer(MapTile[][] map) {
-        Position player = new Position(
-                1 + generator.nextInt(map[0].length - 2),
-                1 + generator.nextInt(map.length - 2)
-        );
+    private List<Position> placePlayers(MapTile[][] map, int numPlayers) {
+        List<Position> freePositions = new ArrayList<>();
+        for (int y = 1; y < map.length - 1; y++) {
+            for (int x = 1; x < map[0].length - 1; x++) {
+                freePositions.add(new Position(x, y));
+            }
+        }
+        List<Position> players = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            int index = generator.nextInt(freePositions.size());
+            Position player = freePositions.get(index);
+            freePositions.remove(index);
+            players.add(player);
+            map[player.getY()][player.getX()].setItem(MapTile.MapItem.PLAYER);
+        }
 
-        map[player.getY()][player.getX()].setItem(MapTile.MapItem.PLAYER);
-        return player;
+        return players;
     }
 }
