@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -13,22 +14,24 @@ import java.util.function.Consumer;
 /**
  * @author Kevin Ni
  */
-public class BeaconFinder extends Thread {
+public class BeaconFinder {
     private DatagramSocket socket;
     private ObservableList<RemoteMapModel> observableList;
     private Set<String> seenAddresses;
     private Consumer<RemoteMapModel> onGameStart;
 
     public BeaconFinder(Consumer<RemoteMapModel> onGameStart) throws SocketException {
-        super();
         socket = new DatagramSocket();
         socket.setBroadcast(true);
         observableList = FXCollections.observableList(new ArrayList<RemoteMapModel>());
         seenAddresses = new HashSet<>();
         this.onGameStart = onGameStart;
-        super.start();
+        new Thread(listener).start();
     }
 
+    /**
+     * find a beacon at this address
+     */
     public void target(String hostName){
         try {
             DatagramPacket packet = new DatagramPacket(
@@ -40,22 +43,24 @@ public class BeaconFinder extends Thread {
         }
         catch (UnknownHostException ex){
             System.out.println("unknown host");
-            ex.printStackTrace();
         }
         catch (IOException ex){
             ex.printStackTrace();
         }
     }
 
+    /**
+     * find all beacons on the subnet
+     */
     public void broadcast(){
         try {
-            InetAddress localhost = Inet4Address.getLocalHost();
-            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localhost);
+            Enumeration<NetworkInterface> it = NetworkInterface.getNetworkInterfaces();
+            while(it.hasMoreElements()){
+                for(InterfaceAddress address : it.nextElement().getInterfaceAddresses()){
+                    System.out.println(address.toString());
 
-            if(networkInterface != null) {
-                for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
-                    if (address.getBroadcast() != null) {
-                        System.out.println(address.getBroadcast().toString());
+                    //ignore loopback interface and IPv6
+                    if (address.getAddress().getAddress()[0] != 127 && address.getBroadcast() != null){
                         DatagramPacket packet = new DatagramPacket(
                                 Constants.BEACON_MESSAGE.getBytes(),
                                 Constants.BEACON_MESSAGE.length(),
@@ -66,16 +71,12 @@ public class BeaconFinder extends Thread {
                 }
             }
         }
-        catch (UnknownHostException ex){
-            System.out.println("unknown host");
-            ex.printStackTrace();
-        }
         catch (IOException ex){
             ex.printStackTrace();
         }
     }
 
-    @Override public void run(){
+    private Runnable listener = () -> {
         DatagramPacket recv = new DatagramPacket(new byte[256], 256);
         while(!socket.isClosed()){
             try {
@@ -93,7 +94,7 @@ public class BeaconFinder extends Thread {
                 System.out.println("Beacon finder closed. thread terminating...");
             }
         }
-    }
+    };
 
     public ObservableList<RemoteMapModel> getObservable(){
         return observableList;
@@ -106,9 +107,7 @@ public class BeaconFinder extends Thread {
     }
 
     public void abort(){
-        new ArrayList<>(observableList).forEach((conn)->{
-            conn.close();
-        });
+        new ArrayList<>(observableList).forEach(RemoteMapModel::close);
         close();
     }
 }
