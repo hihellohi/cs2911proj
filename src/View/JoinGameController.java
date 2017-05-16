@@ -16,10 +16,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.lang.management.PlatformLoggingMXBean;
-import java.net.InetAddress;
-import java.rmi.Remote;
 import java.util.function.Consumer;
 
 /**
@@ -65,9 +61,9 @@ public class JoinGameController{
 
     private Consumer<RemoteMapModel> startEvent = (model) -> {
         finder.close();
-        Platform.runLater(() -> {
-            GameView view = new GameView(model);
 
+        GameView view = new GameView(model);
+        Platform.runLater(() -> {
             view.switchHere(stage);
         });
     };

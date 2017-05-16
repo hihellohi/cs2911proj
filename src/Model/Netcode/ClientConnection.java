@@ -94,8 +94,9 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
     public void handle(MapUpdateInfo updateInfo){
         try {
             out.writeByte(ProtocolHeader.MOVE.ordinal());
-            out.writeInt(updateInfo.size());
             out.writeBoolean(updateInfo.isNewMap());
+            out.writeBoolean(updateInfo.isFinished());
+            out.writeInt(updateInfo.size());
             for (Pair<Position, MapTile> change : updateInfo.getCoordinates()) {
                 Position pos = change.first();
                 MapTile tile = change.second();

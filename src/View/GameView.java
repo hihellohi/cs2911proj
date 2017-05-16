@@ -3,6 +3,7 @@ package View;
 import Model.MapModel;
 import Model.MapUpdateInfo;
 import Model.ModelEventHandler;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -18,6 +19,7 @@ public class GameView extends BorderPane implements ModelEventHandler<MapUpdateI
     private ScoreView sv;
     private GameMenuBar menuBar;
     private PauseMenu pauseMenu;
+    private MapModel model;
 
     public GameView(MapModel model) {
         super();
@@ -25,7 +27,7 @@ public class GameView extends BorderPane implements ModelEventHandler<MapUpdateI
         grid = new MapView(model);
         sv = new ScoreView(model);
         menuBar = new GameMenuBar(model);
-        pauseMenu = new PauseMenu(model);
+        this.model = model;
 
         model.subscribeModelUpdate(this);
 
@@ -37,6 +39,7 @@ public class GameView extends BorderPane implements ModelEventHandler<MapUpdateI
     public void switchHere(Stage stage){
         this.stage = stage;
         menuBar.setStage(stage);
+        pauseMenu = new PauseMenu(model);
         pauseMenu.setStage(stage);
         Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight() + menuBar.getHeight());
 
@@ -54,8 +57,10 @@ public class GameView extends BorderPane implements ModelEventHandler<MapUpdateI
             });
         }
         else if (updateInfo.isFinished()) {
-            new EndGameDialog(sv).showAndWait();
-            pauseMenu.show();
+            Platform.runLater(() -> {
+                new EndGameDialog(sv).showAndWait();
+                pauseMenu.show();
+            });
         }
     }
 }

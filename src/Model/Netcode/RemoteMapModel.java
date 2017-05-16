@@ -57,13 +57,6 @@ public class RemoteMapModel implements MapModel {
     }
 
     public void close(){
-        if(listeners != null) {
-            MapUpdateInfo info = new MapUpdateInfo(false, false, true);
-            for (ModelEventHandler<MapUpdateInfo> listener : listeners) {
-                listener.handle(info);
-            }
-        }
-
         try {
             if(socket != null && !socket.isClosed()) {
                 socket.close();
@@ -115,8 +108,8 @@ public class RemoteMapModel implements MapModel {
     };
 
     private void broadcast() throws IOException{
+        MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), false, in.readBoolean());
         int n = in.readInt();
-        MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), false,false);
         for(int i = 0; i < n; i++){
             Position position = new Position(in.readInt(), in.readInt());
             MapTile mapTile = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
