@@ -58,7 +58,7 @@ public class LobbyController {
 
         model.finish(mapModel);
         new GameView(mapModel).switchHere(stage);
-
+        mapModel.broadcastMap();
     };
 
     private EventHandler<ActionEvent> backEvent = (event) -> {

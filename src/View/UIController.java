@@ -56,8 +56,8 @@ public class UIController {
     private EventHandler<ActionEvent> switchToGame = (e) -> {
         //TODO THROW EXCEPTION
         LocalMapModel model = new LocalMapModel(1);
-        GameView view = new GameView(model);
-        view.switchHere(stage);
+        new GameView(model).switchHere(stage);
+        model.broadcastMap();
     };
 
     private EventHandler<ActionEvent> startHost = (e) -> {
@@ -78,21 +78,6 @@ public class UIController {
         catch (IOException ex){
             ex.printStackTrace();
         }
-//        try {
-//            RemoteMapModel client = new RemoteMapModel(HOST);
-//            client.start();
-//            GameView view = new GameView(client);
-//            view.switchHere(stage);
-//        }
-//        catch (EOFException ex){
-//            System.out.println("you got kicked lol");
-//        }
-//        catch(ConnectException ex){
-//            System.out.println("host not found");
-//        }
-//        catch(IOException ex){
-//            ex.printStackTrace();
-//        }
     };
 
     private EventHandler<ActionEvent> switchToSettings = (e) -> {

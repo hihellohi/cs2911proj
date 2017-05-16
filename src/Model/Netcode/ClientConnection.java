@@ -58,9 +58,6 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                     case MOVE_REQUEST:
                         model.processInput(Constants.CODES[in.readInt()], player);
                         break;
-                    case QUERY:
-                        query(new Position(in.readInt(), in.readInt()));
-                        break;
                     default:
                         System.out.println("unknown command!");
                         break;
@@ -75,13 +72,6 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                 ex.printStackTrace();
             }
         }
-    }
-
-    private void query(Position pos) throws IOException{
-        MapTile tile = model.getMapAt(pos);
-        out.writeByte(ProtocolHeader.ANSWER.ordinal());
-        out.writeBoolean(tile.getIsGoal());
-        out.writeInt(tile.getItem().ordinal());
     }
 
     public void close(){

@@ -31,10 +31,10 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
 
         tiles = new ImageView[model.getHeight()][model.getWidth()];
 
+        MapTile mapTile = new MapTile(false, MapTile.MapItem.WALL);
         for(int r = 0; r < model.getHeight(); r++){
             for(int c = 0; c < model.getWidth(); c++){
                 ImageView viewTile = new ImageView();
-                MapTile mapTile = model.getMapAt(new Position(c, r));
                 setTile(viewTile, mapTile);
                 tiles[r][c] = viewTile;
                 super.add(viewTile, c, r);

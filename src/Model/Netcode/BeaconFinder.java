@@ -88,6 +88,7 @@ public class BeaconFinder extends Thread {
             }
             catch(IOException ex){
                 close();
+                System.out.println("Beacon finder closed. thread terminating...");
             }
         }
     }

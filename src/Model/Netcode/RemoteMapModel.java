@@ -101,10 +101,6 @@ public class RemoteMapModel implements MapModel {
                     case MOVE:
                         broadcast();
                         break;
-                    case ANSWER:
-                        lastQuery = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
-                        semaphore.release();
-                        break;
                     default:
                         System.out.println("unknown command!");
                         break;
@@ -144,20 +140,6 @@ public class RemoteMapModel implements MapModel {
         catch (IOException ex){
             ex.printStackTrace();
         }
-    }
-
-    public MapTile getMapAt(Position pos){
-        try {
-            //TODO THIS IS NOT OPTIMAL CHANGE THIS
-            out.writeByte(ProtocolHeader.QUERY.ordinal());
-            out.writeInt(pos.getX());
-            out.writeInt(pos.getY());
-            semaphore.acquire();
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return lastQuery;
     }
 
     public int getScore() {

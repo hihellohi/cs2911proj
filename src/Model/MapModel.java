@@ -11,7 +11,6 @@ import javafx.util.Duration;
  */
 public interface MapModel extends EventHandler<KeyEvent> {
     void handle(KeyEvent e);
-    MapTile getMapAt(Position pos);
     void setTime(long time);
     long getTime();
     int getScore();

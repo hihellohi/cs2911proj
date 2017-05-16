@@ -163,10 +163,10 @@ public class LocalMapModel implements MapModel {
 
     public synchronized void generateNewMap() {
         generateMap();
-        broadcastReset();
+        broadcastMap();
     }
 
-    private synchronized void broadcastReset() {
+    public void broadcastMap() {
         MapUpdateInfo info = new MapUpdateInfo(goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
@@ -179,9 +179,10 @@ public class LocalMapModel implements MapModel {
             listener.handle(info);
         }
     }
+
     public void reset() {
         setUpMap(startingMap);
-        broadcastReset();
+        broadcastMap();
         System.out.println("Reset map");
     }
 
