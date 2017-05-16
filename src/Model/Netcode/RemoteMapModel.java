@@ -28,7 +28,6 @@ public class RemoteMapModel implements MapModel {
     private long time;
 
     private Semaphore semaphore;
-    private MapTile lastQuery;
 
     public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
         super();

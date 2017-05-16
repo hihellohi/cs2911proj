@@ -13,6 +13,5 @@ class Constants {
     static final MapTile.MapItem[] TILES = MapTile.MapItem.values();
     static final int TCP_PORT = 1337;
     static final int UDP_PORT = 1338;
-    static final int PULSE = 5000;
     static final String BEACON_MESSAGE = "Kevin is awesome";
 }
