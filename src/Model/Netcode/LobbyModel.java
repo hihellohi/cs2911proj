@@ -1,13 +1,11 @@
 package Model.Netcode;
 
 import Model.LocalMapModel;
-import com.sun.deploy.util.SessionState;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
@@ -18,11 +16,13 @@ public class LobbyModel extends Thread{
 
     private ServerSocket welcomingSocket;
     private ObservableList<ClientConnection> connectionSockets;
+    private HostBeacon beacon;
 
     public LobbyModel() throws IOException{
         super();
-        connectionSockets  = FXCollections.observableList(new ArrayList<>());
-        welcomingSocket = new ServerSocket(Constants.PORT);
+        connectionSockets = FXCollections.observableList(new ArrayList<>());
+        welcomingSocket = new ServerSocket(Constants.TCP_PORT);
+        beacon = new HostBeacon();
         super.start();
     }
 
@@ -46,6 +46,7 @@ public class LobbyModel extends Thread{
     }
 
     public void close(){
+        beacon.close();
         if(!welcomingSocket.isClosed()) {
             try {
                 welcomingSocket.close();

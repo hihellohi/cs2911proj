@@ -12,47 +12,48 @@ import javafx.scene.layout.Priority;
 /**
  * @author Kevin Ni
  */
-public class LobbyItem extends ListCell<ClientConnection> {
+public class JoinGameItem extends ListCell<String> {
     private HBox hBox;
     private Label ipLabel;
-    private ClientConnection currentConnection;
+    private String currentString;
 
-    public LobbyItem(){
+    public JoinGameItem(){
         super();
 
         super.setPrefHeight(30);
 
         hBox = new HBox();
         ipLabel = new Label();
-        currentConnection = null;
+        currentString = null;
 
         Pane pane = new Pane();
-        Button button = new Button("Kick");
+        Button button = new Button("Join");
 
         super.setText(null);
 
         hBox.getChildren().addAll(ipLabel, pane, button);
         HBox.setHgrow(pane, Priority.ALWAYS);
         button.setOnAction((e)->{
-            currentConnection.close();
+            System.out.println(currentString);
         });
     }
 
-    @Override protected void updateItem(ClientConnection connection, boolean empty){
-        super.updateItem(connection, empty);
+    @Override protected void updateItem(String string, boolean empty){
+        super.updateItem(string, empty);
 
-        if(empty || connection == null){
-            currentConnection = null;
+        if(empty || string == null){
+            currentString = null;
             Platform.runLater(() ->{
                 super.setGraphic(null);
             });
         }
         else{
-            currentConnection = connection;
-            ipLabel.setText(connection.getHostAddress());
+            currentString = string;
+            ipLabel.setText(string);
             Platform.runLater(() ->{
                 super.setGraphic(hBox);
             });
         }
     }
 }
+

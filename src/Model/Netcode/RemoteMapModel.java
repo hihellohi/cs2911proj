@@ -28,16 +28,17 @@ public class RemoteMapModel extends Thread implements MapModel {
 
     public RemoteMapModel(String host) throws IOException{
         super();
+        score = 0;
+        time = 0;
+
+        listeners = new ArrayList<>();
+        semaphore = new Semaphore(0);
+
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(host, Constants.PORT));
+            socket.connect(new InetSocketAddress(host, Constants.TCP_PORT));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
-            width = in.readInt();
-            height = in.readInt();
-            score = 0;
-            time = 0;
 
             System.out.println("Connected!");
         }
@@ -45,8 +46,7 @@ public class RemoteMapModel extends Thread implements MapModel {
             close();
             throw e;
         }
-        listeners = new ArrayList<>();
-        semaphore = new Semaphore(0);
+        super.start();
     }
 
     public void close(){
