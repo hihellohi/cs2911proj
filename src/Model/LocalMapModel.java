@@ -15,7 +15,7 @@ public class LocalMapModel implements MapModel {
     private MapTile[][] startingMap;
     private Position[] players;
     private int goalsLeft;
-    private List<MapUpdateInfo> moves;
+    private Stack<MapTile[][]> history;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
@@ -38,11 +38,12 @@ public class LocalMapModel implements MapModel {
     private void generateMap(int seed) {
         System.out.println(seed);
         MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
+        history = new Stack<>();
         setUpMap(generator.generateMap(players.length));
+        this.history.push(copyMap());
     }
 
     private void setUpMap(MapTile[][] map) {
-        moves = new ArrayList<>();
         goalsLeft = 0;
         int p = 0;
         for (int y = 0; y < map.length; y++) {
@@ -154,16 +155,24 @@ public class LocalMapModel implements MapModel {
     }
 
     public void undo() {
-
+        if (history.size() <= 1) {
+            System.out.println("can't undo");
+            return;
+        }
+        history.pop();
+        MapTile[][] prevMap = history.peek();
+        setUpMap(prevMap);
+        broadcastMap(false);
+        System.out.println("undo");
     }
 
     public synchronized void generateNewMap() {
         generateMap();
-        broadcastMap();
+        broadcastMap(true);
     }
 
-    public void broadcastMap() {
-        MapUpdateInfo info = new MapUpdateInfo(true, goalsLeft == 0);
+    public void broadcastMap(boolean isNewMap) {
+        MapUpdateInfo info = new MapUpdateInfo(isNewMap, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
                 Position pos = new Position(x, y);
@@ -178,7 +187,9 @@ public class LocalMapModel implements MapModel {
 
     public void reset() {
         setUpMap(startingMap);
-        broadcastMap();
+        broadcastMap(true);
+        history.removeAllElements();
+        history.push(copyMap());
         System.out.println("Reset map");
     }
 
@@ -206,6 +217,7 @@ public class LocalMapModel implements MapModel {
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
         broadcastMove(oldPosition, newPosition, lookAhead, p);
+        history.push(copyMap());
     }
 
     private synchronized void broadcastMove(Position oldPosition, Position newPosition, Position lookAhead, int p){
@@ -221,6 +233,7 @@ public class LocalMapModel implements MapModel {
             setMapAt(newPosition, PLAYER);
 
             MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
+
             info.addChange(newPosition, getMapAt(newPosition));
             if(pushedBox) {
                 info.addChange(lookAhead, getMapAt(lookAhead));

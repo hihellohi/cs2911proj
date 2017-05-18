@@ -3,23 +3,30 @@ package View;
 import Model.*;
 import javafx.application.Platform;
 import javafx.scene.image.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+
+import java.util.Stack;
 
 /**
  * @author Kevin Ni
  */
 class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private final static Image GROUND = new Image("images/ground.png", 100, 100, false, false);
-    private final static Image PLAYER = new Image("images/player.png", 100, 100, false, false);
     private final static Image BOX = new Image("images/box.png", 100, 100, false, false);
     private final static Image GOAL = new Image("images/goal.png", 100, 100, false, false);
     private final static Image GOAL_BOX = new Image("images/goalBox.png", 100, 100, false, false);
     private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png", 100, 100, false, false);
     private final static Image WALL = new Image("images/wall.png", 100, 100, false, false);
+    private final static Image PLAYER_NORTH = new Image("images/playerU.png", 100, 100, false, false);
+    private final static Image PLAYER_EAST = new Image("images/playerR.png", 100, 100, false, false);
+    private final static Image PLAYER_SOUTH = new Image("images/player.png", 100, 100, false, false);
+    private final static Image PLAYER_WEST = new Image("images/playerL.png", 100, 100, false, false);
 
     private MapModel model;
     private ImageView[][] tiles;
+    private Direction dirn;
 
     MapView(MapModel model){
         super();
@@ -30,6 +37,7 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
         model.subscribeModelUpdate(this);
 
         tiles = new ImageView[model.getHeight()][model.getWidth()];
+        dirn = Direction.SOUTH;
 
         MapTile mapTile = new MapTile(false, MapTile.MapItem.WALL);
         for(int r = 0; r < model.getHeight(); r++){
@@ -51,6 +59,9 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     }
 
     public void handle(MapUpdateInfo updateInfo){
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            dirn = dirn.changeDirection(event.getCode());
+        });
         Platform.runLater(() ->{
             for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
                 Position pos = change.first();
@@ -64,7 +75,19 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
             case PLAYER:
-                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER);
+                Image playerDirn = PLAYER_SOUTH;
+                switch (dirn) {
+                    case NORTH:
+                        playerDirn = PLAYER_NORTH;
+                        break;
+                    case EAST:
+                        playerDirn = PLAYER_EAST;
+                        break;
+                    case WEST:
+                        playerDirn = PLAYER_WEST;
+                        break;
+                }
+                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: playerDirn);
                 break;
             case WALL:
                 viewTile.setImage(WALL);
