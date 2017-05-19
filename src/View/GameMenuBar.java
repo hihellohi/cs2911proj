@@ -34,11 +34,15 @@ public class GameMenuBar extends MenuBar {
         newMap.setOnAction(event -> {
             model.generateNewMap();
         });
+        MenuItem undo = new MenuItem("Undo move");
+        undo.setOnAction(event -> {
+            model.undo();
+        });
         MenuItem reset = new MenuItem("Reset map");
         reset.setOnAction(event -> {
             model.reset();
         });
-        options.getItems().addAll(switchToMainMenu, newMap, reset);
+        options.getItems().addAll(switchToMainMenu, newMap, undo, reset);
         getMenus().addAll(options);
     }
 

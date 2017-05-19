@@ -149,6 +149,10 @@ public class RemoteMapModel implements MapModel {
 
     }
 
+    public void undo() {
+
+    }
+
     public void reset() {
 
     }

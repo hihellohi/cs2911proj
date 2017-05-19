@@ -34,6 +34,10 @@ public class MapUpdateInfo {
         return coordinates;
     }
 
+    public Pair<Position, MapTile> get(int index) {
+        return coordinates.get(index);
+    }
+
     public int size(){
         return coordinates.size();
     }

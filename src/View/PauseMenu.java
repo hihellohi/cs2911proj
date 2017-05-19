@@ -37,7 +37,6 @@ public class PauseMenu extends Dialog {
         returnToGame.setOnAction(event -> {
             window.hide();
         });
-        returnToGame.setOnKeyPressed(hideWindow);
 
         Button mainMenu = new Button("Return to Main Menu");
         mainMenu.setPrefWidth(BUTTON_WIDTH);
@@ -51,7 +50,6 @@ public class PauseMenu extends Dialog {
             }
             window.hide();
         });
-        mainMenu.setOnKeyPressed(hideWindow);
 
         Button newGame = new Button("New Game");
         newGame.setPrefWidth(BUTTON_WIDTH);
@@ -59,7 +57,6 @@ public class PauseMenu extends Dialog {
             model.generateNewMap();
             window.hide();
         });
-        newGame.setOnKeyPressed(hideWindow);
 
         Button restart = new Button("Restart Game");
         restart.setPrefWidth(BUTTON_WIDTH);
@@ -67,18 +64,17 @@ public class PauseMenu extends Dialog {
             model.reset();
             window.hide();
         });
-        restart.setOnKeyPressed(hideWindow);
 
         Button exit = new Button("Exit");
         exit.setPrefWidth(BUTTON_WIDTH);
         exit.setOnAction(event -> {
             Platform.exit();
         });
-        exit.setOnKeyPressed(hideWindow);
 
         vbox.getChildren().addAll(returnToGame, mainMenu, newGame, restart, exit);
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(DIALOG_GAP);
+        vbox.setOnKeyPressed(hideWindow);
         super.getDialogPane().setContent(vbox);
     }
 

@@ -57,7 +57,7 @@ public class UIController {
         //TODO THROW EXCEPTION
         LocalMapModel model = new LocalMapModel(1);
         new GameView(model).switchHere(stage);
-        model.broadcastMap(true);
+        model.broadcastMap();
     };
 
     private EventHandler<ActionEvent> startHost = (e) -> {

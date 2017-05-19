@@ -15,7 +15,8 @@ public class LocalMapModel implements MapModel {
     private MapTile[][] startingMap;
     private Position[] players;
     private int goalsLeft;
-    private Stack<MapTile[][]> history;
+    private Stack<MapUpdateInfo> history;
+    private Stack<Position[]> playerHistory;
 
     private List<ModelEventHandler<MapUpdateInfo>> listeners;
 
@@ -39,8 +40,8 @@ public class LocalMapModel implements MapModel {
         System.out.println(seed);
         MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
         history = new Stack<>();
+        playerHistory = new Stack<>();
         setUpMap(generator.generateMap(players.length));
-        this.history.push(copyMap());
     }
 
     private void setUpMap(MapTile[][] map) {
@@ -154,25 +155,47 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    public void undo() {
-        if (history.size() <= 1) {
+    private void setUpPlayers() {
+        Position[] prevPlayers = playerHistory.pop();
+        for (int i = 0; i < players.length; i++)
+            players[i] = prevPlayers[i];
+    }
+
+    private void broadcastPrevMove() {
+        MapUpdateInfo prev = history.pop();
+        for (Pair<Position, MapTile> prevTile : prev.getCoordinates()) {
+            setMapAt(prevTile.first(), prevTile.second().getItem());
+        }
+
+        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
+            listener.handle(prev);
+        }
+    }
+
+    private Position[] copyPlayers() {
+        Position[] newPlayers = new Position[players.length];
+        for (int i = 0; i < players.length; i++)
+            newPlayers[i] = players[i];
+        return newPlayers;
+    }
+
+    public synchronized void undo() {
+        if (history.size() < 1) {
             System.out.println("can't undo");
             return;
         }
-        history.pop();
-        MapTile[][] prevMap = history.peek();
-        setUpMap(prevMap);
-        broadcastMap(false);
+        setUpPlayers();
+        broadcastPrevMove();
         System.out.println("undo");
     }
 
     public synchronized void generateNewMap() {
         generateMap();
-        broadcastMap(true);
+        broadcastMap();
     }
 
-    public void broadcastMap(boolean isNewMap) {
-        MapUpdateInfo info = new MapUpdateInfo(isNewMap, goalsLeft == 0);
+    public void broadcastMap() {
+        MapUpdateInfo info = new MapUpdateInfo(true, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
                 Position pos = new Position(x, y);
@@ -187,9 +210,9 @@ public class LocalMapModel implements MapModel {
 
     public void reset() {
         setUpMap(startingMap);
-        broadcastMap(true);
+        broadcastMap();
         history.removeAllElements();
-        history.push(copyMap());
+        playerHistory.removeAllElements();
         System.out.println("Reset map");
     }
 
@@ -217,14 +240,21 @@ public class LocalMapModel implements MapModel {
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
         broadcastMove(oldPosition, newPosition, lookAhead, p);
-        history.push(copyMap());
     }
+
 
     private synchronized void broadcastMove(Position oldPosition, Position newPosition, Position lookAhead, int p){
         if (validMove(newPosition, lookAhead)) {
+            playerHistory.push(copyPlayers());
             players[p] = newPosition;
 
             boolean pushedBox = getMapAt(newPosition).getItem() == BOX;
+
+            MapUpdateInfo prevInfo = new MapUpdateInfo(false, goalsLeft == 0);
+            prevInfo.addChange(oldPosition, new MapTile(getMapAt(oldPosition).getIsGoal(), getMapAt(oldPosition).getItem()));
+            prevInfo.addChange(newPosition, new MapTile(getMapAt(newPosition).getIsGoal(), getMapAt(newPosition).getItem()));
+            prevInfo.addChange(lookAhead, new MapTile(getMapAt(lookAhead).getIsGoal(), getMapAt(lookAhead).getItem()));
+            history.push(prevInfo);
 
             setMapAt(oldPosition, GROUND);
             if(pushedBox){
