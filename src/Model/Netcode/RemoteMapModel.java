@@ -6,7 +6,6 @@ import javafx.scene.input.KeyEvent;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
 /**
@@ -15,12 +14,12 @@ import java.util.function.Consumer;
 public class RemoteMapModel implements MapModel {
 
     private Socket socket;
-    private List<ModelEventHandler<MapUpdateInfo>> listeners;
     private DataInputStream in;
     private DataOutputStream out;
     private InetSocketAddress host;
 
-    private Consumer<RemoteMapModel> startGame;
+    private List<Consumer<MapUpdateInfo>> gameChangeListeners;
+    private Consumer<RemoteMapModel> startGameListener;
 
     private int width;
     private int height;
@@ -28,10 +27,10 @@ public class RemoteMapModel implements MapModel {
     public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
         super();
 
-        this.startGame = startGame;
+        this.startGameListener = startGame;
         this.host = new InetSocketAddress(host, Constants.TCP_PORT);
 
-        listeners = new ArrayList<>();
+        gameChangeListeners = new ArrayList<>();
     }
 
     public void connect() throws IOException {
@@ -76,8 +75,8 @@ public class RemoteMapModel implements MapModel {
             return;
         }
 
-        startGame.accept(this);
-        startGame = null;
+        startGameListener.accept(this);
+        startGameListener = null;
 
         while(socket != null && !socket.isClosed()){
             try {
@@ -110,8 +109,8 @@ public class RemoteMapModel implements MapModel {
             info.addChange(position, mapTile);
         }
 
-        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(info);
+        for(Consumer<MapUpdateInfo> listener : gameChangeListeners) {
+            listener.accept(info);
         }
     }
 
@@ -134,15 +133,15 @@ public class RemoteMapModel implements MapModel {
     }
 
     public String getHostName(){
-        return host.getAddress().getHostName();
+        return host.getAddress().getHostAddress();
     }
 
     public boolean isConnected(){
         return socket != null && socket.isConnected();
     }
 
-    public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
-        listeners.add(listener);
+    public void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
+        gameChangeListeners.add(listener);
     }
 
     public void generateNewMap() {

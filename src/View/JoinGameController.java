@@ -83,10 +83,10 @@ public class JoinGameController{
     };
 
     public void switchHere(Stage stage){
-        finder.broadcast();
         this.stage = stage;
         stage.setScene(scene);
         stage.show();
+        finder.broadcast();
     }
 }
 

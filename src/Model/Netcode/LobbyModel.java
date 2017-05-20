@@ -12,21 +12,22 @@ import java.util.ArrayList;
 /**
  * @author Kevin Ni
  */
-public class LobbyModel extends Thread{
+public class LobbyModel {
 
     private ServerSocket welcomingSocket;
     private ObservableList<ClientConnection> connectionSockets;
     private HostBeacon beacon;
 
+    //TODO terminate thread (and all other threads) when stage is closed
     public LobbyModel() throws IOException{
         super();
         connectionSockets = FXCollections.observableList(new ArrayList<>());
         welcomingSocket = new ServerSocket(Constants.TCP_PORT);
         beacon = new HostBeacon();
-        super.start();
+        new Thread(listen).start();
     }
 
-    @Override public void run(){
+    private Runnable listen = () -> {
         while(!welcomingSocket.isClosed()){
             try{
                 ClientConnection newConnection = new ClientConnection(welcomingSocket.accept(), (con) -> {
@@ -43,7 +44,7 @@ public class LobbyModel extends Thread{
                 ex.printStackTrace();
             }
         }
-    }
+    };
 
     public void close(){
         beacon.close();

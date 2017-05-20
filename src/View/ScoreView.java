@@ -2,19 +2,19 @@ package View;
 
 import Model.MapModel;
 import Model.MapUpdateInfo;
-import Model.ModelEventHandler;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
+import java.util.function.Consumer;
+
 /**
  * Created by willi on 13/05/2017.
  */
-public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdateInfo> {
+public class ScoreView extends BorderPane {
     private final static int SIDE_PANEL_SIZE = 150;
     private Label scoreLbl;
     private ScoreTimer timeLbl;
@@ -27,7 +27,7 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
 
         this.model = model;
         score = 0;
-        model.subscribeModelUpdate(this);
+        model.subscribeModelUpdate(onMapChange);
 
         super.setPrefWidth(sideWidth());
         VBox vbox = new VBox();
@@ -47,8 +47,7 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
         super.setTop(vbox);
     }
 
-    @Override
-    public void handle(MapUpdateInfo updateInfo) {
+    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
         if (updateInfo.isFinished()) {
             timeLbl.stopTimer();
         }
@@ -60,7 +59,7 @@ public class ScoreView extends BorderPane implements ModelEventHandler<MapUpdate
             score++;
         }
         Platform.runLater(() -> scoreLbl.setText(String.valueOf(score)));
-    }
+    };
 
     public int getScore() {
         return score;

@@ -4,6 +4,7 @@ import javafx.scene.input.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static Model.MapTile.MapItem.*;
 
@@ -18,7 +19,7 @@ public class LocalMapModel implements MapModel {
     private Stack<MapUpdateInfo> history;
     private Stack<Position[]> playerHistory;
 
-    private List<ModelEventHandler<MapUpdateInfo>> listeners;
+    private List<Consumer<MapUpdateInfo>> listeners;
 
     //TODO close to notify connections. also take in a close notification from connections
 
@@ -167,8 +168,8 @@ public class LocalMapModel implements MapModel {
             setMapAt(prevTile.first(), prevTile.second().getItem());
         }
 
-        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(prev);
+        for(Consumer<MapUpdateInfo> listener : listeners) {
+            listener.accept(prev);
         }
     }
 
@@ -203,8 +204,8 @@ public class LocalMapModel implements MapModel {
             }
         }
 
-        for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-            listener.handle(info);
+        for(Consumer<MapUpdateInfo> listener : listeners) {
+            listener.accept(info);
         }
     }
 
@@ -270,8 +271,8 @@ public class LocalMapModel implements MapModel {
             }
             info.addChange(oldPosition, getMapAt(oldPosition));
 
-            for(ModelEventHandler<MapUpdateInfo> listener : listeners) {
-                listener.handle(info);
+            for(Consumer<MapUpdateInfo> listener : listeners) {
+                listener.accept(info);
             }
         }
     }
@@ -315,7 +316,7 @@ public class LocalMapModel implements MapModel {
         return getHeight() == 0 ? 0 : map[0].length;
     }
 
-    public void subscribeModelUpdate(ModelEventHandler<MapUpdateInfo> listener){
+    public void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         listeners.add(listener);
     }
 }

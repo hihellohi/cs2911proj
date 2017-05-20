@@ -57,10 +57,11 @@ public class BeaconFinder {
             Enumeration<NetworkInterface> it = NetworkInterface.getNetworkInterfaces();
             while(it.hasMoreElements()){
                 for(InterfaceAddress address : it.nextElement().getInterfaceAddresses()){
-                    System.out.println(address.toString());
 
                     //ignore loopback interface and IPv6
                     if (address.getAddress().getAddress()[0] != 127 && address.getBroadcast() != null){
+                        System.out.println(String.format("broadcasting on %s", address.getBroadcast()));
+
                         DatagramPacket packet = new DatagramPacket(
                                 Constants.BEACON_MESSAGE.getBytes(),
                                 Constants.BEACON_MESSAGE.length(),
@@ -81,12 +82,12 @@ public class BeaconFinder {
         while(!socket.isClosed()){
             try {
                 socket.receive(recv);
-                String string = new String(recv.getData()).trim();
+                String name = new String(recv.getData()).trim();
                 InetAddress address = recv.getAddress();
-                String hostAddress = address.getHostAddress();
-                if(string.equals(Constants.BEACON_MESSAGE) && !seenAddresses.contains(hostAddress)){
+                if(!seenAddresses.contains(name)){
+                    System.out.println(String.format("host %s found!", name));
                     observableList.add(new RemoteMapModel(address, onGameStart));
-                    seenAddresses.add(hostAddress);
+                    seenAddresses.add(name);
                 }
             }
             catch(IOException ex){

@@ -2,7 +2,6 @@ package View;
 
 import Model.MapModel;
 import Model.MapUpdateInfo;
-import Model.ModelEventHandler;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,11 +12,13 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.util.function.Consumer;
+
 
 /**
  * @author Kevin Ni
  */
-public class GameView extends StackPane implements ModelEventHandler<MapUpdateInfo> {
+public class GameView extends StackPane {
 
     private Stage stage;
     private MapView grid;
@@ -41,7 +42,7 @@ public class GameView extends StackPane implements ModelEventHandler<MapUpdateIn
         region.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7)");
         region.setVisible(false);
 
-        model.subscribeModelUpdate(this);
+        model.subscribeModelUpdate(onMapChange);
 
         bp.setLeft(grid);
         bp.setRight(sv);
@@ -73,12 +74,12 @@ public class GameView extends StackPane implements ModelEventHandler<MapUpdateIn
         }
     };
 
-    public void handle(MapUpdateInfo updateInfo) {
+    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
         if (updateInfo.isFinished()) {
             Platform.runLater(() -> {
                 new EndGameDialog(sv).showAndWait();
                 pauseMenu.show();
             });
         }
-    }
+    };
 }

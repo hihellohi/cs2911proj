@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * @author Kevin Ni
  */
-public class ClientConnection extends Thread implements ModelEventHandler<MapUpdateInfo> {
+public class ClientConnection {
 
     private LocalMapModel model;
     private DataInputStream in;
@@ -36,7 +36,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             close();
         }
 
-        super.start();
+        new Thread(listen).start();
     }
 
     public void StartGame(LocalMapModel model, int player) throws IOException{
@@ -48,10 +48,10 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
 
         lobbyRemover = null;
 
-        model.subscribeModelUpdate(this);
+        model.subscribeModelUpdate(onMapChange);
     }
 
-    @Override public void run(){
+    private Runnable listen = () -> {
         while(!socket.isClosed()){
             try {
                 switch(Constants.HEADERS[in.readByte()]){
@@ -72,7 +72,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                 ex.printStackTrace();
             }
         }
-    }
+    };
 
     public void close(){
 
@@ -81,6 +81,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
                 socket.close();
             }
 
+            //TODO probably implement kick all here?
             if(lobbyRemover != null){
                 lobbyRemover.accept(this);
             }
@@ -91,7 +92,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
 
     }
 
-    public void handle(MapUpdateInfo updateInfo){
+    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
         try {
             out.writeByte(ProtocolHeader.MOVE.ordinal());
             out.writeBoolean(updateInfo.isNewMap());
@@ -110,7 +111,7 @@ public class ClientConnection extends Thread implements ModelEventHandler<MapUpd
             close();
             e.printStackTrace();
         }
-    }
+    };
 
     public String getHostAddress(){
         return socket.getInetAddress().getHostAddress();

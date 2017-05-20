@@ -3,16 +3,15 @@ package View;
 import Model.*;
 import javafx.application.Platform;
 import javafx.scene.image.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
-import java.util.Stack;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
  */
-class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
+class MapView extends GridPane {
     private final static Image GROUND = new Image("images/ground.png", 100, 100, false, false);
     private final static Image BOX = new Image("images/box.png", 100, 100, false, false);
     private final static Image GOAL = new Image("images/goal.png", 100, 100, false, false);
@@ -34,7 +33,7 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
         this.model = model;
         super.addEventHandler(KeyEvent.KEY_PRESSED, model);
 
-        model.subscribeModelUpdate(this);
+        model.subscribeModelUpdate(onMapChange);
 
         tiles = new ImageView[model.getHeight()][model.getWidth()];
         dirn = Direction.SOUTH;
@@ -58,7 +57,7 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
         return (int) (GROUND.getWidth() * model.getWidth());
     }
 
-    public void handle(MapUpdateInfo updateInfo){
+    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             dirn = dirn.changeDirection(event.getCode());
         });
@@ -70,7 +69,7 @@ class MapView extends GridPane implements ModelEventHandler<MapUpdateInfo>{
                 setTile(tiles[y][x], change.second());
             }
         });
-    }
+    };
 
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
