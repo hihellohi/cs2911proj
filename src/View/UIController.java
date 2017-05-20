@@ -1,7 +1,6 @@
 package View;
 
 import Model.*;
-import Model.Netcode.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,9 +10,7 @@ import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.net.ConnectException;
 
 /**
  * Created by willi on 9/05/2017.
@@ -23,6 +20,7 @@ public class UIController {
     @FXML private Button playGameBtn;
     @FXML private Button hostBtn;
     @FXML private Button clientBtn;
+    @FXML private Button tutorialBtn;
     @FXML private Button settingsBtn;
     @FXML private Button closeGameBtn;
 
@@ -43,6 +41,7 @@ public class UIController {
         playGameBtn.setOnAction(switchToGame);
         hostBtn.setOnAction(startHost);
         clientBtn.setOnAction(startClient);
+        tutorialBtn.setOnAction(startTutorial);
         settingsBtn.setOnAction(switchToSettings);
         closeGameBtn.setOnAction(closeGame);
     }
@@ -74,6 +73,15 @@ public class UIController {
     private EventHandler<ActionEvent> startClient = (e) -> {
         try {
             new JoinGameController().switchHere(stage);
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+    };
+
+    private EventHandler<ActionEvent> startTutorial = (e) -> {
+        try {
+            new TutorialController().switchHere(stage);
         }
         catch (IOException ex){
             ex.printStackTrace();

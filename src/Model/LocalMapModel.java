@@ -33,6 +33,11 @@ public class LocalMapModel implements MapModel {
         this(new Random().nextInt(), nPlayers);
     }
 
+    public LocalMapModel(String path){
+        listeners = new ArrayList<>();
+        loadFromFile(path);
+    }
+
     private void generateMap() {
         generateMap(new Random().nextInt());
     }
@@ -59,7 +64,6 @@ public class LocalMapModel implements MapModel {
             }
         }
         this.map = map;
-        this.map = copyMap();
         this.startingMap = copyMap();
     }
 
@@ -79,7 +83,8 @@ public class LocalMapModel implements MapModel {
     }
 
     private void loadFromFile(String fin) {
-        //read map from file
+        history = new Stack<>();
+        playerHistory = new Stack<>();
         Scanner sc = null;
         try{
             int p = 0;
@@ -88,6 +93,8 @@ public class LocalMapModel implements MapModel {
             String[] dim = sc.nextLine().split("\\s");
             int r = Integer.parseInt(dim[0]);
             int c = Integer.parseInt(dim[1]);
+            int numPlayers = Integer.parseInt(dim[2]);
+            players = new Position[numPlayers];
 
             map = new MapTile[r+2][c+2];
 
@@ -128,6 +135,8 @@ public class LocalMapModel implements MapModel {
                     }
                 }
             }
+
+            this.startingMap = copyMap();
         }
         catch(FileNotFoundException e) {
             System.err.println(String.format("File %s/%s not found", System.getProperty("user.dir"), fin));
@@ -174,12 +183,10 @@ public class LocalMapModel implements MapModel {
 
     public synchronized void undo() {
         if (history.size() < 1) {
-            System.out.println("can't undo");
             return;
         }
         setUpPlayers();
         broadcastPrevMove();
-        System.out.println("undo");
     }
 
     public synchronized void generateNewMap() {
@@ -206,7 +213,6 @@ public class LocalMapModel implements MapModel {
         broadcastMap();
         history.removeAllElements();
         playerHistory.removeAllElements();
-        System.out.println("Reset map");
     }
 
     public synchronized void processInput(KeyCode k, int p){

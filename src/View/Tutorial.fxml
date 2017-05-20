@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="840.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <SplitPane dividerPositions="0.9" layoutX="226.0" layoutY="100.0" orientation="VERTICAL" prefHeight="517.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane>
+               <children>
+                  <VBox layoutX="65.0" layoutY="39.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to Warehouse Boss!" wrappingWidth="505.7294921875">
+                           <font>
+                              <Font size="31.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </Text>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Boss around warehouses in this amazing new game by TheWorstTeam. Control your player with the arrow keys to boss around those crates and place them where they belong!" wrappingWidth="487.0810546875">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Text>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="But be careful! You can only push, not pull, and only in the direction you move. Figure out the rest of the rules by trying the tutorial map below!" wrappingWidth="487.0810632109642" />
+                        <ImageView fitHeight="559.0" fitWidth="660.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/tutorial.png" />
+                           </image>
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </ImageView>
+                     </children>
+                  </VBox>
+               </children></AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="47.0" prefWidth="798.0">
+               <children>
+                  <Button fx:id="exitBtn" layoutX="254.0" layoutY="27.0" mnemonicParsing="false" text="Main Menu" />
+                  <Button fx:id="startTutorialBtn" layoutX="374.0" layoutY="27.0" mnemonicParsing="false" text="Start Tutorial Map" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>
