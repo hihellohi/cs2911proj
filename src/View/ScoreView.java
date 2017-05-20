@@ -55,7 +55,7 @@ public class ScoreView extends BorderPane {
             score = 0;
             timeLbl.resetTimer();
         }
-        else {
+        else if (updateInfo.size() > 1){
             score++;
         }
         Platform.runLater(() -> scoreLbl.setText(String.valueOf(score)));

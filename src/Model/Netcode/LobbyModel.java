@@ -40,7 +40,7 @@ public class LobbyModel {
                 System.out.println("Welcoming socket closed, lobby thread ending...");
             }
             catch (IOException ex) {
-                abort();
+                finish();
                 ex.printStackTrace();
             }
         }
@@ -58,7 +58,7 @@ public class LobbyModel {
         }
     }
 
-    public void finish(LocalMapModel model){
+    public void startGame(LocalMapModel model){
         int i = 1;
         for(ClientConnection connection : connectionSockets) {
             try {
@@ -71,10 +71,8 @@ public class LobbyModel {
         }
     }
 
-    public void abort(){
-        new ArrayList<>(connectionSockets).forEach((conn)->{
-            conn.close();
-        });
+    public void finish(){
+        new ArrayList<>(connectionSockets).forEach(ClientConnection::close);
         close();
     }
 

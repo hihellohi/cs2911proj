@@ -56,14 +56,14 @@ public class LobbyController {
 
         LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1);
 
-        model.finish(mapModel);
+        model.startGame(mapModel);
         new GameView(mapModel).switchHere(stage);
         mapModel.broadcastMap();
     };
 
     private EventHandler<ActionEvent> backEvent = (event) -> {
         try {
-            model.abort();
+            model.finish();
             new UIController().switchHere(stage);
         }
         catch (IOException ex){
