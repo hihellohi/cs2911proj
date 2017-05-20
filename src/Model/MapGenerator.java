@@ -123,7 +123,7 @@ public class MapGenerator {
         }
 
         for (Position start: startingPositions) {
-            setMapAt(map, start, MapTile.MapItem.PLAYER);
+            setMapAt(map, start, MapTile.MapItem.PLAYER_SOUTH);
         }
 
         // reset the position of boxes at where they were initially placed
@@ -169,7 +169,7 @@ public class MapGenerator {
         if(pushedBox){
             setMapAt(map, lookAhead, MapTile.MapItem.BOX);
         }
-        setMapAt(map, newPosition, MapTile.MapItem.PLAYER);
+        setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH);
     }
 
     private Pair<Position, Position> getPositions(KeyCode move, Position player) {
@@ -198,7 +198,7 @@ public class MapGenerator {
 
         switch (item.getItem()){
             case WALL:
-            case PLAYER:
+            case PLAYER_SOUTH:
                 return false;
             case BOX:
                 return getMapAt(map, lookAhead).getItem() == MapTile.MapItem.GROUND;
@@ -252,7 +252,7 @@ public class MapGenerator {
             Position player = freePositions.get(index);
             freePositions.remove(index);
             players.add(player);
-            map[player.getY()][player.getX()].setItem(MapTile.MapItem.PLAYER);
+            map[player.getY()][player.getX()].setItem(MapTile.MapItem.PLAYER_SOUTH);
         }
 
         return players;

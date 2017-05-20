@@ -18,6 +18,7 @@ public class LocalMapModel implements MapModel {
     private int goalsLeft;
     private Stack<MapUpdateInfo> history;
     private Stack<Position[]> playerHistory;
+    private Direction[] playerDirns;
 
     private List<Consumer<MapUpdateInfo>> listeners;
 
@@ -25,6 +26,7 @@ public class LocalMapModel implements MapModel {
 
     public LocalMapModel(int seed, int nPlayers){
         players = new Position[nPlayers];
+        playerDirns = new Direction[nPlayers];
         listeners = new ArrayList<>();
         generateMap(seed);
     }
@@ -50,8 +52,9 @@ public class LocalMapModel implements MapModel {
         int p = 0;
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
-                if (map[y][x].getItem() == PLAYER) {
-                    players[p++] = new Position(x, y);
+                if (map[y][x].getItem() == PLAYER_SOUTH) {
+                    players[p] = new Position(x, y);
+                    playerDirns[p++] = Direction.SOUTH;
                 }
                 if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
                     goalsLeft++;
@@ -106,7 +109,7 @@ public class LocalMapModel implements MapModel {
                 for(int j = 1; j <= c; j++){
                     switch(line.charAt(j - 1)){
                         case 'p':
-                            map[i][j] = new MapTile(false, PLAYER);
+                            map[i][j] = new MapTile(false, PLAYER_SOUTH);
                             players[p++] = new Position(j, i);
                             break;
                         case 'b':
@@ -227,6 +230,7 @@ public class LocalMapModel implements MapModel {
         int oldx = players[p].getX();
         int oldy = players[p].getY();
         Position oldPosition = players[p];
+        playerDirns[p] = playerDirns[p].changeDirection(k);
 
         switch (k){
             case UP:
@@ -261,7 +265,21 @@ public class LocalMapModel implements MapModel {
             if(pushedBox){
                 setMapAt(lookAhead, BOX);
             }
-            setMapAt(newPosition, PLAYER);
+
+            switch (playerDirns[p]) {
+                case NORTH:
+                    setMapAt(newPosition, PLAYER_NORTH);
+                    break;
+                case EAST:
+                    setMapAt(newPosition, PLAYER_EAST);
+                    break;
+                case SOUTH:
+                    setMapAt(newPosition, PLAYER_SOUTH);
+                    break;
+                case WEST:
+                    setMapAt(newPosition, PLAYER_WEST);
+                    break;
+            }
 
             MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
 
@@ -282,7 +300,10 @@ public class LocalMapModel implements MapModel {
 
         switch (item.getItem()){
             case WALL:
-            case PLAYER:
+            case PLAYER_NORTH:
+            case PLAYER_EAST:
+            case PLAYER_SOUTH:
+            case PLAYER_WEST:
                 return false;
             case BOX:
                 return getMapAt(lookAhead).getItem() == GROUND;
