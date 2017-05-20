@@ -23,7 +23,7 @@ public class PauseMenu extends Dialog {
     private Window window;
     private Stage stage;
 
-    public PauseMenu(MapModel model) {
+    public PauseMenu(MapModel model, boolean tutorial) {
         super();
         super.setTitle("Paused");
 
@@ -52,11 +52,13 @@ public class PauseMenu extends Dialog {
         });
 
         Button newGame = new Button("New Game");
-        newGame.setPrefWidth(BUTTON_WIDTH);
-        newGame.setOnAction(event -> {
-            model.generateNewMap();
-            window.hide();
-        });
+        if (!tutorial) {
+            newGame.setPrefWidth(BUTTON_WIDTH);
+            newGame.setOnAction(event -> {
+                model.generateNewMap();
+                window.hide();
+            });
+        }
 
         Button restart = new Button("Restart Game");
         restart.setPrefWidth(BUTTON_WIDTH);
@@ -71,7 +73,12 @@ public class PauseMenu extends Dialog {
             Platform.exit();
         });
 
-        vbox.getChildren().addAll(returnToGame, mainMenu, newGame, restart, exit);
+        if (tutorial) {
+            vbox.getChildren().addAll(returnToGame, mainMenu, restart, exit);
+        }
+        else {
+            vbox.getChildren().addAll(returnToGame, mainMenu, newGame, restart, exit);
+        }
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(DIALOG_GAP);
         vbox.setOnKeyPressed(hideWindow);

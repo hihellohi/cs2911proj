@@ -47,7 +47,7 @@ public class TutorialController {
     private EventHandler<ActionEvent> startTutorial = (e) -> {
         //TODO THROW EXCEPTION
         LocalMapModel model = new LocalMapModel("src/tutorial.txt");
-        new GameView(model).switchHere(stage);
+        new GameView(model, true).switchHere(stage);
         model.broadcastMap();
     };
 
