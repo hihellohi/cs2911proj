@@ -16,11 +16,11 @@ public class GameMenuBar extends MenuBar {
     private MapModel model;
     private Stage stage;
 
-    public GameMenuBar(MapModel model) {
+    public GameMenuBar(MapModel model, boolean tutorial) {
         super();
         this.model = model;
         Menu options = new Menu("Options");
-        MenuItem switchToMainMenu = new MenuItem("Go back to Main Menu");
+        MenuItem switchToMainMenu = new MenuItem("Main menu");
         switchToMainMenu.setOnAction(event -> {
             try {
                 //TODO graceful exit notify clientconnection
@@ -30,19 +30,26 @@ public class GameMenuBar extends MenuBar {
                 ex.printStackTrace();
             }
         });
-        MenuItem newMap = new MenuItem("Generate new map");
-        newMap.setOnAction(event -> {
-            model.generateNewMap();
-        });
-        MenuItem undo = new MenuItem("Undo move");
+        MenuItem newMap = new MenuItem("New game - n");
+        if (!tutorial) {
+            newMap.setOnAction(event -> {
+                model.generateNewMap();
+            });
+        }
+        MenuItem undo = new MenuItem("Undo move - u");
         undo.setOnAction(event -> {
             model.undo();
         });
-        MenuItem reset = new MenuItem("Reset map");
+        MenuItem reset = new MenuItem("Reset game - r");
         reset.setOnAction(event -> {
             model.reset();
         });
-        options.getItems().addAll(switchToMainMenu, newMap, undo, reset);
+        if (!tutorial) {
+            options.getItems().addAll(switchToMainMenu, newMap, undo, reset);
+        }
+        else {
+            options.getItems().addAll(switchToMainMenu, undo, reset);
+        }
         getMenus().addAll(options);
     }
 

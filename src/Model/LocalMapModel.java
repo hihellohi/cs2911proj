@@ -16,6 +16,7 @@ public class LocalMapModel implements MapModel {
     private MapTile[][] startingMap;
     private Position[] players;
     private int goalsLeft;
+    private boolean tutorial;
     private Stack<MapUpdateInfo> history;
     private Stack<Pair<Integer, Position>> playerHistory;
 
@@ -24,6 +25,7 @@ public class LocalMapModel implements MapModel {
     //TODO close to notify connections. also take in a close notification from connections
 
     public LocalMapModel(int seed, int nPlayers){
+        tutorial = false;
         players = new Position[nPlayers];
         listeners = new ArrayList<>();
         generateMap(seed);
@@ -33,8 +35,13 @@ public class LocalMapModel implements MapModel {
         this(new Random().nextInt(), nPlayers);
     }
 
+    /** Used solely for the tutorial
+     *
+     * @param path path to file with the map
+     */
     public LocalMapModel(String path){
         listeners = new ArrayList<>();
+        tutorial = true;
         loadFromFile(path);
     }
 
@@ -158,7 +165,9 @@ public class LocalMapModel implements MapModel {
                 reset();
                 break;
             case N:
-                generateNewMap();
+                if (!tutorial) {
+                    generateNewMap();
+                }
                 break;
             default:
                 processInput(e.getCode(), 0);
