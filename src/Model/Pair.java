@@ -4,8 +4,8 @@ package Model;
  * @author Kevin Ni
  */
 public class Pair<T1, T2> {
-    T1 first;
-    T2 second;
+    protected T1 first;
+    protected T2 second;
 
     public Pair(T1 first, T2 second){
         this.first = first;

@@ -17,8 +17,7 @@ public class LocalMapModel implements MapModel {
     private Position[] players;
     private int goalsLeft;
     private Stack<MapUpdateInfo> history;
-    private Stack<Position[]> playerHistory;
-    private Direction[] playerDirns;
+    private Stack<Pair<Integer, Position>> playerHistory;
 
     private List<Consumer<MapUpdateInfo>> listeners;
 
@@ -26,7 +25,6 @@ public class LocalMapModel implements MapModel {
 
     public LocalMapModel(int seed, int nPlayers){
         players = new Position[nPlayers];
-        playerDirns = new Direction[nPlayers];
         listeners = new ArrayList<>();
         generateMap(seed);
     }
@@ -53,8 +51,7 @@ public class LocalMapModel implements MapModel {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
                 if (map[y][x].getItem() == PLAYER_SOUTH) {
-                    players[p] = new Position(x, y);
-                    playerDirns[p++] = Direction.SOUTH;
+                    players[p++] = new Position(x, y);
                 }
                 if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
                     goalsLeft++;
@@ -160,9 +157,8 @@ public class LocalMapModel implements MapModel {
     }
 
     private void setUpPlayers() {
-        Position[] prevPlayers = playerHistory.pop();
-        for (int i = 0; i < players.length; i++)
-            players[i] = prevPlayers[i];
+        Pair<Integer, Position> prevPlayers = playerHistory.pop();
+        players[prevPlayers.first()] = prevPlayers.second();
     }
 
     private void broadcastPrevMove() {
@@ -174,13 +170,6 @@ public class LocalMapModel implements MapModel {
         for(Consumer<MapUpdateInfo> listener : listeners) {
             listener.accept(prev);
         }
-    }
-
-    private Position[] copyPlayers() {
-        Position[] newPlayers = new Position[players.length];
-        for (int i = 0; i < players.length; i++)
-            newPlayers[i] = players[i];
-        return newPlayers;
     }
 
     public synchronized void undo() {
@@ -198,7 +187,7 @@ public class LocalMapModel implements MapModel {
         broadcastMap();
     }
 
-    public void broadcastMap() {
+    public synchronized void broadcastMap() {
         MapUpdateInfo info = new MapUpdateInfo(true, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
@@ -212,7 +201,7 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    public void reset() {
+    public synchronized void reset() {
         setUpMap(startingMap);
         broadcastMap();
         history.removeAllElements();
@@ -220,7 +209,7 @@ public class LocalMapModel implements MapModel {
         System.out.println("Reset map");
     }
 
-    public void processInput(KeyCode k, int p){
+    public synchronized void processInput(KeyCode k, int p){
         if(goalsLeft == 0){
             return;
         }
@@ -230,69 +219,75 @@ public class LocalMapModel implements MapModel {
         int oldx = players[p].getX();
         int oldy = players[p].getY();
         Position oldPosition = players[p];
-        playerDirns[p] = playerDirns[p].changeDirection(k);
+        MapTile.MapItem newDirection ;
 
         switch (k){
             case UP:
+                newDirection = PLAYER_NORTH;
                 y--; break;
             case DOWN:
+                newDirection = PLAYER_SOUTH;
                 y++; break;
             case LEFT:
+                newDirection = PLAYER_WEST;
                 x--; break;
             case RIGHT:
+                newDirection = PLAYER_EAST;
                 x++; break;
+            default:
+                return;
         }
         Position newPosition = new Position(oldx + x, oldy + y);
         Position lookAhead = new Position(oldx + x + x, oldy + y + y);
-        broadcastMove(oldPosition, newPosition, lookAhead, p);
+        broadcastMove(oldPosition, newPosition, lookAhead, newDirection, p);
     }
 
 
-    private synchronized void broadcastMove(Position oldPosition, Position newPosition, Position lookAhead, int p){
+    private synchronized void broadcastMove(Position oldPosition,
+                                            Position newPosition,
+                                            Position lookAhead,
+                                            MapTile.MapItem newDirection,
+                                            int p){
+
+        MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
         if (validMove(newPosition, lookAhead)) {
-            playerHistory.push(copyPlayers());
+            recordHistory(oldPosition, newPosition, lookAhead, p);
             players[p] = newPosition;
 
             boolean pushedBox = getMapAt(newPosition).getItem() == BOX;
 
-            MapUpdateInfo prevInfo = new MapUpdateInfo(false, goalsLeft == 0);
-            prevInfo.addChange(oldPosition, new MapTile(getMapAt(oldPosition).getIsGoal(), getMapAt(oldPosition).getItem()));
-            prevInfo.addChange(newPosition, new MapTile(getMapAt(newPosition).getIsGoal(), getMapAt(newPosition).getItem()));
-            prevInfo.addChange(lookAhead, new MapTile(getMapAt(lookAhead).getIsGoal(), getMapAt(lookAhead).getItem()));
-            history.push(prevInfo);
-
             setMapAt(oldPosition, GROUND);
-            if(pushedBox){
-                setMapAt(lookAhead, BOX);
-            }
-
-            switch (playerDirns[p]) {
-                case NORTH:
-                    setMapAt(newPosition, PLAYER_NORTH);
-                    break;
-                case EAST:
-                    setMapAt(newPosition, PLAYER_EAST);
-                    break;
-                case SOUTH:
-                    setMapAt(newPosition, PLAYER_SOUTH);
-                    break;
-                case WEST:
-                    setMapAt(newPosition, PLAYER_WEST);
-                    break;
-            }
-
-            MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
-
-            info.addChange(newPosition, getMapAt(newPosition));
-            if(pushedBox) {
-                info.addChange(lookAhead, getMapAt(lookAhead));
-            }
             info.addChange(oldPosition, getMapAt(oldPosition));
 
-            for(Consumer<MapUpdateInfo> listener : listeners) {
-                listener.accept(info);
+            setMapAt(newPosition, newDirection);
+            info.addChange(newPosition, getMapAt(newPosition));
+
+            if(pushedBox){
+                setMapAt(lookAhead, BOX);
+                info.addChange(lookAhead, getMapAt(lookAhead));
             }
         }
+        else{
+            setMapAt(oldPosition, newDirection);
+            info.addChange(oldPosition, getMapAt(oldPosition));
+        }
+
+        for(Consumer<MapUpdateInfo> listener : listeners) {
+            listener.accept(info);
+        }
+    }
+
+    private synchronized void recordHistory(Position oldPosition,
+                                            Position newPosition,
+                                            Position lookAhead,
+                                            int p){
+
+        playerHistory.push(new Pair<>(p, players[p]));
+        MapUpdateInfo prevInfo = new MapUpdateInfo(false, goalsLeft == 0);
+        prevInfo.addChange(oldPosition, new MapTile(getMapAt(oldPosition).getIsGoal(), getMapAt(oldPosition).getItem()));
+        prevInfo.addChange(newPosition, new MapTile(getMapAt(newPosition).getIsGoal(), getMapAt(newPosition).getItem()));
+        prevInfo.addChange(lookAhead, new MapTile(getMapAt(lookAhead).getIsGoal(), getMapAt(lookAhead).getItem()));
+        history.push(prevInfo);
     }
 
     private synchronized boolean validMove(Position newPos, Position lookAhead) {
@@ -312,7 +307,7 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    private void setMapAt(Position pos, MapTile.MapItem item){
+    private synchronized void setMapAt(Position pos, MapTile.MapItem item){
         MapTile tile = map[pos.getY()][pos.getX()];
 
         if(tile.getIsGoal() && tile.getItem() == BOX) {
