@@ -335,7 +335,7 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    public MapTile getMapAt(Position pos){
+    private MapTile getMapAt(Position pos){
         return map[pos.getY()][pos.getX()];
     }
 
