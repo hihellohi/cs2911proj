@@ -27,12 +27,13 @@ public class GameView extends StackPane {
     private PauseMenu pauseMenu;
     private MapModel model;
     private Region region;
+    private boolean tutorial;
 
     public GameView(MapModel model, boolean tutorial) {
         super();
+        this.tutorial = tutorial;
         BorderPane bp = new BorderPane();
 
-        pauseMenu = new PauseMenu(model, tutorial);
         grid = new MapView(model);
         sv = new ScoreView(model);
         menuBar = new GameMenuBar(model, tutorial);
@@ -59,6 +60,7 @@ public class GameView extends StackPane {
         this.stage = stage;
         menuBar.setStage(stage);
 
+        pauseMenu = new PauseMenu(model, tutorial);
         grid.setOnKeyPressed(handleKey);
         pauseMenu.setStage(stage);
 
