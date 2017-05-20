@@ -32,7 +32,10 @@ public class MapTile{
 
     public enum MapItem {
         GROUND,
-        PLAYER,
+        PLAYER_NORTH,
+        PLAYER_EAST,
+        PLAYER_SOUTH,
+        PLAYER_WEST,
         WALL,
         BOX,
     }
