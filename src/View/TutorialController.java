@@ -6,15 +6,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
  * Created by adley
  */
 public class TutorialController {
+
+    private static final String TUTORIAL_FILE = "src/tutorial.txt";
+
     @FXML private Button exitBtn;
     @FXML private Button startTutorialBtn;
 
@@ -45,10 +51,16 @@ public class TutorialController {
     }
 
     private void startTutorial (ActionEvent e) {
-        //TODO THROW EXCEPTION
-        LocalMapModel model = new LocalMapModel("src/tutorial.txt");
-        new GameView(model, true).switchHere(stage);
-        model.broadcastMap();
+        try {
+            LocalMapModel model = new LocalMapModel(TUTORIAL_FILE);
+            new GameView(model, true).switchHere(stage);
+            model.broadcastMap();
+        }
+        catch(FileNotFoundException ex){
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
+            alert.setHeaderText(null);
+            alert.showAndWait();
+        }
     }
 
     public void switchHere(Stage stage){

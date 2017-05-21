@@ -69,6 +69,7 @@ public class JoinGameController{
 
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Connection to the host has been lost");
+                alert.setHeaderText(null);
                 alert.showAndWait();
             });
         });

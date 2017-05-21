@@ -62,6 +62,7 @@ public class JoinGameItem extends ListCell<RemoteMapModel> {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION,
                             String.format("You have been kicked from %s", currentModel.getHostName()));
+                    alert.setHeaderText(null);
                     alert.showAndWait();
                 });
                 onLeave();

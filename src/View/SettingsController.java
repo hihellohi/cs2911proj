@@ -72,12 +72,14 @@ public class SettingsController {
         Settings settings = Settings.getInstance();
         if(TCPField.getText().equals(UDPField.getText())){
             Alert alert = new Alert(Alert.AlertType.ERROR, "Beacon and Connection ports must be distinct");
+            alert.setHeaderText(null);
             alert.showAndWait();
             return;
         }
 
         if(!settings.setTCPPort(TCPField.getText()) || !settings.setUDPPort(UDPField.getText())){
             Alert alert = new Alert(Alert.AlertType.ERROR, "please enter a valid port");
+            alert.setHeaderText(null);
             alert.showAndWait();
             return;
         }

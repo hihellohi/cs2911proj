@@ -3,12 +3,14 @@ package View;
 import Model.LocalMapModel;
 import Model.Netcode.ClientConnection;
 import Model.Netcode.LobbyModel;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -21,6 +23,8 @@ import java.io.UncheckedIOException;
  * @author Kevin Ni
  */
 public class LobbyController {
+
+    private static final int MAX_PLAYERS = 15;
 
     @FXML private ListView<ClientConnection> listView;
     @FXML private Button startBtn;
@@ -42,7 +46,7 @@ public class LobbyController {
 
     @FXML
     public void initialize(){
-        listView.setPlaceholder(new Label("Nobody has joined and you have no friends :("));
+        listView.setPlaceholder(new Label("Nobody has joined :("));
         listView.setItems(model.getObservable());
         listView.setCellFactory((param) -> new LobbyItem());
 
@@ -51,6 +55,16 @@ public class LobbyController {
     }
 
     private void startEvent (ActionEvent event) {
+        if (model.nPlayers() > MAX_PLAYERS){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, String.format(
+                    "Maximum of %d players! Kick %d player(s) and try again",
+                    MAX_PLAYERS + 1,
+                    model.nPlayers() - MAX_PLAYERS));
+            alert.setHeaderText(null);
+            alert.showAndWait();
+            return;
+        }
+
         model.close();
 
         LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1);
