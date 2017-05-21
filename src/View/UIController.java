@@ -66,7 +66,8 @@ public class UIController {
             new LobbyController().switchHere(stage);
         }
         catch (BindException ex){
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Port 1337 already in use");
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Port already in use! Kill the process occupying it or change to another port");
             alert.showAndWait();
         }
         catch (IOException ex){

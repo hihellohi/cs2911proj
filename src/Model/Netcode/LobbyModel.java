@@ -1,6 +1,7 @@
 package Model.Netcode;
 
 import Model.LocalMapModel;
+import Model.Settings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -22,7 +23,7 @@ public class LobbyModel {
     public LobbyModel() throws IOException{
         super();
         connectionSockets = FXCollections.observableList(new ArrayList<>());
-        welcomingSocket = new ServerSocket(Constants.TCP_PORT);
+        welcomingSocket = new ServerSocket(Settings.getInstance().getTCPPort());
         beacon = new HostBeacon();
         new Thread(this::listen).start();
     }

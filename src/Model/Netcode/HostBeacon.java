@@ -1,5 +1,7 @@
 package Model.Netcode;
 
+import Model.Settings;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,7 +17,7 @@ public class HostBeacon {
 
     public HostBeacon() throws SocketException {
         super();
-        socket = new DatagramSocket(Constants.UDP_PORT);
+        socket = new DatagramSocket(Settings.getInstance().getUDPPort());
         beaconName = UUID.randomUUID().toString();
         new Thread(this::listen).start();
     }

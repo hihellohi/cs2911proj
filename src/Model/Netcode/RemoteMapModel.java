@@ -29,7 +29,7 @@ public class RemoteMapModel implements MapModel {
         super();
 
         this.startGameListener = startGame;
-        this.host = new InetSocketAddress(host, Constants.TCP_PORT);
+        this.host = new InetSocketAddress(host, Settings.getInstance().getTCPPort());
 
         gameChangeListeners = new ArrayList<>();
     }

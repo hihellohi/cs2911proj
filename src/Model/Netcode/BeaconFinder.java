@@ -1,5 +1,6 @@
 package Model.Netcode;
 
+import Model.Settings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -38,7 +39,7 @@ public class BeaconFinder {
                     Constants.BEACON_MESSAGE.getBytes(),
                     Constants.BEACON_MESSAGE.length(),
                     InetAddress.getByName(hostName),
-                    Constants.UDP_PORT);
+                    Settings.getInstance().getUDPPort());
             socket.send(packet);
         }
         catch (UnknownHostException ex){
@@ -53,6 +54,7 @@ public class BeaconFinder {
      * find all beacons on the subnet
      */
     public void broadcast(){
+        Settings settings = Settings.getInstance();
         try {
             Enumeration<NetworkInterface> it = NetworkInterface.getNetworkInterfaces();
             while(it.hasMoreElements()){
@@ -66,7 +68,7 @@ public class BeaconFinder {
                                 Constants.BEACON_MESSAGE.getBytes(),
                                 Constants.BEACON_MESSAGE.length(),
                                 address.getBroadcast(),
-                                Constants.UDP_PORT);
+                                settings.getUDPPort());
                         socket.send(packet);
                     }
                 }
