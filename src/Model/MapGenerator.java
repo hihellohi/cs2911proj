@@ -7,17 +7,31 @@ import java.util.*;
 import static javafx.scene.input.KeyCode.*;
 
 /**
- * Created by adley on 13/05/17.
+ * This class generates all maps (single-player and multi-player).
+ * It is deterministic on the seed provided to the constructor.
  */
 public class MapGenerator {
     private Random generator;
     private Settings.Difficulty difficulty;
 
+    /**
+     * Create a new MapGenerator from a seed and difficulty level
+     *
+     * @param seed the seed used to seed the internal random number generator
+     * @param difficulty one of three difficulty levels
+     * @pre difficulty != null
+     */
     public MapGenerator(long seed, Settings.Difficulty difficulty) {
         this.generator = new Random(seed);
         this.difficulty = difficulty;
     }
 
+    /** Generates a new map
+     *
+     * @param numPlayers number of players in the map
+     * @pre numPlayers <= 16
+     * @return a two-dimensional array of MapTiles representing the map
+     */
     public MapTile[][] generateMap(int numPlayers) {
         MapTile[][] map;
         do {
@@ -26,6 +40,14 @@ public class MapGenerator {
         return map;
     }
 
+    /**
+     * Does the bulk of the work of generating a map. Not guaranteed to produce a "good" map, but will
+     * always produce a fully solvable map.
+     *
+     * @param numPlayers
+     * @pre numPlayers <= 16
+     * @return newly generated map
+     */
     private MapTile[][] makeMap(int numPlayers) {
         int walkLength = 0;
         int maxNumberOfBoxes = 0;
@@ -133,6 +155,12 @@ public class MapGenerator {
         return map;
     }
 
+    /**
+     * A heuristic function used to determine if a map is considered "good".
+     *
+     * @param map to evaluate
+     * @return true if the map is considered "good" else false
+     */
     private boolean isMapGood(MapTile[][] map) {
         int height = map.length;
         int width = map[0].length;
@@ -160,6 +188,15 @@ public class MapGenerator {
         }
         return true;
     }
+
+    /**
+     * Helper function to simulate a move of the player on a map that is currently being generated
+     *
+     * @param map map to work on
+     * @param oldPosition position of the player currently
+     * @param newPosition requested new position of the player
+     * @param lookAhead the new position that a box would be in if this move pushes a box
+     */
     private void makeMove(
             MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead, int player
     ) {
@@ -172,6 +209,13 @@ public class MapGenerator {
         setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH, player);
     }
 
+    /**
+     * Helper function to get the new positions of the player when a certain move is made
+     *
+     * @param move direction of move
+     * @param player current position of player
+     * @return a Pair consisting of the new player position and the position a box pushed by this move would move to
+     */
     private Pair<Position, Position> getPositions(KeyCode move, Position player) {
         int x = 0;
         int y = 0;
@@ -193,6 +237,14 @@ public class MapGenerator {
         return new Pair<>(newPosition, lookAhead);
     }
 
+    /**
+     * Helper function to determine if a move is valid
+     *
+     * @param map to operate on
+     * @param newPosition requested new position of player
+     * @param lookAhead position a box would move to if the move was made
+     * @return true if the move results in the player actually changing position else false
+     */
     private boolean isValidMove(MapTile[][] map, Position newPosition, Position lookAhead) {
         MapTile item = getMapAt(map, newPosition);
 
@@ -207,6 +259,13 @@ public class MapGenerator {
         }
     }
 
+    /**
+     * Create and return a new map that is completely empty, except surrounded by walls.
+     *
+     * @param width of the new map
+     * @param height of the new map
+     * @return the new, empty map
+     */
     private MapTile[][] initializeEmptyMap(int width, int height) {
         MapTile[][] map = new MapTile[width][height];
         MapTile wallTile = new MapTile(false, MapTile.MapItem.WALL);
@@ -230,10 +289,24 @@ public class MapGenerator {
         return map;
     }
 
+    /**
+     * Get the contents of the map at a specified position
+     *
+     * @pre positioon != null
+     * @pre map != null
+     * @return contents of that cell
+     */
     private MapTile getMapAt(MapTile[][] map, Position pos){
         return map[pos.getY()][pos.getX()];
     }
 
+    /**
+     * Set the contents of a position in them map
+     *
+     * @pre map != null
+     * @pre pos != null
+     * @pre item != null
+     */
     private void setMapAt(MapTile[][] map, Position pos, MapTile.MapItem item){
         setMapAt(map, pos, item, -1);
     }
@@ -243,6 +316,14 @@ public class MapGenerator {
         tile.setTile(item, player);
     }
 
+    /**
+     * Place specified number of players at random positions on an empty map
+     *
+     * @param map empty map to operate on
+     * @param numPlayers number of players to place down
+     * @pre map is an initialized, but empty map
+     * @return list of positions that the players were dropped on
+     */
     private List<Position> placePlayers(MapTile[][] map, int numPlayers) {
         List<Position> freePositions = new ArrayList<>();
         for (int y = 1; y < map.length - 1; y++) {
