@@ -121,7 +121,7 @@ public class MapGenerator {
             }
 
             if (isValidMove(map, newPosition, lookAhead)) {
-                makeMove(map, player, newPosition, lookAhead, playerIndex);
+                makeMove(map, player, newPosition, lookAhead);
                 players.set(playerIndex, newPosition);
                 path.add(newPosition);
             }
@@ -198,9 +198,11 @@ public class MapGenerator {
      * @param lookAhead the new position that a box would be in if this move pushes a box
      */
     private void makeMove(
-            MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead, int player
+            MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead
     ) {
         boolean pushedBox = getMapAt(map, newPosition).getItem() == MapTile.MapItem.BOX;
+
+        int player = getMapAt(map, oldPosition).getPlayer();
 
         setMapAt(map, oldPosition, MapTile.MapItem.GROUND);
         if(pushedBox){
