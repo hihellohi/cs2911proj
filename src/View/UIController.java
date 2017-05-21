@@ -68,6 +68,7 @@ public class UIController {
         catch (BindException ex){
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Port already in use! Kill the process occupying it or change to another port");
+            alert.setHeaderText(null);
             alert.showAndWait();
         }
         catch (IOException ex){

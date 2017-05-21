@@ -10,8 +10,8 @@ import javafx.scene.layout.GridPane;
  * @author Kevin Ni
  */
 class MapView extends GridPane {
+    final static Image BOX = new Image("images/box.png", 100, 100, false, false);
     private final static Image GROUND = new Image("images/ground.png", 100, 100, false, false);
-    private final static Image BOX = new Image("images/box.png", 100, 100, false, false);
     private final static Image GOAL = new Image("images/goal.png", 100, 100, false, false);
     private final static Image GOAL_BOX = new Image("images/goalBox.png", 100, 100, false, false);
     private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png", 100, 100, false, false);

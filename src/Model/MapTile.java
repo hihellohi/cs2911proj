@@ -4,7 +4,7 @@ package Model;
  * @author Kevin Ni
  */
 
-public class MapTile{
+public class MapTile implements Cloneable{
 
     private boolean isGoal;
     private MapItem item;
@@ -22,22 +22,22 @@ public class MapTile{
         return item;
     }
 
-    void setGoal(boolean goal){
-        this.isGoal = goal;
-    }
-
     void setItem(MapItem item){
         this.item = item;
     }
 
     public enum MapItem {
         GROUND,
+        WALL,
+        BOX,
         PLAYER_NORTH,
         PLAYER_EAST,
         PLAYER_SOUTH,
-        PLAYER_WEST,
-        WALL,
-        BOX,
+        PLAYER_WEST
+    }
+
+    @Override public MapTile clone(){
+        return new MapTile(getIsGoal(), getItem());
     }
 }
 

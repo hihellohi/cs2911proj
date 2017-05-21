@@ -39,7 +39,7 @@ public class LocalMapModel implements MapModel {
      *
      * @param path path to file with the map
      */
-    public LocalMapModel(String path){
+    public LocalMapModel(String path) throws FileNotFoundException {
         listeners = new ArrayList<>();
         tutorial = true;
         loadFromFile(path);
@@ -89,7 +89,7 @@ public class LocalMapModel implements MapModel {
         return map;
     }
 
-    private void loadFromFile(String fin) {
+    private void loadFromFile(String fin) throws FileNotFoundException {
         history = new Stack<>();
         playerHistory = new Stack<>();
         Scanner sc = null;
@@ -144,9 +144,6 @@ public class LocalMapModel implements MapModel {
             }
 
             this.startingMap = copyMap();
-        }
-        catch(FileNotFoundException e) {
-            System.err.println(String.format("File %s/%s not found", System.getProperty("user.dir"), fin));
         }
         finally{
             if (sc != null){
@@ -304,9 +301,9 @@ public class LocalMapModel implements MapModel {
 
         playerHistory.push(new Pair<>(p, players[p]));
         MapUpdateInfo prevInfo = new MapUpdateInfo(false, goalsLeft == 0);
-        prevInfo.addChange(oldPosition, new MapTile(getMapAt(oldPosition).getIsGoal(), getMapAt(oldPosition).getItem()));
-        prevInfo.addChange(newPosition, new MapTile(getMapAt(newPosition).getIsGoal(), getMapAt(newPosition).getItem()));
-        prevInfo.addChange(lookAhead, new MapTile(getMapAt(lookAhead).getIsGoal(), getMapAt(lookAhead).getItem()));
+        prevInfo.addChange(oldPosition, getMapAt(oldPosition).clone());
+        prevInfo.addChange(newPosition, getMapAt(newPosition).clone());
+        prevInfo.addChange(lookAhead, getMapAt(lookAhead).clone());
         history.push(prevInfo);
     }
 
