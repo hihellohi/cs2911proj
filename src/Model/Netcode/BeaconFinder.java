@@ -26,7 +26,7 @@ public class BeaconFinder {
         observableList = FXCollections.observableList(new ArrayList<RemoteMapModel>());
         seenAddresses = new HashSet<>();
         this.onGameStart = onGameStart;
-        new Thread(listener).start();
+        new Thread(this::listener).start();
     }
 
     /**
@@ -77,7 +77,7 @@ public class BeaconFinder {
         }
     }
 
-    private Runnable listener = () -> {
+    private void listener() {
         DatagramPacket recv = new DatagramPacket(new byte[256], 256);
         while(!socket.isClosed()){
             try {
@@ -95,7 +95,7 @@ public class BeaconFinder {
                 System.out.println("Beacon finder closed. thread terminating...");
             }
         }
-    };
+    }
 
     public ObservableList<RemoteMapModel> getObservable(){
         return observableList;

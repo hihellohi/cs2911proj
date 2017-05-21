@@ -12,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 
@@ -44,7 +45,7 @@ public class GameView extends StackPane {
         region.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7)");
         region.setVisible(false);
 
-        model.subscribeModelUpdate(onMapChange);
+        model.subscribeModelUpdate(this::onMapChange);
 
         bp.setLeft(grid);
         bp.setRight(sv);
@@ -61,7 +62,7 @@ public class GameView extends StackPane {
         menuBar.setStage(stage);
 
         pauseMenu = new PauseMenu(model, tutorial);
-        grid.setOnKeyPressed(handleKey);
+        grid.setOnKeyPressed(this::handleKey);
         pauseMenu.setStage(stage);
 
         Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight() + menuBar.getHeight() + region.getPrefHeight());
@@ -72,20 +73,20 @@ public class GameView extends StackPane {
         stage.show();
     }
 
-    private EventHandler<KeyEvent> handleKey = (e) -> {
+    private void handleKey (KeyEvent e) {
         KeyCode code = e.getCode();
         if(code == KeyCode.P || code == KeyCode.ESCAPE){
             pauseMenu.show();
             region.visibleProperty().bind(pauseMenu.showingProperty());
         }
-    };
+    }
 
-    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
+    private void onMapChange (MapUpdateInfo updateInfo) {
         if (updateInfo.isFinished()) {
             Platform.runLater(() -> {
                 new EndGameDialog(sv).showAndWait();
                 pauseMenu.show();
             });
         }
-    };
+    }
 }

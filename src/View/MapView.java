@@ -6,8 +6,6 @@ import javafx.scene.image.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
-import java.util.function.Consumer;
-
 /**
  * @author Kevin Ni
  */
@@ -32,7 +30,7 @@ class MapView extends GridPane {
         this.model = model;
         super.addEventHandler(KeyEvent.KEY_PRESSED, model);
 
-        model.subscribeModelUpdate(onMapChange);
+        model.subscribeModelUpdate(this::onMapChange);
 
         tiles = new ImageView[model.getHeight()][model.getWidth()];
 
@@ -55,16 +53,14 @@ class MapView extends GridPane {
         return (int) (GROUND.getWidth() * model.getWidth());
     }
 
-    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
-        Platform.runLater(() ->{
-            for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
-                Position pos = change.first();
-                int x = pos.getX();
-                int y = pos.getY();
-                setTile(tiles[y][x], change.second());
-            }
-        });
-    };
+    private void onMapChange (MapUpdateInfo updateInfo) {
+        for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
+            Position pos = change.first();
+            int x = pos.getX();
+            int y = pos.getY();
+            Platform.runLater(() -> setTile(tiles[y][x], change.second()));
+        }
+    }
 
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {

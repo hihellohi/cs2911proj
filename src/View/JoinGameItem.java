@@ -2,10 +2,11 @@ package View;
 
 import Model.Netcode.RemoteMapModel;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -35,29 +36,42 @@ public class JoinGameItem extends ListCell<RemoteMapModel> {
         joinButton = new Button("Join");
         leaveButton = new Button("Leave");
 
-        //TODO on connection close change the thingy
-
-        joinButton.setOnAction((e) -> {
-            try {
-                currentModel.connect();
-                hBox.getChildren().set(2, leaveButton);
-            }
-            catch(IOException ex){
-                currentModel = null;
-                hBox.getChildren().get(2).setVisible(false);
-                ((Label)hBox.getChildren().get(0)).setText("Unable to connect to host :(");
-            }
-        });
+        joinButton.setOnAction(this::onJoin);
 
         leaveButton.setOnAction((e) -> {
             currentModel.close();
-            hBox.getChildren().set(2, joinButton);
+            onLeave();
         });
 
         super.setText(null);
 
         hBox.getChildren().addAll(ipLabel, pane, joinButton);
         HBox.setHgrow(pane, Priority.ALWAYS);
+    }
+
+    private void onLeave(){
+        Platform.runLater(() -> hBox.getChildren().set(2, joinButton));
+        currentModel.setConnectionInterruptedListener(null);
+    }
+
+    private void onJoin(ActionEvent e){
+        try {
+            currentModel.connect();
+            hBox.getChildren().set(2, leaveButton);
+            currentModel.setConnectionInterruptedListener(() -> {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                            String.format("You have been kicked from %s", currentModel.getHostName()));
+                    alert.showAndWait();
+                });
+                onLeave();
+            });
+        }
+        catch(IOException ex){
+            currentModel = null;
+            hBox.getChildren().get(2).setVisible(false);
+            ((Label)hBox.getChildren().get(0)).setText("Unable to connect to host :(");
+        }
     }
 
     @Override protected void updateItem(RemoteMapModel model, boolean empty){
@@ -70,18 +84,14 @@ public class JoinGameItem extends ListCell<RemoteMapModel> {
         else{
             currentModel = model;
 
-            if(model != null) {
-                hBox.getChildren().get(2).setVisible(true);
-                ipLabel.setText(currentModel.getHostName());
-                if (model.isConnected()) {
-                    hBox.getChildren().set(2, leaveButton);
-                } else {
-                    hBox.getChildren().set(2, joinButton);
-                }
-            }
-            else{
-                hBox.getChildren().get(2).setVisible(false);
-                ((TextField)hBox.getChildren().get(0)).setText("Unable to connect :(");
+            hBox.getChildren().get(2).setVisible(true);
+            ipLabel.setText(currentModel.getHostName());
+            if (model.isConnected()) {
+                hBox.getChildren().set(2, leaveButton);
+                currentModel.setConnectionInterruptedListener(this::onLeave);
+            } else {
+                hBox.getChildren().set(2, joinButton);
+                currentModel.setConnectionInterruptedListener(null);
             }
 
             super.setGraphic(hBox);

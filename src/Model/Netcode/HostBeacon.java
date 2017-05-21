@@ -17,10 +17,10 @@ public class HostBeacon {
         super();
         socket = new DatagramSocket(Constants.UDP_PORT);
         beaconName = UUID.randomUUID().toString();
-        new Thread(listen).start();
+        new Thread(this::listen).start();
     }
 
-    private Runnable listen = () -> {
+    private void listen () {
         DatagramPacket recv = new DatagramPacket(new byte[256], 256);
         while(!socket.isClosed()){
             try {
@@ -40,7 +40,7 @@ public class HostBeacon {
                 System.out.println("Beacon socket closed. beacon thread terminating...");
             }
         }
-    };
+    }
 
     public void close(){
         if(!socket.isClosed()) {

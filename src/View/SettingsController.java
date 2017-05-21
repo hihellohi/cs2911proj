@@ -35,12 +35,12 @@ public class SettingsController {
 
     @FXML
     public void initialize(){
-        choiceBox.setOnAction(chooseDifficulty);
-        exitSettingsBtn.setOnAction(exitSettings);
+        choiceBox.setOnAction(this::chooseDifficulty);
+        exitSettingsBtn.setOnAction(this::exitSettings);
     }
 
 
-    private EventHandler<ActionEvent> chooseDifficulty = (e) -> {
+    private void chooseDifficulty (ActionEvent e) {
         string = choiceBox.getSelectionModel().getSelectedItem();
         if (string == null) {
             string = Settings.getInstance().getDifficultyString();
@@ -60,16 +60,16 @@ public class SettingsController {
                 break;
         }
         Settings.getInstance().setDifficulty(difficulty);
-    };
+    }
 
-    private EventHandler<ActionEvent> exitSettings = (e) -> {
+    private void exitSettings (ActionEvent e) {
         try {
             new UIController().switchHere(stage);
         }
         catch(IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
     public void switchHere(Stage stage){
         this.stage = stage;

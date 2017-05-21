@@ -20,6 +20,7 @@ public class RemoteMapModel implements MapModel {
 
     private List<Consumer<MapUpdateInfo>> gameChangeListeners;
     private Consumer<RemoteMapModel> startGameListener;
+    private Runnable connectionInterruptedListener;
 
     private int width;
     private int height;
@@ -46,7 +47,7 @@ public class RemoteMapModel implements MapModel {
             close();
             throw e;
         }
-        new Thread(listen).start();
+        new Thread(this::listen).start();
     }
 
     public void close(){
@@ -61,7 +62,16 @@ public class RemoteMapModel implements MapModel {
         }
     }
 
-    private Runnable listen = () -> {
+    private void onConnectionInterrupt(){
+        if(socket != null){
+            if(connectionInterruptedListener != null){
+                connectionInterruptedListener.run();
+            }
+            close();
+        }
+    }
+
+    private void listen(){
         if(socket == null){
             return;
         }
@@ -71,7 +81,7 @@ public class RemoteMapModel implements MapModel {
             height = in.readInt();
         }
         catch (IOException ex){
-            close();
+            onConnectionInterrupt();
             return;
         }
 
@@ -80,17 +90,10 @@ public class RemoteMapModel implements MapModel {
 
         while(socket != null && !socket.isClosed()){
             try {
-                switch(Constants.HEADERS[in.readByte()]){
-                    case MOVE:
-                        broadcast();
-                        break;
-                    default:
-                        System.out.println("unknown command!");
-                        break;
-                }
+                broadcast();
             }
             catch (SocketException | EOFException ex){
-                close();
+                onConnectionInterrupt();
                 System.out.println("Connection closed");
             }
             catch (IOException ex){
@@ -98,7 +101,7 @@ public class RemoteMapModel implements MapModel {
                 ex.printStackTrace();
             }
         }
-    };
+    }
 
     private void broadcast() throws IOException{
         MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), in.readBoolean());
@@ -116,7 +119,6 @@ public class RemoteMapModel implements MapModel {
 
     public void handle(KeyEvent e){
         try {
-            out.writeByte(ProtocolHeader.MOVE_REQUEST.ordinal());
             out.writeInt(e.getCode().ordinal());
         }
         catch (IOException ex){
@@ -142,6 +144,10 @@ public class RemoteMapModel implements MapModel {
 
     public void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         gameChangeListeners.add(listener);
+    }
+
+    public void setConnectionInterruptedListener(Runnable listener){
+        connectionInterruptedListener = listener;
     }
 
     public void generateNewMap() {

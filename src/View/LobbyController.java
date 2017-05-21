@@ -46,12 +46,11 @@ public class LobbyController {
         listView.setItems(model.getObservable());
         listView.setCellFactory((param) -> new LobbyItem());
 
-        startBtn.setOnAction(startEvent);
-
-        backBtn.setOnAction(backEvent);
+        startBtn.setOnAction(this::startEvent);
+        backBtn.setOnAction(this::backEvent);
     }
 
-    private EventHandler<ActionEvent> startEvent = (event) -> {
+    private void startEvent (ActionEvent event) {
         model.close();
 
         LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1);
@@ -59,9 +58,9 @@ public class LobbyController {
         model.startGame(mapModel);
         new GameView(mapModel).switchHere(stage);
         mapModel.broadcastMap();
-    };
+    }
 
-    private EventHandler<ActionEvent> backEvent = (event) -> {
+    private void backEvent (ActionEvent event) {
         try {
             model.finish();
             new UIController().switchHere(stage);
@@ -69,7 +68,7 @@ public class LobbyController {
         catch (IOException ex){
             throw new UncheckedIOException(ex);
         }
-    };
+    }
 
     public void switchHere(Stage stage){
         this.stage = stage;

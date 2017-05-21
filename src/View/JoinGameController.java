@@ -4,19 +4,14 @@ import Model.Netcode.BeaconFinder;
 import Model.Netcode.RemoteMapModel;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
@@ -35,7 +30,7 @@ public class JoinGameController{
 
     public JoinGameController() throws IOException {
 
-        finder = new BeaconFinder(startEvent);
+        finder = new BeaconFinder(this::startEvent);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("JoinGame.fxml"));
         loader.setController(this);
         Parent parent = loader.load();
@@ -50,29 +45,45 @@ public class JoinGameController{
         listView.setItems(finder.getObservable());
         listView.setCellFactory((param) -> new JoinGameItem());
 
-        searchBtn.setOnAction(searchEvent);
-        backBtn.setOnAction(backEvent);
-        refreshBtn.setOnAction(refreshEvent);
+        searchBtn.setOnAction(this::searchEvent);
+        backBtn.setOnAction(this::backEvent);
+        refreshBtn.setOnAction(this::refreshEvent);
     }
 
-    private EventHandler<ActionEvent> refreshEvent = (event) -> {
+    private void refreshEvent (ActionEvent event) {
         finder.broadcast();
-    };
+    }
 
-    private Consumer<RemoteMapModel> startEvent = (model) -> {
+    private void startEvent (RemoteMapModel model) {
         finder.close();
+
+        model.setConnectionInterruptedListener(() -> {
+            try {
+                UIController controller = new UIController();
+                Platform.runLater(() -> {
+                    controller.switchHere(stage);
+                });
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Connection to the host has been lost");
+                alert.showAndWait();
+            });
+        });
 
         GameView view = new GameView(model);
         Platform.runLater(() -> {
             view.switchHere(stage);
         });
-    };
+    }
 
-    private EventHandler<ActionEvent> searchEvent = (event) -> {
+    private void searchEvent (ActionEvent event) {
         finder.target(ipField.getText());
-    };
+    }
 
-    private EventHandler<ActionEvent> backEvent = (event) -> {
+    private void backEvent (ActionEvent event) {
         try {
             finder.abort();
             new UIController().switchHere(stage);
@@ -80,7 +91,7 @@ public class JoinGameController{
         catch (IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
     public void switchHere(Stage stage){
         this.stage = stage;

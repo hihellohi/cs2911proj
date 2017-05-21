@@ -31,25 +31,25 @@ public class TutorialController {
 
     @FXML
     public void initialize(){
-        exitBtn.setOnAction(exitTutorial);
-        startTutorialBtn.setOnAction(startTutorial);
+        exitBtn.setOnAction(this::exitTutorial);
+        startTutorialBtn.setOnAction(this::startTutorial);
     }
 
-    private EventHandler<ActionEvent> exitTutorial = (e) -> {
+    private void exitTutorial (ActionEvent e) {
         try {
             new UIController().switchHere(stage);
         }
         catch(IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
-    private EventHandler<ActionEvent> startTutorial = (e) -> {
+    private void startTutorial (ActionEvent e) {
         //TODO THROW EXCEPTION
         LocalMapModel model = new LocalMapModel("src/tutorial.txt");
         new GameView(model, true).switchHere(stage);
         model.broadcastMap();
-    };
+    }
 
     public void switchHere(Stage stage){
         this.stage = stage;

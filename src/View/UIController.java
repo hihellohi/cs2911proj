@@ -7,10 +7,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.IOException;
+import java.net.BindException;
 
 /**
  * Created by willi on 9/05/2017.
@@ -38,12 +41,12 @@ public class UIController {
 
     @FXML
     public void initialize(){
-        playGameBtn.setOnAction(switchToGame);
-        hostBtn.setOnAction(startHost);
-        clientBtn.setOnAction(startClient);
-        tutorialBtn.setOnAction(startTutorial);
-        settingsBtn.setOnAction(switchToSettings);
-        closeGameBtn.setOnAction(closeGame);
+        playGameBtn.setOnAction(this::switchToGame);
+        hostBtn.setOnAction(this::startHost);
+        clientBtn.setOnAction(this::startClient);
+        tutorialBtn.setOnAction(this::startTutorial);
+        settingsBtn.setOnAction(this::switchToSettings);
+        closeGameBtn.setOnAction(this::closeGame);
     }
 
     public void switchHere(Stage stage){
@@ -52,52 +55,53 @@ public class UIController {
         stage.show();
     }
 
-    private EventHandler<ActionEvent> switchToGame = (e) -> {
-        //TODO THROW EXCEPTION
+    private void switchToGame (ActionEvent e) {
         LocalMapModel model = new LocalMapModel(1);
         new GameView(model).switchHere(stage);
         model.broadcastMap();
-    };
+    }
 
-    private EventHandler<ActionEvent> startHost = (e) -> {
+    private void startHost (ActionEvent e) {
         try {
             new LobbyController().switchHere(stage);
         }
-        catch (IOException ex){
-            //TODO Socket used
-            ex.printStackTrace();
-            System.out.println("port already occupied");
+        catch (BindException ex){
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Port 1337 already in use");
+            alert.showAndWait();
         }
-    };
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+    }
 
-    private EventHandler<ActionEvent> startClient = (e) -> {
+    private void startClient (ActionEvent e) {
         try {
             new JoinGameController().switchHere(stage);
         }
         catch (IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
-    private EventHandler<ActionEvent> startTutorial = (e) -> {
+    private void startTutorial (ActionEvent e) {
         try {
             new TutorialController().switchHere(stage);
         }
         catch (IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
-    private EventHandler<ActionEvent> switchToSettings = (e) -> {
+    private void switchToSettings  (ActionEvent e) {
         try {
             new SettingsController().switchHere(stage);
         }
         catch(IOException ex){
             ex.printStackTrace();
         }
-    };
+    }
 
-    private EventHandler<ActionEvent> closeGame = (e) -> {
+    private void closeGame (ActionEvent e){
         Platform.exit();
-    };
+    }
 }

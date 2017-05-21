@@ -8,7 +8,6 @@ import javafx.scene.input.KeyCode;
  */
 class Constants {
 
-    static final ProtocolHeader[] HEADERS = ProtocolHeader.values();
     static final KeyCode[] CODES = KeyCode.values();
     static final MapTile.MapItem[] TILES = MapTile.MapItem.values();
     static final int TCP_PORT = 1337;

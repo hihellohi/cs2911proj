@@ -24,10 +24,10 @@ public class LobbyModel {
         connectionSockets = FXCollections.observableList(new ArrayList<>());
         welcomingSocket = new ServerSocket(Constants.TCP_PORT);
         beacon = new HostBeacon();
-        new Thread(listen).start();
+        new Thread(this::listen).start();
     }
 
-    private Runnable listen = () -> {
+    private void listen() {
         while(!welcomingSocket.isClosed()){
             try{
                 ClientConnection newConnection = new ClientConnection(welcomingSocket.accept(), (con) -> {
@@ -44,7 +44,7 @@ public class LobbyModel {
                 ex.printStackTrace();
             }
         }
-    };
+    }
 
     public void close(){
         beacon.close();

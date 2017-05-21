@@ -36,7 +36,7 @@ public class ClientConnection {
             close();
         }
 
-        new Thread(listen).start();
+        new Thread(this::listen).start();
     }
 
     public void StartGame(LocalMapModel model, int player) throws IOException{
@@ -48,20 +48,14 @@ public class ClientConnection {
 
         lobbyRemover = null;
 
-        model.subscribeModelUpdate(onMapChange);
+        model.subscribeModelUpdate(this::onMapChange);
     }
 
-    private Runnable listen = () -> {
+    private void listen () {
         while(!socket.isClosed()){
             try {
-                switch(Constants.HEADERS[in.readByte()]){
-                    case MOVE_REQUEST:
-                        model.processInput(Constants.CODES[in.readInt()], player);
-                        break;
-                    default:
-                        System.out.println("unknown command!");
-                        break;
-                }
+                KeyCode move = Constants.CODES[in.readInt()];
+                model.processInput(move, player);
             }
             catch (SocketException | EOFException ex){
                 close();
@@ -72,10 +66,9 @@ public class ClientConnection {
                 ex.printStackTrace();
             }
         }
-    };
+    }
 
     public void close(){
-
         try {
             if(!socket.isClosed()) {
                 socket.close();
@@ -89,12 +82,10 @@ public class ClientConnection {
         catch (IOException e){
             e.printStackTrace();
         }
-
     }
 
-    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
+    private void onMapChange (MapUpdateInfo updateInfo) {
         try {
-            out.writeByte(ProtocolHeader.MOVE.ordinal());
             out.writeBoolean(updateInfo.isNewMap());
             out.writeBoolean(updateInfo.isFinished());
             out.writeInt(updateInfo.size());
@@ -111,7 +102,7 @@ public class ClientConnection {
             close();
             e.printStackTrace();
         }
-    };
+    }
 
     public String getHostAddress(){
         return socket.getInetAddress().getHostAddress();
