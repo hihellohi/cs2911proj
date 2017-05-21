@@ -13,6 +13,7 @@ public interface MapModel extends EventHandler<KeyEvent> {
     void handle(KeyEvent e);
     int getHeight();
     int getWidth();
+    int getPlayer();
     void generateNewMap();
     void undo();
     void reset();

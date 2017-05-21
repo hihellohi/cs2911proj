@@ -19,20 +19,17 @@ public class LocalMapModel implements MapModel {
     private boolean tutorial;
     private Stack<MapUpdateInfo> history;
     private Stack<Pair<Integer, Position>> playerHistory;
-
     private List<Consumer<MapUpdateInfo>> listeners;
+    private boolean localMulti;
 
     //TODO close to notify connections. also take in a close notification from connections
 
-    public LocalMapModel(int seed, int nPlayers){
+    public LocalMapModel(int nPlayers, boolean localMulti){
+        this.localMulti = localMulti;
         tutorial = false;
         players = new Position[nPlayers];
         listeners = new ArrayList<>();
-        generateMap(seed);
-    }
-
-    public LocalMapModel(int nPlayers){
-        this(new Random().nextInt(), nPlayers);
+        generateMap(new Random().nextInt());
     }
 
     /** Used solely for the tutorial
@@ -62,10 +59,11 @@ public class LocalMapModel implements MapModel {
         int p = 0;
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
-                if (map[y][x].getItem() == PLAYER_SOUTH) {
-                    players[p++] = new Position(x, y);
+                MapTile tile = map[y][x];
+                if (tile.getItem() == PLAYER_SOUTH) {
+                    players[tile.getPlayer()] = new Position(x, y);
                 }
-                if (map[y][x].getIsGoal() && map[y][x].getItem() != BOX) {
+                if (tile.getIsGoal() && tile.getItem() != BOX) {
                     goalsLeft++;
                 }
             }
@@ -78,12 +76,7 @@ public class LocalMapModel implements MapModel {
         MapTile[][] map = new MapTile[getHeight()][getWidth()];
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
-                if (this.map[y][x].getIsGoal()) {
-                    map[y][x] = new MapTile(true, this.map[y][x].getItem());
-                }
-                else {
-                    map[y][x] = new MapTile(false, this.map[y][x].getItem());
-                }
+                map[y][x] = this.map[y][x].clone();
             }
         }
         return map;
@@ -120,7 +113,7 @@ public class LocalMapModel implements MapModel {
                 for(int j = 1; j <= c; j++){
                     switch(line.charAt(j - 1)){
                         case 'p':
-                            map[i][j] = new MapTile(false, PLAYER_SOUTH);
+                            map[i][j] = new MapTile(false, PLAYER_SOUTH, getPlayer());
                             players[p++] = new Position(j, i);
                             break;
                         case 'b':
@@ -152,8 +145,30 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    public int getPlayer(){
+        return 0;
+    }
+
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
+
+        if(localMulti){
+            switch (e.getCode()) {
+                case W:
+                    processInput(KeyCode.UP, 1);
+                    return;
+                case A:
+                    processInput(KeyCode.LEFT, 1);
+                    return;
+                case S:
+                    processInput(KeyCode.DOWN, 1);
+                    return;
+                case D:
+                    processInput(KeyCode.RIGHT, 1);
+                    return;
+            }
+        }
+
         switch (e.getCode()) {
             case U:
                 undo();
@@ -167,7 +182,7 @@ public class LocalMapModel implements MapModel {
                 }
                 break;
             default:
-                processInput(e.getCode(), 0);
+                processInput(e.getCode(), getPlayer());
         }
     }
 
@@ -179,7 +194,7 @@ public class LocalMapModel implements MapModel {
     private void broadcastPrevMove() {
         MapUpdateInfo prev = history.pop();
         for (Pair<Position, MapTile> prevTile : prev.getCoordinates()) {
-            setMapAt(prevTile.first(), prevTile.second().getItem());
+            setMapAt(prevTile.first(), prevTile.second().getItem(), prevTile.second().getPlayer());
         }
 
         broadcast(prev);
@@ -263,10 +278,10 @@ public class LocalMapModel implements MapModel {
 
             boolean pushedBox = getMapAt(newPosition).getItem() == BOX;
 
-            setMapAt(oldPosition, GROUND);
-            setMapAt(newPosition, newDirection);
+            setMapAt(oldPosition, GROUND, -1);
+            setMapAt(newPosition, newDirection, p);
             if(pushedBox){
-                setMapAt(lookAhead, BOX);
+                setMapAt(lookAhead, BOX, -1);
             }
 
             MapUpdateInfo info = new MapUpdateInfo(false, goalsLeft == 0);
@@ -281,7 +296,7 @@ public class LocalMapModel implements MapModel {
         }
         else{
             MapUpdateInfo info = new MapUpdateInfo(false, false);
-            setMapAt(oldPosition, newDirection);
+            setMapAt(oldPosition, newDirection, p);
             info.addChange(oldPosition, getMapAt(oldPosition));
 
             broadcast(info);
@@ -324,13 +339,13 @@ public class LocalMapModel implements MapModel {
         }
     }
 
-    private synchronized void setMapAt(Position pos, MapTile.MapItem item){
+    private synchronized void setMapAt(Position pos, MapTile.MapItem item, int player){
         MapTile tile = map[pos.getY()][pos.getX()];
 
         if(tile.getIsGoal() && tile.getItem() == BOX) {
             goalsLeft++;
         }
-        tile.setItem(item);
+        tile.setTile(item, player);
 
         if(tile.getIsGoal() && tile.getItem() == BOX) {
             goalsLeft--;

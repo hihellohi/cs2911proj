@@ -24,6 +24,7 @@ public class RemoteMapModel implements MapModel {
 
     private int width;
     private int height;
+    private int player;
 
     public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
         super();
@@ -77,6 +78,7 @@ public class RemoteMapModel implements MapModel {
         }
 
         try {
+            player = in.readInt();
             width = in.readInt();
             height = in.readInt();
         }
@@ -108,13 +110,17 @@ public class RemoteMapModel implements MapModel {
         int n = in.readInt();
         for(int i = 0; i < n; i++){
             Position position = new Position(in.readInt(), in.readInt());
-            MapTile mapTile = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()]);
+            MapTile mapTile = new MapTile(in.readBoolean(), Constants.TILES[in.readInt()], in.readInt());
             info.addChange(position, mapTile);
         }
 
         for(Consumer<MapUpdateInfo> listener : gameChangeListeners) {
             listener.accept(info);
         }
+    }
+
+    public int getPlayer(){
+        return player;
     }
 
     public void handle(KeyEvent e){

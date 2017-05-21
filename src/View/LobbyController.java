@@ -67,7 +67,7 @@ public class LobbyController {
 
         model.close();
 
-        LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1);
+        LocalMapModel mapModel = new LocalMapModel(model.nPlayers() + 1, false);
 
         model.startGame(mapModel);
         new GameView(mapModel).switchHere(stage);

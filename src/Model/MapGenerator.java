@@ -99,7 +99,7 @@ public class MapGenerator {
             }
 
             if (isValidMove(map, newPosition, lookAhead)) {
-                makeMove(map, player, newPosition, lookAhead);
+                makeMove(map, player, newPosition, lookAhead, playerIndex);
                 players.set(playerIndex, newPosition);
                 path.add(newPosition);
             }
@@ -122,8 +122,8 @@ public class MapGenerator {
             }
         }
 
-        for (Position start: startingPositions) {
-            setMapAt(map, start, MapTile.MapItem.PLAYER_SOUTH);
+        for(int i = 0; i < startingPositions.size(); i++){
+            setMapAt(map, startingPositions.get(i), MapTile.MapItem.PLAYER_SOUTH, i);
         }
 
         // reset the position of boxes at where they were initially placed
@@ -161,7 +161,7 @@ public class MapGenerator {
         return true;
     }
     private void makeMove(
-            MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead
+            MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead, int player
     ) {
         boolean pushedBox = getMapAt(map, newPosition).getItem() == MapTile.MapItem.BOX;
 
@@ -169,7 +169,7 @@ public class MapGenerator {
         if(pushedBox){
             setMapAt(map, lookAhead, MapTile.MapItem.BOX);
         }
-        setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH);
+        setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH, player);
     }
 
     private Pair<Position, Position> getPositions(KeyCode move, Position player) {
@@ -235,8 +235,12 @@ public class MapGenerator {
     }
 
     private void setMapAt(MapTile[][] map, Position pos, MapTile.MapItem item){
+        setMapAt(map, pos, item, -1);
+    }
+
+    private void setMapAt(MapTile[][] map, Position pos, MapTile.MapItem item, int player){
         MapTile tile = map[pos.getY()][pos.getX()];
-        tile.setItem(item);
+        tile.setTile(item, player);
     }
 
     private List<Position> placePlayers(MapTile[][] map, int numPlayers) {
@@ -252,7 +256,7 @@ public class MapGenerator {
             Position player = freePositions.get(index);
             freePositions.remove(index);
             players.add(player);
-            map[player.getY()][player.getX()].setItem(MapTile.MapItem.PLAYER_SOUTH);
+            map[player.getY()][player.getX()].setTile(MapTile.MapItem.PLAYER_SOUTH, i);
         }
 
         return players;

@@ -14,12 +14,22 @@ class MapView extends GridPane {
     private final static Image GROUND = new Image("images/ground.png", 100, 100, false, false);
     private final static Image GOAL = new Image("images/goal.png", 100, 100, false, false);
     private final static Image GOAL_BOX = new Image("images/goalBox.png", 100, 100, false, false);
-    private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png", 100, 100, false, false);
     private final static Image WALL = new Image("images/wall.png", 100, 100, false, false);
+
+    private final static Image GOAL_PLAYER = new Image("images/goalPlayer.png", 100, 100, false, false);
     private final static Image PLAYER_N = new Image("images/playerU.png", 100, 100, false, false);
     private final static Image PLAYER_E = new Image("images/playerR.png", 100, 100, false, false);
     private final static Image PLAYER_S = new Image("images/player.png", 100, 100, false, false);
     private final static Image PLAYER_W = new Image("images/playerL.png", 100, 100, false, false);
+
+    private final static Image GOAL_PLAYER2 = new Image("images/goalPlayer2.png", 100, 100, false, false);
+    private final static Image PLAYER_N2 = new Image("images/player2U.png", 100, 100, false, false);
+    private final static Image PLAYER_E2 = new Image("images/player2R.png", 100, 100, false, false);
+    private final static Image PLAYER_S2 = new Image("images/player2.png", 100, 100, false, false);
+    private final static Image PLAYER_W2 = new Image("images/player2L.png", 100, 100, false, false);
+
+    private final static Image[] PLAYER1 = new Image[] {GOAL_PLAYER, GOAL_PLAYER, GOAL_PLAYER, GOAL_PLAYER, PLAYER_N, PLAYER_E, PLAYER_S, PLAYER_W};
+    private final static Image[] PLAYER2 = new Image[] {GOAL_PLAYER2, GOAL_PLAYER2, GOAL_PLAYER2, GOAL_PLAYER2, PLAYER_N2, PLAYER_E2, PLAYER_S2, PLAYER_W2};
 
     private MapModel model;
     private ImageView[][] tiles;
@@ -64,18 +74,6 @@ class MapView extends GridPane {
 
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
-            case PLAYER_NORTH:
-                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER_N);
-                break;
-            case PLAYER_EAST:
-                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER_E);
-                break;
-            case PLAYER_SOUTH:
-                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER_S);
-                break;
-            case PLAYER_WEST:
-                viewTile.setImage(mapTile.getIsGoal() ? GOAL_PLAYER: PLAYER_W);
-                break;
             case WALL:
                 viewTile.setImage(WALL);
                 break;
@@ -85,6 +83,10 @@ class MapView extends GridPane {
             case BOX:
                 viewTile.setImage(mapTile.getIsGoal() ? GOAL_BOX : BOX);
                 break;
+            default:
+                Image[] player = mapTile.getPlayer() == model.getPlayer() ? PLAYER2 : PLAYER1;
+                int index = mapTile.getItem().ordinal() - MapTile.MapItem.PLAYER_NORTH.ordinal();
+                viewTile.setImage(player[index + (mapTile.getIsGoal() ? 0 : 4)]);
         }
     }
 }

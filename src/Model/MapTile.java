@@ -8,10 +8,20 @@ public class MapTile implements Cloneable{
 
     private boolean isGoal;
     private MapItem item;
+    private int player;
 
     public MapTile(boolean isGoal, MapItem item){
+        this(isGoal, item, -1);
+    }
+
+    public MapTile(boolean isGoal, MapItem item, int player){
         this.isGoal = isGoal;
         this.item = item;
+        this.player = player;
+    }
+
+    public int getPlayer(){
+        return player;
     }
 
     public boolean getIsGoal(){
@@ -22,8 +32,9 @@ public class MapTile implements Cloneable{
         return item;
     }
 
-    void setItem(MapItem item){
+    void setTile(MapItem item, int player){
         this.item = item;
+        this.player = player;
     }
 
     public enum MapItem {
@@ -37,7 +48,7 @@ public class MapTile implements Cloneable{
     }
 
     @Override public MapTile clone(){
-        return new MapTile(getIsGoal(), getItem());
+        return new MapTile(getIsGoal(), getItem(), getPlayer());
     }
 }
 

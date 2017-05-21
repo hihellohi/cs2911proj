@@ -40,6 +40,7 @@ public class ClientConnection {
     }
 
     public void StartGame(LocalMapModel model, int player) throws IOException{
+        out.writeInt(player);
         out.writeInt(model.getWidth());
         out.writeInt(model.getHeight());
 
@@ -96,6 +97,7 @@ public class ClientConnection {
                 out.writeInt(pos.getY());
                 out.writeBoolean(tile.getIsGoal());
                 out.writeInt(tile.getItem().ordinal());
+                out.writeInt(tile.getPlayer());
             }
         }
         catch(IOException e){

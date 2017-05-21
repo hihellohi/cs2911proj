@@ -26,6 +26,7 @@ public class UIController {
     @FXML private Button tutorialBtn;
     @FXML private Button settingsBtn;
     @FXML private Button closeGameBtn;
+    @FXML private Button localBtn;
 
     private Scene scene;
     private static final String HOST = "localhost";
@@ -47,6 +48,7 @@ public class UIController {
         tutorialBtn.setOnAction(this::startTutorial);
         settingsBtn.setOnAction(this::switchToSettings);
         closeGameBtn.setOnAction(this::closeGame);
+        localBtn.setOnAction(this::switchToMultiplayer);
     }
 
     public void switchHere(Stage stage){
@@ -56,7 +58,13 @@ public class UIController {
     }
 
     private void switchToGame (ActionEvent e) {
-        LocalMapModel model = new LocalMapModel(1);
+        LocalMapModel model = new LocalMapModel(1, false);
+        new GameView(model).switchHere(stage);
+        model.broadcastMap();
+    }
+
+    private void switchToMultiplayer(ActionEvent e) {
+        LocalMapModel model = new LocalMapModel(2, true);
         new GameView(model).switchHere(stage);
         model.broadcastMap();
     }

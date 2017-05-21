@@ -12,8 +12,9 @@
         <Button GridPane.rowIndex="2" text="Play Game" fx:id="playGameBtn"/>
         <Button GridPane.rowIndex="3" text="Host Game" fx:id="hostBtn"/>
         <Button GridPane.rowIndex="4" text="Join Game" fx:id="clientBtn"/>
-        <Button GridPane.rowIndex="5" text="Tutorial" fx:id="tutorialBtn"/>
-        <Button GridPane.rowIndex="6" text="Settings" fx:id="settingsBtn"/>
-        <Button GridPane.rowIndex="7" text="Exit" fx:id="closeGameBtn"/>
+        <Button GridPane.rowIndex="5" text="Local MultiPlayer" fx:id="localBtn"/>
+        <Button GridPane.rowIndex="6" text="Tutorial" fx:id="tutorialBtn"/>
+        <Button GridPane.rowIndex="7" text="Settings" fx:id="settingsBtn"/>
+        <Button GridPane.rowIndex="8" text="Exit" fx:id="closeGameBtn"/>
     </VBox>
 </GridPane>
