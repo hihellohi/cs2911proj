@@ -19,7 +19,6 @@ public class LobbyModel {
     private ObservableList<ClientConnection> connectionSockets;
     private HostBeacon beacon;
 
-    //TODO terminate thread (and all other threads) when stage is closed
     public LobbyModel() throws IOException{
         super();
         connectionSockets = FXCollections.observableList(new ArrayList<>());
@@ -41,13 +40,13 @@ public class LobbyModel {
                 System.out.println("Welcoming socket closed, lobby thread ending...");
             }
             catch (IOException ex) {
-                finish();
+                abort();
                 ex.printStackTrace();
             }
         }
     }
 
-    public void close(){
+    public synchronized void close(){
         beacon.close();
         if(!welcomingSocket.isClosed()) {
             try {
@@ -72,7 +71,7 @@ public class LobbyModel {
         }
     }
 
-    public void finish(){
+    public void abort(){
         new ArrayList<>(connectionSockets).forEach(ClientConnection::close);
         close();
     }

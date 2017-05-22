@@ -87,6 +87,7 @@ public class JoinGameController{
     private void backEvent (ActionEvent event) {
         try {
             finder.abort();
+            stage.setOnCloseRequest(null);
             new UIController().switchHere(stage);
         }
         catch (IOException ex){
@@ -96,6 +97,7 @@ public class JoinGameController{
 
     public void switchHere(Stage stage){
         this.stage = stage;
+        stage.setOnCloseRequest((e) -> finder.abort());
         stage.setScene(scene);
         stage.show();
         finder.broadcast();

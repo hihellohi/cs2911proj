@@ -103,7 +103,7 @@ public class BeaconFinder {
         return observableList;
     }
 
-    public void close(){
+    public synchronized void close(){
         if(!socket.isClosed()) {
             socket.close();
         }

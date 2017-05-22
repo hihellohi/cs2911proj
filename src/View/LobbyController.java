@@ -3,9 +3,7 @@ package View;
 import Model.LocalMapModel;
 import Model.Netcode.ClientConnection;
 import Model.Netcode.LobbyModel;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -76,7 +74,8 @@ public class LobbyController {
 
     private void backEvent (ActionEvent event) {
         try {
-            model.finish();
+            model.abort();
+            stage.setOnCloseRequest(null);
             new UIController().switchHere(stage);
         }
         catch (IOException ex){
@@ -86,6 +85,7 @@ public class LobbyController {
 
     public void switchHere(Stage stage){
         this.stage = stage;
+        stage.setOnCloseRequest((e) -> model.abort());
         stage.setScene(scene);
         stage.show();
     }

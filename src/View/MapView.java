@@ -64,6 +64,10 @@ class MapView extends GridPane {
     }
 
     private void onMapChange (MapUpdateInfo updateInfo) {
+        if(updateInfo == null){
+            return;
+        }
+
         for(Pair<Position, MapTile> change: updateInfo.getCoordinates()) {
             Position pos = change.first();
             int x = pos.getX();

@@ -51,7 +51,7 @@ public class RemoteMapModel implements MapModel {
         new Thread(this::listen).start();
     }
 
-    public void close(){
+    public synchronized void close(){
         try {
             if(socket != null && !socket.isClosed()) {
                 socket.close();
@@ -64,6 +64,7 @@ public class RemoteMapModel implements MapModel {
     }
 
     private void onConnectionInterrupt(){
+        //if the connection was closed on the other side run the listener
         if(socket != null){
             if(connectionInterruptedListener != null){
                 connectionInterruptedListener.run();
@@ -124,11 +125,14 @@ public class RemoteMapModel implements MapModel {
     }
 
     public void handle(KeyEvent e){
-        try {
-            out.writeInt(e.getCode().ordinal());
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
+        switch (e.getCode()){
+            case UP:case DOWN:case LEFT: case RIGHT:
+                try {
+                    out.writeInt(e.getCode().ordinal());
+                }
+                catch (IOException ex){
+                    ex.printStackTrace();
+                }
         }
     }
 
@@ -154,17 +158,5 @@ public class RemoteMapModel implements MapModel {
 
     public void setConnectionInterruptedListener(Runnable listener){
         connectionInterruptedListener = listener;
-    }
-
-    public void generateNewMap() {
-
-    }
-
-    public void undo() {
-
-    }
-
-    public void reset() {
-
     }
 }

@@ -28,14 +28,14 @@ public class MapGenerator {
 
     /** Generates a new map
      *
-     * @param numPlayers number of players in the map
+     * @param players players in the map
      * @pre numPlayers <= 16
      * @return a two-dimensional array of MapTiles representing the map
      */
-    public MapTile[][] generateMap(int numPlayers) {
+    public MapTile[][] generateMap(Set<Integer> players) {
         MapTile[][] map;
         do {
-            map = makeMap(numPlayers);
+            map = makeMap(players);
         } while (!isMapGood(map));
         return map;
     }
@@ -44,11 +44,11 @@ public class MapGenerator {
      * Does the bulk of the work of generating a map. Not guaranteed to produce a "good" map, but will
      * always produce a fully solvable map.
      *
-     * @param numPlayers
-     * @pre numPlayers <= 16
+     * @param livePlayers
+     * @pre livePlayers.size() <= 16
      * @return newly generated map
      */
-    private MapTile[][] makeMap(int numPlayers) {
+    private MapTile[][] makeMap(Set<Integer> livePlayers) {
         int walkLength = 0;
         int maxNumberOfBoxes = 0;
         int maxGeneratingPoint = 0;
@@ -81,7 +81,7 @@ public class MapGenerator {
         System.out.println(difficulty);
         MapTile[][] map = initializeEmptyMap(width, height);
 
-        List<Position> players = placePlayers(map, numPlayers);
+        List<Position> players = placePlayers(map, livePlayers.size());
         // copy over the starting positions of each player
         List<Position> startingPositions = new ArrayList<>(players);
 
@@ -104,7 +104,7 @@ public class MapGenerator {
         path.addAll(startingPositions);
         KeyCode[] directions = {UP, DOWN, LEFT, RIGHT};
         for (int i = 0; i < walkLength; i++) {
-            int playerIndex = generator.nextInt(numPlayers);
+            int playerIndex = generator.nextInt(livePlayers.size());
             Position player = players.get(playerIndex);
             KeyCode move = directions[generator.nextInt(4)];
 
@@ -144,8 +144,9 @@ public class MapGenerator {
             }
         }
 
-        for(int i = 0; i < startingPositions.size(); i++){
-            setMapAt(map, startingPositions.get(i), MapTile.MapItem.PLAYER_SOUTH, i);
+        int i = 0;
+        for(int player : livePlayers){
+            setMapAt(map, startingPositions.get(i++), MapTile.MapItem.PLAYER_SOUTH, player);
         }
 
         // reset the position of boxes at where they were initially placed
@@ -202,13 +203,11 @@ public class MapGenerator {
     ) {
         boolean pushedBox = getMapAt(map, newPosition).getItem() == MapTile.MapItem.BOX;
 
-        int player = getMapAt(map, oldPosition).getPlayer();
-
         setMapAt(map, oldPosition, MapTile.MapItem.GROUND);
         if(pushedBox){
             setMapAt(map, lookAhead, MapTile.MapItem.BOX);
         }
-        setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH, player);
+        setMapAt(map, newPosition, MapTile.MapItem.PLAYER_SOUTH, 0);
     }
 
     /**
@@ -339,7 +338,7 @@ public class MapGenerator {
             Position player = freePositions.get(index);
             freePositions.remove(index);
             players.add(player);
-            map[player.getY()][player.getX()].setTile(MapTile.MapItem.PLAYER_SOUTH, i);
+            map[player.getY()][player.getX()].setTile(MapTile.MapItem.PLAYER_SOUTH, 0);
         }
 
         return players;

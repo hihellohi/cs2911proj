@@ -44,7 +44,7 @@ public class HostBeacon {
         }
     }
 
-    public void close(){
+    public synchronized void close(){
         if(!socket.isClosed()) {
             socket.close();
         }

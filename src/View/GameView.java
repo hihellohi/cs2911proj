@@ -3,6 +3,7 @@ package View;
 import Model.MapModel;
 import Model.MapUpdateInfo;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -12,6 +13,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -36,8 +38,8 @@ public class GameView extends StackPane {
         BorderPane bp = new BorderPane();
 
         grid = new MapView(model);
-        sv = new ScoreView(model);
-        menuBar = new GameMenuBar(model, tutorial);
+        sv = new ScoreView();
+        menuBar = new GameMenuBar(model, this::onMapEnd, tutorial);
         this.model = model;
 
         region = new Region();
@@ -61,32 +63,48 @@ public class GameView extends StackPane {
         this.stage = stage;
         menuBar.setStage(stage);
 
-        pauseMenu = new PauseMenu(model, tutorial);
-        grid.setOnKeyPressed(this::handleKey);
+        pauseMenu = new PauseMenu(model, this::onMapEnd, tutorial);
         pauseMenu.setStage(stage);
+        region.visibleProperty().bind(pauseMenu.showingProperty());
 
         Scene gameScene = new Scene(this, grid.mapWidth() + sv.sideWidth(), grid.mapHeight() + menuBar.getHeight() + region.getPrefHeight());
 
+        grid.setOnKeyPressed(this::handleKey);
         grid.requestFocus();
+
+        stage.setOnCloseRequest((e) -> model.close());
 
         stage.setScene(gameScene);
         stage.show();
+    }
+
+    private void onMapEnd (ActionEvent e){
+        try {
+            model.close();
+            stage.setOnCloseRequest(null);
+            new UIController().switchHere(stage);
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 
     private void handleKey (KeyEvent e) {
         KeyCode code = e.getCode();
         if(code == KeyCode.P || code == KeyCode.ESCAPE){
             pauseMenu.show();
-            region.visibleProperty().bind(pauseMenu.showingProperty());
         }
     }
 
     private void onMapChange (MapUpdateInfo updateInfo) {
-        if (updateInfo.isFinished()) {
-            Platform.runLater(() -> {
-                new EndGameDialog(sv).showAndWait();
-                pauseMenu.show();
-            });
+        if (updateInfo != null){
+            if(updateInfo.isFinished()) {
+                Platform.runLater(() -> {
+                    new EndGameDialog(sv).showAndWait();
+                    pauseMenu.show();
+                });
+            }
+            sv.onMapChange(updateInfo);
         }
     }
 }

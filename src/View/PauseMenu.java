@@ -1,7 +1,9 @@
 package View;
 
+import Model.LocalMapModel;
 import Model.MapModel;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -23,7 +25,7 @@ public class PauseMenu extends Dialog {
     private Window window;
     private Stage stage;
 
-    public PauseMenu(MapModel model, boolean tutorial) {
+    public PauseMenu(MapModel model, EventHandler<ActionEvent> leaveHandler, boolean tutorial) {
         super();
         super.setTitle("Paused");
 
@@ -41,47 +43,48 @@ public class PauseMenu extends Dialog {
         Button mainMenu = new Button("Return to Main Menu");
         mainMenu.setPrefWidth(BUTTON_WIDTH);
         mainMenu.setOnAction(event -> {
-            try {
-                //TODO graceful exit notify clientconnection
-                new UIController().switchHere(stage);
-            }
-            catch(IOException ex){
-                ex.printStackTrace();
-            }
-            window.hide();
-        });
-
-        Button newGame = new Button("New Game");
-        if (!tutorial) {
-            newGame.setPrefWidth(BUTTON_WIDTH);
-            newGame.setOnAction(event -> {
-                model.generateNewMap();
-                window.hide();
-            });
-        }
-
-        Button restart = new Button("Restart Game");
-        restart.setPrefWidth(BUTTON_WIDTH);
-        restart.setOnAction(event -> {
-            model.reset();
+            leaveHandler.handle(event);
             window.hide();
         });
 
         Button exit = new Button("Exit");
         exit.setPrefWidth(BUTTON_WIDTH);
         exit.setOnAction(event -> {
+            leaveHandler.handle(event);
             Platform.exit();
         });
 
-        if (tutorial) {
-            vbox.getChildren().addAll(returnToGame, mainMenu, restart, exit);
+        if(model instanceof LocalMapModel) {
+            Button newGame = new Button("New Game");
+            LocalMapModel localModel = (LocalMapModel) model;
+            if (!tutorial) {
+                newGame.setPrefWidth(BUTTON_WIDTH);
+                newGame.setOnAction(event -> {
+                    localModel.generateNewMap();
+                    window.hide();
+                });
+            }
+
+            Button restart = new Button("Restart Game");
+            restart.setPrefWidth(BUTTON_WIDTH);
+            restart.setOnAction(event -> {
+                localModel.reset();
+                window.hide();
+            });
+
+            if (tutorial) {
+                vbox.getChildren().addAll(returnToGame, mainMenu, restart, exit);
+            }
+            else {
+                vbox.getChildren().addAll(returnToGame, mainMenu, newGame, restart, exit);
+            }
         }
-        else {
-            vbox.getChildren().addAll(returnToGame, mainMenu, newGame, restart, exit);
+        else{
+            vbox.getChildren().addAll(returnToGame, mainMenu, exit);
         }
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(DIALOG_GAP);
-        vbox.setOnKeyPressed(hideWindow);
+        vbox.setOnKeyPressed(this::hideWindow);
         super.getDialogPane().setContent(vbox);
     }
 
@@ -89,10 +92,10 @@ public class PauseMenu extends Dialog {
         this.stage = stage;
     }
 
-    private EventHandler<KeyEvent> hideWindow = (e) -> {
+    private void hideWindow (KeyEvent e){
         KeyCode code = e.getCode();
         if(code == KeyCode.P || code == KeyCode.ESCAPE){
             window.hide();
         }
-    };
+    }
 }

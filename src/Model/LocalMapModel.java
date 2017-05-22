@@ -15,20 +15,24 @@ public class LocalMapModel implements MapModel {
     private MapTile[][] map;
     private MapTile[][] startingMap;
     private Position[] players;
+    private Set<Integer> livePlayers;
     private int goalsLeft;
     private boolean tutorial;
     private Stack<MapUpdateInfo> history;
     private Stack<Pair<Integer, Position>> playerHistory;
-    private List<Consumer<MapUpdateInfo>> listeners;
+    private Set<Consumer<MapUpdateInfo>> listeners;
     private boolean localMulti;
-
-    //TODO close to notify connections. also take in a close notification from connections
 
     public LocalMapModel(int nPlayers, boolean localMulti){
         this.localMulti = localMulti;
         tutorial = false;
         players = new Position[nPlayers];
-        listeners = new ArrayList<>();
+        listeners = new HashSet<>();
+
+        livePlayers = new HashSet<>();
+        for(int i = 0; i < nPlayers; i++){
+            livePlayers.add(i);
+        }
         generateMap(new Random().nextInt());
     }
 
@@ -37,7 +41,7 @@ public class LocalMapModel implements MapModel {
      * @param path path to file with the map
      */
     public LocalMapModel(String path) throws FileNotFoundException {
-        listeners = new ArrayList<>();
+        listeners = new HashSet<>();
         tutorial = true;
         loadFromFile(path);
     }
@@ -51,7 +55,7 @@ public class LocalMapModel implements MapModel {
         MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
         history = new Stack<>();
         playerHistory = new Stack<>();
-        setUpMap(generator.generateMap(players.length));
+        setUpMap(generator.generateMap(livePlayers));
     }
 
     private void setUpMap(MapTile[][] map) {
@@ -145,28 +149,28 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    public synchronized void killPlayer(int p){
+        setMapAt(players[p], GROUND, -1);
+        livePlayers.remove(p);
+
+        MapUpdateInfo info = new MapUpdateInfo(false, false);
+        info.addChange(players[p], getMapAt(players[p]));
+
+        broadcast(info);
+
+        players[p] = null;
+    }
+
     public int getPlayer(){
         return 0;
     }
 
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
-
-        if(localMulti){
-            switch (e.getCode()) {
-                case W:
-                    processInput(KeyCode.UP, 1);
-                    return;
-                case A:
-                    processInput(KeyCode.LEFT, 1);
-                    return;
-                case S:
-                    processInput(KeyCode.DOWN, 1);
-                    return;
-                case D:
-                    processInput(KeyCode.RIGHT, 1);
-                    return;
-            }
+        KeyCode p2 = localPlayer2(e.getCode());
+        if(p2 != null){
+            processInput(p2, 1);
+            return;
         }
 
         switch (e.getCode()) {
@@ -183,6 +187,26 @@ public class LocalMapModel implements MapModel {
                 break;
             default:
                 processInput(e.getCode(), getPlayer());
+        }
+    }
+
+    private KeyCode localPlayer2(KeyCode k){
+
+        if(localMulti){
+            return null;
+        }
+
+        switch (k) {
+            case W:
+                return KeyCode.UP;
+            case A:
+                return KeyCode.LEFT;
+            case S:
+                return KeyCode.DOWN;
+            case D:
+                return KeyCode.RIGHT;
+            default:
+                return null;
         }
     }
 
@@ -364,7 +388,16 @@ public class LocalMapModel implements MapModel {
         return getHeight() == 0 ? 0 : map[0].length;
     }
 
-    public void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
+    public synchronized void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         listeners.add(listener);
+    }
+
+    public synchronized void unSubscribeModelUpdate(Consumer<MapUpdateInfo> listener){
+        assert listeners.contains(listener);
+        listeners.remove(listener);
+    }
+
+    public void close(){
+        broadcast(null);
     }
 }

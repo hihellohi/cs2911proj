@@ -49,7 +49,7 @@ public class ClientConnection {
 
         lobbyRemover = null;
 
-        model.subscribeModelUpdate(this::onMapChange);
+        model.subscribeModelUpdate(onMapChange);
     }
 
     private void listen () {
@@ -69,13 +69,12 @@ public class ClientConnection {
         }
     }
 
-    public void close(){
+    private synchronized void finish(){
         try {
             if(!socket.isClosed()) {
                 socket.close();
             }
 
-            //TODO probably implement kick all here?
             if(lobbyRemover != null){
                 lobbyRemover.accept(this);
             }
@@ -85,7 +84,21 @@ public class ClientConnection {
         }
     }
 
-    private void onMapChange (MapUpdateInfo updateInfo) {
+    public synchronized void close(){
+        if(model != null) {
+            model.unSubscribeModelUpdate(onMapChange);
+            model.killPlayer(player);
+            model = null;
+        }
+        finish();
+    }
+
+    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
+        if(updateInfo == null){
+            finish();
+            return;
+        }
+
         try {
             out.writeBoolean(updateInfo.isNewMap());
             out.writeBoolean(updateInfo.isFinished());
@@ -104,7 +117,7 @@ public class ClientConnection {
             close();
             e.printStackTrace();
         }
-    }
+    };
 
     public String getHostAddress(){
         return socket.getInetAddress().getHostAddress();

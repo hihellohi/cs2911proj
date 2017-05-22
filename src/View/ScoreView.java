@@ -18,16 +18,11 @@ public class ScoreView extends BorderPane {
     private final static int SIDE_PANEL_SIZE = 150;
     private Label scoreLbl;
     private ScoreTimer timeLbl;
-    private MapModel model;
     private int score;
 
-    public ScoreView(MapModel model) {
+    public ScoreView() {
         super();
-        super.addEventHandler(KeyEvent.KEY_PRESSED, model);
-
-        this.model = model;
         score = 0;
-        model.subscribeModelUpdate(onMapChange);
 
         super.setPrefWidth(sideWidth());
         VBox vbox = new VBox();
@@ -47,7 +42,7 @@ public class ScoreView extends BorderPane {
         super.setTop(vbox);
     }
 
-    private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
+    public void onMapChange(MapUpdateInfo updateInfo){
         if (updateInfo.isFinished()) {
             timeLbl.stopTimer();
         }
