@@ -192,7 +192,7 @@ public class LocalMapModel implements MapModel {
 
     private KeyCode localPlayer2(KeyCode k){
 
-        if(localMulti){
+        if(!localMulti){
             return null;
         }
 
