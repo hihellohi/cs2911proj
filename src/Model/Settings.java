@@ -14,7 +14,7 @@ public class Settings {
 
     private Difficulty difficulty;
     private int TCPPort;
-    private int UDPPort;
+    private String name;
 
     public static Settings getInstance() {
         return instance;
@@ -23,10 +23,19 @@ public class Settings {
     private Settings() {
         difficulty = Difficulty.MEDIUM;
         TCPPort = 1337;
+        name = "";
     }
 
     public Difficulty getDifficulty() {
         return difficulty;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name){
+        this.name = name;
     }
 
     public int getTCPPort() {

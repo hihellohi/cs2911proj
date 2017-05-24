@@ -11,24 +11,26 @@ import java.util.function.Consumer;
 /**
  * @author Kevin Ni
  */
-public class RemoteMapModel implements MapModel {
+public class HostConnection implements MapModel {
 
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
     private InetSocketAddress host;
+    private String name;
 
     private List<Consumer<MapUpdateInfo>> gameChangeListeners;
-    private Consumer<RemoteMapModel> startGameListener;
+    private Consumer<HostConnection> startGameListener;
     private Runnable connectionInterruptedListener;
 
     private int width;
     private int height;
     private int player;
 
-    public RemoteMapModel(InetAddress host, Consumer<RemoteMapModel> startGame) {
+    public HostConnection(InetAddress host, String name, Consumer<HostConnection> startGame) {
         super();
 
+        this.name = name;
         this.startGameListener = startGame;
         this.host = new InetSocketAddress(host, Settings.getInstance().getTCPPort());
 
@@ -41,6 +43,9 @@ public class RemoteMapModel implements MapModel {
             socket.connect(host);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+
+            String name = Settings.getInstance().getName();
+            out.writeUTF(name);
 
             System.out.println("Connected!");
         }
@@ -145,7 +150,7 @@ public class RemoteMapModel implements MapModel {
     }
 
     public String getHostName(){
-        return host.getAddress().getHostAddress();
+        return name;
     }
 
     public boolean isConnected(){

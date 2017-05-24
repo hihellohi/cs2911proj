@@ -33,7 +33,7 @@ public class LobbyItem extends ListCell<ClientConnection> {
 
         hBox.getChildren().addAll(ipLabel, pane, button);
         HBox.setHgrow(pane, Priority.ALWAYS);
-        button.setOnAction((e) -> currentConnection.close());
+        button.setOnAction((e) -> currentConnection.closeAndRemoveFromModel());
     }
 
     @Override protected void updateItem(ClientConnection connection, boolean empty){
@@ -45,7 +45,7 @@ public class LobbyItem extends ListCell<ClientConnection> {
         }
         else{
             currentConnection = connection;
-            ipLabel.setText(connection.getHostAddress());
+            ipLabel.setText(connection.getClientName());
             Platform.runLater(() -> super.setGraphic(hBox));
         }
     }

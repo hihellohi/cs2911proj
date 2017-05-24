@@ -1,7 +1,7 @@
 package View;
 
 import Model.Netcode.BeaconFinder;
-import Model.Netcode.RemoteMapModel;
+import Model.Netcode.HostConnection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
  */
 public class JoinGameController{
 
-    @FXML private ListView<RemoteMapModel> listView;
+    @FXML private ListView<HostConnection> listView;
     @FXML private Button backBtn;
     @FXML private Button searchBtn;
     @FXML private Button refreshBtn;
@@ -55,7 +55,7 @@ public class JoinGameController{
         finder.broadcast();
     }
 
-    private synchronized void startEvent (RemoteMapModel model) {
+    private synchronized void startEvent (HostConnection model) {
         if(finder.isLive()) {
             finder.finish(model);
 

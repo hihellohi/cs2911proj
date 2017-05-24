@@ -22,6 +22,8 @@
       <Button fx:id="exitSettingsBtn" layoutX="140.0" layoutY="200.0" mnemonicParsing="false" text="Save and Exit" />
       <Label layoutX="72.0" layoutY="50.0" text="Difficulty" />
       <Label layoutX="33.0" layoutY="103.0" text="Connection Port" />
-      <TextField fx:id="TCPField" layoutX="141.0" layoutY="99.0" />
+      <TextField fx:id="tcpField" layoutX="141.0" layoutY="99.0" />
+      <Label layoutX="87.0" layoutY="153.0" text="Name" />
+      <TextField fx:id="nameField" layoutX="141.0" layoutY="149.0" />
    </children>
 </AnchorPane>

@@ -66,13 +66,13 @@ public class LobbyModel {
             }
             catch (IOException ex){
                 ex.printStackTrace();
-                connection.close();
+                connection.closeAndRemoveFromModel();
             }
         }
     }
 
     public void abort(){
-        new ArrayList<>(connectionSockets).forEach(ClientConnection::close);
+        new ArrayList<>(connectionSockets).forEach(ClientConnection::closeAndRemoveFromModel);
         close();
     }
 

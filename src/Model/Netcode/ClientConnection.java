@@ -8,6 +8,8 @@ import java.net.*;
 import java.util.function.Consumer;
 
 /**
+ * Represents a connection to a host
+ *
  * @author Kevin Ni
  */
 public class ClientConnection {
@@ -17,85 +19,12 @@ public class ClientConnection {
     private DataOutputStream out;
     private int player;
     private Socket socket;
-    private Consumer<ClientConnection> lobbyRemover;
-
-    public ClientConnection(Socket socket, Consumer<ClientConnection> lobbyRemover){
-        super();
-
-        this.lobbyRemover = lobbyRemover;
-        this.socket = socket;
-
-        try {
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-
-            System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
-        }
-        catch(IOException e){
-            e.printStackTrace();
-            close();
-        }
-
-        new Thread(this::listen).start();
-    }
-
-    public void StartGame(LocalMapModel model, int player) throws IOException{
-        out.writeInt(player);
-        out.writeInt(model.getWidth());
-        out.writeInt(model.getHeight());
-
-        this.player = player;
-        this.model = model;
-
-        lobbyRemover = null;
-
-        model.subscribeModelUpdate(onMapChange);
-    }
-
-    private void listen () {
-        while(!socket.isClosed()){
-            try {
-                KeyCode move = Constants.CODES[in.readInt()];
-                model.processInput(move, player);
-            }
-            catch (SocketException | EOFException ex){
-                close();
-                System.out.println("Connection closed");
-            }
-            catch (IOException ex){
-                close();
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    private synchronized void finish(){
-        try {
-            if(!socket.isClosed()) {
-                socket.close();
-            }
-
-            if(lobbyRemover != null){
-                lobbyRemover.accept(this);
-            }
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void close(){
-        if(model != null) {
-            model.unSubscribeModelUpdate(onMapChange);
-            model.killPlayer(player);
-            model = null;
-        }
-        finish();
-    }
+    private Consumer<ClientConnection> onClientRemovedFromLobby;
+    private String name;
 
     private Consumer<MapUpdateInfo> onMapChange = (updateInfo) -> {
         if(updateInfo == null){
-            finish();
+            close();
             return;
         }
 
@@ -114,12 +43,117 @@ public class ClientConnection {
             }
         }
         catch(IOException e){
-            close();
+            closeAndRemoveFromModel();
             e.printStackTrace();
         }
     };
 
-    public String getHostAddress(){
-        return socket.getInetAddress().getHostAddress();
+    /**
+     * Class constructor
+     *
+     * @param socket the socket to be used for this connection
+     * @param onClientRemovedFromLobby callback invoked when the connection is closed in the lobby
+     */
+    ClientConnection(Socket socket, Consumer<ClientConnection> onClientRemovedFromLobby){
+        super();
+
+        this.onClientRemovedFromLobby = onClientRemovedFromLobby;
+        this.socket = socket;
+
+        try {
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
+            name = in.readUTF();
+            if(name.isEmpty()){
+                name = socket.getInetAddress().getHostName();
+            }
+
+            System.out.println(String.format("%s connected!", socket.getInetAddress().getHostAddress()));
+
+            new Thread(this::listen).start();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            closeAndRemoveFromModel();
+        }
+    }
+
+    /**
+     * Attaches a model to the connection and signals the client that the game has started
+     *
+     * @param model model to be attached to the connection
+     * @param player player number of the client
+     * @throws IOException if the connection has already been closed
+     */
+    void StartGame(LocalMapModel model, int player) throws IOException{
+        out.writeInt(player);
+        out.writeInt(model.getWidth());
+        out.writeInt(model.getHeight());
+
+        this.player = player;
+        this.model = model;
+
+        onClientRemovedFromLobby = null;
+
+        model.subscribeModelUpdate(onMapChange);
+    }
+
+    /**
+     * listen for input from the client
+     */
+    private void listen () {
+        while(!socket.isClosed()){
+            try {
+                KeyCode move = Constants.CODES[in.readInt()];
+                model.processInput(move, player);
+            }
+            catch (SocketException | EOFException ex){
+                closeAndRemoveFromModel();
+                System.out.println("Connection closed");
+            }
+            catch (IOException ex){
+                closeAndRemoveFromModel();
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * closes the connection
+     */
+    private synchronized void close(){
+        try {
+            if(!socket.isClosed()) {
+                socket.close();
+            }
+
+            if(onClientRemovedFromLobby != null){
+                onClientRemovedFromLobby.accept(this);
+            }
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * closes the connection and detaches the class from the associated model (if it exists)
+     */
+    public synchronized void closeAndRemoveFromModel(){
+        if(model != null) {
+            model.unSubscribeModelUpdate(onMapChange);
+            model.killPlayer(player);
+            model = null;
+        }
+        close();
+    }
+
+    /**
+     * get the name of the client
+     *
+     * @return the name of the client
+     */
+    public String getClientName(){
+        return name;
     }
 }

@@ -20,7 +20,7 @@ public class EndGameDialog extends Dialog {
         super.setTitle("Congratulations!");
         super.getDialogPane().setPrefSize(DIALOG_WIDTH, DIALOG_HEIGHT);
 
-        // close dialog
+        // closeAndRemoveFromModel dialog
         Window window = super.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
 

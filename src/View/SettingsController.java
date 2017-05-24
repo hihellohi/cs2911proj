@@ -1,10 +1,8 @@
 package View;
 
 import Model.Settings;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -21,7 +19,8 @@ import java.io.IOException;
 public class SettingsController {
     @FXML private ChoiceBox<String> choiceBox;
     @FXML private Button exitSettingsBtn;
-    @FXML private TextField TCPField;
+    @FXML private TextField tcpField;
+    @FXML private TextField nameField;
 
     private static String string;
     private Stage stage;
@@ -33,7 +32,6 @@ public class SettingsController {
         Parent parent = loader.load();
         scene = new Scene(parent);
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
-        choiceBox.setValue(Settings.getInstance().getDifficultyString());
     }
 
     @FXML
@@ -41,7 +39,10 @@ public class SettingsController {
         choiceBox.setOnAction(this::chooseDifficulty);
         exitSettingsBtn.setOnAction(this::exitSettings);
         Settings settings = Settings.getInstance();
-        TCPField.setText(Integer.toString(settings.getTCPPort()));
+
+        choiceBox.setValue(settings.getDifficultyString());
+        tcpField.setText(Integer.toString(settings.getTCPPort()));
+        nameField.setText(settings.getName());
     }
 
     private void chooseDifficulty (ActionEvent e) {
@@ -68,12 +69,14 @@ public class SettingsController {
 
     private void exitSettings (ActionEvent e) {
         Settings settings = Settings.getInstance();
-        if(!settings.setTCPPort(TCPField.getText())){
+        if(!settings.setTCPPort(tcpField.getText())){
             Alert alert = new Alert(Alert.AlertType.ERROR, "please enter a valid port");
             alert.setHeaderText(null);
             alert.showAndWait();
             return;
         }
+
+        settings.setName(nameField.getText());
 
         try {
             new UIController().switchHere(stage);

@@ -18,7 +18,14 @@ public class HostBeacon {
     public HostBeacon() throws SocketException {
         super();
         socket = new DatagramSocket(Settings.getInstance().getTCPPort());
-        beaconName = UUID.randomUUID().toString();
+
+        String name = Settings.getInstance().getName();
+        if(name.isEmpty()){
+            beaconName = UUID.randomUUID().toString();
+        }
+        else {
+            beaconName = String.format("%s|%s", UUID.randomUUID().toString(), name);
+        }
         new Thread(this::listen).start();
     }
 

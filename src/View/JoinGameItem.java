@@ -1,6 +1,6 @@
 package View;
 
-import Model.Netcode.RemoteMapModel;
+import Model.Netcode.HostConnection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -16,10 +16,10 @@ import java.io.IOException;
 /**
  * @author Kevin Ni
  */
-public class JoinGameItem extends ListCell<RemoteMapModel> {
+public class JoinGameItem extends ListCell<HostConnection> {
     private HBox hBox;
     private Label ipLabel;
-    private RemoteMapModel currentModel;
+    private HostConnection currentModel;
     private Button joinButton;
     private Button leaveButton;
 
@@ -75,12 +75,12 @@ public class JoinGameItem extends ListCell<RemoteMapModel> {
         }
     }
 
-    @Override protected void updateItem(RemoteMapModel model, boolean empty){
+    @Override protected void updateItem(HostConnection model, boolean empty){
         super.updateItem(model, empty);
 
         if(empty || model == null){
             currentModel = null;
-            super.setGraphic(null);
+            Platform.runLater(() -> super.setGraphic(null));
         }
         else{
             currentModel = model;
@@ -95,7 +95,7 @@ public class JoinGameItem extends ListCell<RemoteMapModel> {
                 currentModel.setConnectionInterruptedListener(null);
             }
 
-            super.setGraphic(hBox);
+            Platform.runLater(() -> super.setGraphic(hBox));
         }
     }
 }
