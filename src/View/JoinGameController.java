@@ -55,30 +55,32 @@ public class JoinGameController{
         finder.broadcast();
     }
 
-    private void startEvent (RemoteMapModel model) {
-        finder.close();
+    private synchronized void startEvent (RemoteMapModel model) {
+        if(finder.isLive()) {
+            finder.finish(model);
 
-        model.setConnectionInterruptedListener(() -> {
-            try {
-                UIController controller = new UIController();
+            model.setConnectionInterruptedListener(() -> {
+                try {
+                    UIController controller = new UIController();
+                    Platform.runLater(() -> {
+                        controller.switchHere(stage);
+                    });
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
                 Platform.runLater(() -> {
-                    controller.switchHere(stage);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Connection to the host has been lost");
+                    alert.setHeaderText(null);
+                    alert.showAndWait();
                 });
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Connection to the host has been lost");
-                alert.setHeaderText(null);
-                alert.showAndWait();
             });
-        });
 
-        GameView view = new GameView(model);
-        Platform.runLater(() -> {
-            view.switchHere(stage);
-        });
+            GameView view = new GameView(model);
+            Platform.runLater(() -> {
+                view.switchHere(stage);
+            });
+        }
     }
 
     private void searchEvent (ActionEvent event) {

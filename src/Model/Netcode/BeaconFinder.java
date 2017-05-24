@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
+ * Sends pings to desired addresses and updates an ObservableList when it receives replies.
+ *
  * @author Kevin Ni
  */
 public class BeaconFinder {
@@ -21,6 +23,11 @@ public class BeaconFinder {
     private Set<String> seenAddresses;
     private Consumer<RemoteMapModel> onGameStart;
 
+    /**
+     *
+     * @param onGameStart callback that is invoked when a connected host starts the game
+     * @throws SocketException when desired socket is already occupied
+     */
     public BeaconFinder(Consumer<RemoteMapModel> onGameStart) throws SocketException {
         socket = new DatagramSocket();
         socket.setBroadcast(true);
@@ -31,9 +38,9 @@ public class BeaconFinder {
     }
 
     /**
-     * Pings this address
+     * pings a host
      *
-     *
+     * @param hostName the host to be pinged
      */
     public void target(String hostName) throws UnknownHostException {
         try {
@@ -53,7 +60,7 @@ public class BeaconFinder {
     }
 
     /**
-     * find all beacons on the subnet
+     * pings all hosts on the subnet (pings the broadcast address of all interfaces on the machine)
      */
     public void broadcast(){
         Settings settings = Settings.getInstance();
@@ -105,6 +112,15 @@ public class BeaconFinder {
         return observableList;
     }
 
+    public synchronized void finish(RemoteMapModel spare){
+        for(RemoteMapModel model : observableList){
+            if(model != spare) {
+                model.close();
+            }
+        }
+        close();
+    }
+
     public synchronized void close(){
         if(!socket.isClosed()) {
             socket.close();
@@ -114,5 +130,9 @@ public class BeaconFinder {
     public void abort(){
         new ArrayList<>(observableList).forEach(RemoteMapModel::close);
         close();
+    }
+
+    public boolean isLive(){
+        return socket.isClosed();
     }
 }
