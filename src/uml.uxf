@@ -1,0 +1,957 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>5</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>270</x>
+      <y>720</y>
+      <w>320</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>Model::LocalMapModel
+--
+-map: MapTile[][]
+-startingMap: MapTile[][]
+-players: Position[]
+-livePlayers: Set&lt;Integer&gt;
+-goalsLeft: int
+-tutorial: boolean
+-history: Stack&lt;MapUpdateInfo&gt;
+-playerHistory: Stack&lt;Pair&lt;Integer, Position&gt;&gt;
+-listeners: Set&lt;Consumer&lt;MapUpdateInfo&gt;&gt;
+-localMulti: boolean
+--
++LocalMapModel(int nPlayers, boolean localMulti): ctor
++LocalMapModel(String path): ctor
+-generateMap(): void
+-generateMap(int seed): void
+-setUpMap(MapTile[][] map): void
+-copyMap(): MapTile[][]
+-loadFromFile(String fin): void
++killPlayer(int p): void
++getPlayer(): int
++handle(KeyEvent e): void
+-localPlayer2(KeyCode k): KeyCode
+-setUpPlayers(): void
+-broadcastPrevMove(): void
++undo(): void
++generateNewMap(): void
++broadcastMap(): void
++reset(): void
++processInput(KeyCode k, int p): void
+-makeMove(
+Position oldPosition, Position newPosition, Position lookAhead, 
+MapTile.MapItem newDirection, int p
+): void
+-broadcast(MapUpdateInfo info): void
+-recordHistory(Position oldPosition, Position newPosition, Position lookAhead, int p): void
+-validMove(Position newPos, Position lookAhead): boolean
+-setMapAt(Position pos, MapTile.MapItem item, int player): void
+-getMapAt(Position pos): MapTile
++getHeight(): int
++getWidth(): int
++subscribeModelUpdate(Consumer&lt;MapUpdateInfo&gt; listener): void
++unSubscribeModelUpdate(Consumer&lt;MapUpdateInfo&gt; listener): void
++close(): void
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>235</x>
+      <y>1105</y>
+      <w>350</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>Model::MapGenerator
+--
+-generator: Random
+-difficulty: Settings.Difficulty
+--
++MapGenerator(long seed, Settings.Difficulty difficulty): ctor
++generateMap(Set&lt;Integer&gt; players): MapTile[][]
+-makeMap(Set&lt;Integer&gt; livePlayers): MapTile[][]
+-isMapGood(MapTile[][] map): boolean
+-makeMove(MapTile[][] map, Position oldPosition, Position newPosition, Position lookAhead): void
+-getPositions(KeyCode move, Position player): Pair&lt;Position, Position&gt;
+-isValidMove(MapTile[][] map, Position newPosition, Position lookAhead): boolean
+-initializeEmptyMap(int width, int height): MapTile[][]
+-getMapAt(MapTile[][] map, Position pos): MapTile
+-setMapAt(MapTile[][] map, Position pos, MapTile.MapItem item): void
+-setMapAt(MapTile[][] map, Position pos, MapTile.MapItem item, int player): void
+-placePlayers(MapTile[][] map, int numPlayers): List&lt;Position&gt;
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>950</x>
+      <y>910</y>
+      <w>210</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Model::MapTile
+--
+-isGoal: boolean
+-item: MapItem
+-player: int
+--
++MapTile(boolean isGoal, MapItem item): ctor
++MapTile(boolean isGoal, MapItem item, int player): ctor
++getPlayer(): int
++getIsGoal(): boolean
++getItem(): MapItem
+~setTile(MapItem item, int player): void
++clone(): MapTile
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>915</x>
+      <y>1110</y>
+      <w>215</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Model::MapUpdateInfo
+--
+-coordinates: List&lt;Pair&lt;Position, MapTile&gt;&gt;
+-newMap: boolean
+-finished: boolean
+--
++MapUpdateInfo(boolean newMap, boolean finished): ctor
++addChange(Position pos, MapTile v): void
++isNewMap(): boolean
++isFinished(): boolean
++getCoordinates(): Iterable&lt;Pair&lt;Position, MapTile&gt;&gt;
++get(int index): Pair&lt;Position, MapTile&gt;
++size(): int
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>285</x>
+      <y>610</y>
+      <w>250</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Model::MapModel
+--
+--
+~handle(KeyEvent e): void
+~getHeight(): int
+~getWidth(): int
+~getPlayer(): int
+~subscribeModelUpdate(Consumer&lt;MapUpdateInfo&gt; listener): void
+~close(): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>665</x>
+      <y>920</y>
+      <w>115</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Model::Pair
+--
+#first: T1
+#second: T2
+--
++Pair(T1 first, T2 second): ctor
++first(): T1
++second(): T2
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>800</x>
+      <y>925</y>
+      <w>135</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Model::Position
+--
+--
++Position(Integer x, Integer y): ctor
++getX(): int
++getY(): int
++hashCode(): int
++equals(Object o): boolean
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>680</y>
+      <w>15</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>775</x>
+      <y>950</y>
+      <w>35</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1025</x>
+      <y>1005</y>
+      <w>15</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>10.0;210.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>865</x>
+      <y>980</y>
+      <w>60</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>100.0;310.0;10.0;310.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>395</x>
+      <y>1045</y>
+      <w>15</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>975</y>
+      <w>185</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>350.0;440.0;10.0;440.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>830</y>
+      <w>400</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;780.0;10.0;780.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>945</y>
+      <w>90</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>870</y>
+      <w>290</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;560.0;10.0;560.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>580</x>
+      <y>975</y>
+      <w>125</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>230.0;10.0;230.0;340.0;10.0;340.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>15</x>
+      <y>865</y>
+      <w>145</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Model::Settings
+--
+-instance = new Settings(): Settings
+-difficulty: Difficulty
+-TCPPort: int
+-name: String
+--
+-Settings(): ctor
++getInstance(): Settings
++getDifficulty(): Difficulty
++getName(): String
++setName(String name): void
++getTCPPort(): int
++setTCPPort(String port): boolean
++getDifficultyString(): String
++setDifficulty(Difficulty difficulty): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>580</x>
+      <y>980</y>
+      <w>255</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>490.0;10.0;490.0;380.0;10.0;380.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>580</x>
+      <y>1005</y>
+      <w>570</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1120.0;10.0;1120.0;440.0;10.0;440.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>155</x>
+      <y>920</y>
+      <w>125</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>75</x>
+      <y>990</y>
+      <w>170</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;330.0;320.0;330.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>960</x>
+      <y>275</y>
+      <w>220</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>View::MapView
+--
+-model: MapModel
+-tiles: ImageView[][]
+--
+~MapView(MapModel model): ctor
+~mapHeight(): int
+~mapWidth(): int
+-onMapChange(MapUpdateInfo updateInfo): void
+-setTile(ImageView viewTile, MapTile mapTile): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>515</x>
+      <y>155</y>
+      <w>160</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>View::UIController
+--
+-playGameBtn: Button
+-hostBtn: Button
+-clientBtn: Button
+-tutorialBtn: Button
+-settingsBtn: Button
+-closeGameBtn: Button
+-localBtn: Button
+-scene: Scene
+-HOST = "localhost": String
+-stage: Stage
+--
++UIController(): ctor
++initialize(): void
++switchHere(Stage stage): void
+-switchToGame(ActionEvent e): void
+-switchToMultiplayer(ActionEvent e): void
+-startHost(ActionEvent e): void
+-startClient(ActionEvent e): void
+-startTutorial(ActionEvent e): void
+-switchToSettings(ActionEvent e): void
+-closeGame(ActionEvent e): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>485</x>
+      <y>365</y>
+      <w>155</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>View::JoinGameController
+--
+-listView: ListView&lt;HostConnection&gt;
+-backBtn: Button
+-searchBtn: Button
+-refreshBtn: Button
+-ipField: TextField
+-scene: Scene
+-stage: Stage
+-finder: BeaconFinder
+--
++JoinGameController(): ctor
++initialize(): void
+-refreshEvent(ActionEvent event): void
+-startEvent(HostConnection model): void
+-searchEvent(ActionEvent event): void
+-backEvent(ActionEvent event): void
++switchHere(Stage stage): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1210</x>
+      <y>240</y>
+      <w>200</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>View::GameView
+--
+-stage: Stage
+-grid: MapView
+-sv: ScoreView
+-menuBar: GameMenuBar
+-pauseMenu: PauseMenu
+-model: MapModel
+-region: Region
+-tutorial: boolean
+--
++GameView(MapModel model, boolean tutorial): ctor
++GameView(MapModel model): ctor
++switchHere(Stage stage): void
+-onMapEnd(ActionEvent e): void
+-handleKey(KeyEvent e): void
+-onMapChange(MapUpdateInfo updateInfo): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>750</x>
+      <y>375</y>
+      <w>145</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>View::SettingsController
+--
+-choiceBox: ChoiceBox&lt;String&gt;
+-exitSettingsBtn: Button
+-tcpField: TextField
+-nameField: TextField
+-string: String
+-stage: Stage
+-scene: Scene
+--
++SettingsController(): ctor
++initialize(): void
+-chooseDifficulty(ActionEvent e): void
+-exitSettings(ActionEvent e): void
++switchHere(Stage stage): void
++getDifficulty(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>525</x>
+      <y>10</y>
+      <w>150</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>View::LobbyController
+--
+-MAX_PLAYERS = 15: int
+-listView: ListView&lt;ClientConnection&gt;
+-startBtn: Button
+-backBtn: Button
+-model: LobbyModel
+-scene: Scene
+-stage: Stage
+--
++LobbyController(): ctor
++initialize(): void
+-startEvent(ActionEvent event): void
+-backEvent(ActionEvent event): void
++switchHere(Stage stage): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>715</x>
+      <y>5</y>
+      <w>240</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>View::ScoreTimer
+--
+-TIME_FORMAT = new SimpleDateFormat("mm:ss"): DateFormat
+-time: Duration
+-formattedTime = new SimpleDoubleProperty(): DoubleProperty
+-timeline: Timeline
+-timeScore: long
+--
++ScoreTimer(): ctor
++initTimer(): void
++resetTimer(): void
++startTimer(): void
++stopTimer(): void
++timeToString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>750</x>
+      <y>265</y>
+      <w>160</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>View::TutorialController
+--
+-TUTORIAL_FILE = "src/tutorial.txt": String
+-exitBtn: Button
+-startTutorialBtn: Button
+-stage: Stage
+-scene: Scene
+--
++TutorialController(): ctor
++initialize(): void
+-exitTutorial(ActionEvent e): void
+-startTutorial(ActionEvent e): void
++switchHere(Stage stage): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>670</x>
+      <y>515</y>
+      <w>220</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>View::JoinGameItem
+--
+-hBox: HBox
+-ipLabel: Label
+-currentModel: HostConnection
+-joinButton: Button
+-leaveButton: Button
+--
++JoinGameItem(): ctor
+-onLeave(): void
+-onJoin(ActionEvent e): void
+#updateItem(HostConnection model, boolean empty): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>745</x>
+      <y>140</y>
+      <w>185</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>View::ScoreView
+--
+-SIDE_PANEL_SIZE = 150: int
+-scoreLbl: Label
+-timeLbl: ScoreTimer
+-score: int
+--
++ScoreView(): ctor
++onMapChange(MapUpdateInfo updateInfo): void
++getScore(): int
++getTime(): String
++sideWidth(): int
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>975</x>
+      <y>400</y>
+      <w>360</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>View::PauseMenu
+--
+-BUTTON_WIDTH = 200: int
+-DIALOG_GAP = 10: int
+-window: Window
+-stage: Stage
+--
++PauseMenu(MapModel model, EventHandler&lt;ActionEvent&gt; leaveHandler, boolean tutorial): ctor
++setStage(Stage stage): void
+-hideWindow(KeyEvent e): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>250</x>
+      <y>0</y>
+      <w>240</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>View::LobbyItem
+--
+-hBox: HBox
+-ipLabel: Label
+-currentConnection: ClientConnection
+--
++LobbyItem(): ctor
+#updateItem(ClientConnection connection, boolean empty): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>995</x>
+      <y>215</y>
+      <w>145</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>View::EndGameDialog
+--
+-DIALOG_WIDTH = 200: int
+-DIALOG_HEIGHT = 70: int
+-DIALOG_GAP = 20: int
+--
++EndGameDialog(ScoreView sv): ctor
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1190</x>
+      <y>150</y>
+      <w>220</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>View::GameMenuBar
+--
+-model: MapModel
+-stage: Stage
+--
++GameMenuBar(
+	MapModel model, EventHandler&lt;ActionEvent&gt; leaveHandler, boolean tutorial
+	): ctor
++setStage(Stage stage): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>265</x>
+      <y>425</y>
+      <w>130</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>View::WarehouseBoss
+--
+--
++start(Stage primaryStage): void
++main(String[] args): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>670</x>
+      <y>245</y>
+      <w>545</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;1070.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>330</y>
+      <w>110</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0;200.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>120</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>670</x>
+      <y>195</y>
+      <w>85</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>670</x>
+      <y>295</y>
+      <w>90</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>160.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>580</x>
+      <y>330</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1290</x>
+      <y>210</y>
+      <w>25</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>30.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1285</x>
+      <y>365</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1175</x>
+      <y>315</y>
+      <w>45</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>530</x>
+      <y>320</y>
+      <w>440</w>
+      <h>365</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>860.0;10.0;730.0;710.0;10.0;690.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>530</x>
+      <y>365</y>
+      <w>845</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>1670.0;10.0;1670.0;500.0;10.0;520.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>470</y>
+      <w>420</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;530.0;790.0;540.0;820.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>835</x>
+      <y>105</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>30</y>
+      <w>50</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>505</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>220.0;100.0;10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>300</y>
+      <w>370</w>
+      <h>485</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;950.0;720.0;950.0;720.0;10.0;650.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1135</x>
+      <y>240</y>
+      <w>85</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>905</x>
+      <y>355</y>
+      <w>315</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>610.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
