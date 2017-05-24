@@ -31,9 +31,11 @@ public class BeaconFinder {
     }
 
     /**
-     * find a beacon at this address
+     * Pings this address
+     *
+     *
      */
-    public void target(String hostName){
+    public void target(String hostName) throws UnknownHostException {
         try {
             DatagramPacket packet = new DatagramPacket(
                     Constants.BEACON_MESSAGE.getBytes(),
@@ -43,7 +45,7 @@ public class BeaconFinder {
             socket.send(packet);
         }
         catch (UnknownHostException ex){
-            System.out.println("unknown host");
+            throw ex;
         }
         catch (IOException ex){
             ex.printStackTrace();

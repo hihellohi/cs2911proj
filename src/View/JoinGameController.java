@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 /**
  * @author Kevin Ni
@@ -81,7 +82,14 @@ public class JoinGameController{
     }
 
     private void searchEvent (ActionEvent event) {
-        finder.target(ipField.getText());
+        try {
+            finder.target(ipField.getText());
+        }
+        catch(UnknownHostException ex){
+            Alert alert = new Alert(Alert.AlertType.ERROR, String.format("hostname %s not found", ex.getMessage()));
+            alert.setHeaderText(null);
+            alert.showAndWait();
+        }
     }
 
     private void backEvent (ActionEvent event) {
