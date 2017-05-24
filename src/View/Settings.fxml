@@ -21,9 +21,7 @@
       </ChoiceBox>
       <Button fx:id="exitSettingsBtn" layoutX="140.0" layoutY="200.0" mnemonicParsing="false" text="Save and Exit" />
       <Label layoutX="72.0" layoutY="50.0" text="Difficulty" />
-      <Label layoutX="33.0" layoutY="152.0" text="Connection Port" />
-      <Label layoutX="55.0" layoutY="103.0" text="Beacon Port" />
-      <TextField fx:id="UDPField" layoutX="141.0" layoutY="99.0" />
-      <TextField fx:id="TCPField" layoutX="141.0" layoutY="148.0" />
+      <Label layoutX="33.0" layoutY="103.0" text="Connection Port" />
+      <TextField fx:id="TCPField" layoutX="141.0" layoutY="99.0" />
    </children>
 </AnchorPane>

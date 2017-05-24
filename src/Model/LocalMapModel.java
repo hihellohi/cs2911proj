@@ -53,12 +53,12 @@ public class LocalMapModel implements MapModel {
     private void generateMap(int seed) {
         System.out.println(seed);
         MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
-        history = new Stack<>();
-        playerHistory = new Stack<>();
         setUpMap(generator.generateMap(livePlayers));
     }
 
     private void setUpMap(MapTile[][] map) {
+        history = new Stack<>();
+        playerHistory = new Stack<>();
         goalsLeft = 0;
         int p = 0;
         for (int y = 0; y < map.length; y++) {
@@ -87,18 +87,14 @@ public class LocalMapModel implements MapModel {
     }
 
     private void loadFromFile(String fin) throws FileNotFoundException {
-        history = new Stack<>();
-        playerHistory = new Stack<>();
         Scanner sc = null;
         try{
-            int p = 0;
             sc = new Scanner(new FileReader(fin));
 
             String[] dim = sc.nextLine().split("\\s");
             int r = Integer.parseInt(dim[0]);
             int c = Integer.parseInt(dim[1]);
-            int numPlayers = Integer.parseInt(dim[2]);
-            players = new Position[numPlayers];
+            players = new Position[1];
 
             map = new MapTile[r+2][c+2];
 
@@ -118,7 +114,6 @@ public class LocalMapModel implements MapModel {
                     switch(line.charAt(j - 1)){
                         case 'p':
                             map[i][j] = new MapTile(false, PLAYER_SOUTH, getPlayer());
-                            players[p++] = new Position(j, i);
                             break;
                         case 'b':
                             map[i][j] = new MapTile(false, BOX);
@@ -128,7 +123,6 @@ public class LocalMapModel implements MapModel {
                             break;
                         case 'g':
                             map[i][j] = new MapTile(true, GROUND);
-                            goalsLeft++;
                             break;
                         case 'd':
                             map[i][j] = new MapTile(true, BOX);
@@ -139,8 +133,7 @@ public class LocalMapModel implements MapModel {
                     }
                 }
             }
-
-            this.startingMap = copyMap();
+            setUpMap(map);
         }
         finally{
             if (sc != null){
@@ -252,8 +245,6 @@ public class LocalMapModel implements MapModel {
     public synchronized void reset() {
         setUpMap(startingMap);
         broadcastMap();
-        history.removeAllElements();
-        playerHistory.removeAllElements();
     }
 
     public synchronized void processInput(KeyCode k, int p){

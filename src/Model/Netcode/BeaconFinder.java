@@ -39,7 +39,7 @@ public class BeaconFinder {
                     Constants.BEACON_MESSAGE.getBytes(),
                     Constants.BEACON_MESSAGE.length(),
                     InetAddress.getByName(hostName),
-                    Settings.getInstance().getUDPPort());
+                    Settings.getInstance().getTCPPort());
             socket.send(packet);
         }
         catch (UnknownHostException ex){
@@ -68,7 +68,7 @@ public class BeaconFinder {
                                 Constants.BEACON_MESSAGE.getBytes(),
                                 Constants.BEACON_MESSAGE.length(),
                                 address.getBroadcast(),
-                                settings.getUDPPort());
+                                settings.getTCPPort());
                         socket.send(packet);
                     }
                 }

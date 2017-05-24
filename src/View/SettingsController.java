@@ -21,7 +21,6 @@ import java.io.IOException;
 public class SettingsController {
     @FXML private ChoiceBox<String> choiceBox;
     @FXML private Button exitSettingsBtn;
-    @FXML private TextField UDPField;
     @FXML private TextField TCPField;
 
     private static String string;
@@ -43,7 +42,6 @@ public class SettingsController {
         exitSettingsBtn.setOnAction(this::exitSettings);
         Settings settings = Settings.getInstance();
         TCPField.setText(Integer.toString(settings.getTCPPort()));
-        UDPField.setText(Integer.toString(settings.getUDPPort()));
     }
 
     private void chooseDifficulty (ActionEvent e) {
@@ -70,14 +68,7 @@ public class SettingsController {
 
     private void exitSettings (ActionEvent e) {
         Settings settings = Settings.getInstance();
-        if(TCPField.getText().equals(UDPField.getText())){
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Beacon and Connection ports must be distinct");
-            alert.setHeaderText(null);
-            alert.showAndWait();
-            return;
-        }
-
-        if(!settings.setTCPPort(TCPField.getText()) || !settings.setUDPPort(UDPField.getText())){
+        if(!settings.setTCPPort(TCPField.getText())){
             Alert alert = new Alert(Alert.AlertType.ERROR, "please enter a valid port");
             alert.setHeaderText(null);
             alert.showAndWait();

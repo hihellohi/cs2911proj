@@ -17,7 +17,7 @@ public class HostBeacon {
 
     public HostBeacon() throws SocketException {
         super();
-        socket = new DatagramSocket(Settings.getInstance().getUDPPort());
+        socket = new DatagramSocket(Settings.getInstance().getTCPPort());
         beaconName = UUID.randomUUID().toString();
         new Thread(this::listen).start();
     }
