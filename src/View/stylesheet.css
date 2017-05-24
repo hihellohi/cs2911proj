@@ -3,11 +3,63 @@
 }
 
 #bigText {
-    -fx-font-size: 40px;
+    -fx-font-size: 0px;
 }
 
 #playGameBtn {
-    -fx-font-size: 20px;
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#hostBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#clientBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#localBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#tutorialBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#settingsBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+}
+
+#closeGameBtn {
+    -fx-font-size: 0px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
 }
 
 #closeGameBtn {

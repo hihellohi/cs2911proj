@@ -1,20 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<GridPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0" alignment="center" hgap="10" vgap="10" fx:id="root">
+<AnchorPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+        <HBox layoutX="70.0" prefHeight="100.0" prefWidth="600.0">
+            <Label prefHeight="77.0" prefWidth="500.0">
+                <graphic>
+                    <ImageView fitWidth="500" preserveRatio="true">
+                            <Image url="images/title.png" />
+                    </ImageView>
+                </graphic>
+            </Label>
+        </HBox>
+        <VBox layoutX="130.0" layoutY="90.0" prefHeight="201.0" prefWidth="200.0">
+            <GridPane prefHeight="205.0" prefWidth="200.0">
+                <Button fx:id="playGameBtn" GridPane.rowIndex="0">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/playButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="hostBtn" GridPane.rowIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/hostButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="clientBtn" GridPane.rowIndex="2">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/joinButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <columnConstraints>
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
+        </VBox>
+        <VBox layoutX="350.0" layoutY="90.0" prefHeight="201.0" prefWidth="200.0">
+            <GridPane prefHeight="205.0" prefWidth="200.0">
+                <Button fx:id="localBtn" GridPane.rowIndex="0">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/localButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="tutorialBtn" GridPane.rowIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/tutorialButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="settingsBtn" GridPane.rowIndex="2">
+                    <graphic>
+                        <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="images/settingsButton.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <columnConstraints>
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
+        </VBox>
+        <HBox layoutX="250.0" layoutY="309.0" prefHeight="91.0" prefWidth="304.0">
+            <Button fx:id="closeGameBtn">
+                <graphic>
+                    <ImageView fitHeight="70.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="images/exitButton.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+</AnchorPane>
 
-    <VBox spacing="10" alignment="CENTER">
-        <Label GridPane.rowIndex="1" text="Warehouse Boss" fx:id="bigText"/>
-        <Button GridPane.rowIndex="2" text="Play Game" fx:id="playGameBtn"/>
-        <Button GridPane.rowIndex="3" text="Host Game" fx:id="hostBtn"/>
-        <Button GridPane.rowIndex="4" text="Join Game" fx:id="clientBtn"/>
-        <Button GridPane.rowIndex="5" text="Local MultiPlayer" fx:id="localBtn"/>
-        <Button GridPane.rowIndex="6" text="Tutorial" fx:id="tutorialBtn"/>
-        <Button GridPane.rowIndex="7" text="Settings" fx:id="settingsBtn"/>
-        <Button GridPane.rowIndex="8" text="Exit" fx:id="closeGameBtn"/>
-    </VBox>
-</GridPane>
