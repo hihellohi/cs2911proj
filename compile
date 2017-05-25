@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -r bin
+mkdir bin
+~cs2911/jdk1.8.0_131/bin/javac -cp src src/**/*.java -d bin
+cp -r src/images bin
+cp src/View/*.fxml bin/View 
+cp src/View/*.css bin/View 

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd bin
+~cs2911/jdk1.8.0_131/bin/java View.WarehouseBoss
+cd ..
