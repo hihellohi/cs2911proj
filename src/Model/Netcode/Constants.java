@@ -4,6 +4,8 @@ import Model.MapTile;
 import javafx.scene.input.KeyCode;
 
 /**
+ * Common constants used by classes in Model.Netcode
+ *
  * @author Kevin Ni
  */
 class Constants {

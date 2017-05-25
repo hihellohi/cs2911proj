@@ -9,13 +9,20 @@ import java.net.SocketException;
 import java.util.UUID;
 
 /**
+ * responds to pings from BeaconFinders with a UUID and a name
+ *
  * @author Kevin Ni
  */
-public class HostBeacon {
+class HostBeacon {
     private DatagramSocket socket;
     private String beaconName;
 
-    public HostBeacon() throws SocketException {
+    /**
+     * Class constructor
+     *
+     * @throws SocketException when socket already occupied
+     */
+    HostBeacon() throws SocketException {
         super();
         socket = new DatagramSocket(Settings.getInstance().getTCPPort());
 
@@ -29,6 +36,9 @@ public class HostBeacon {
         new Thread(this::listen).start();
     }
 
+    /**
+     * listens for pings and responds to them until socket is closed
+     */
     private void listen () {
         DatagramPacket recv = new DatagramPacket(new byte[256], 256);
         while(!socket.isClosed()){
@@ -51,6 +61,9 @@ public class HostBeacon {
         }
     }
 
+    /**
+     * closes the thread and socket associated with this socket
+     */
     public synchronized void close(){
         if(!socket.isClosed()) {
             socket.close();

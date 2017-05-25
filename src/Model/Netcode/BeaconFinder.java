@@ -1,6 +1,7 @@
 package Model.Netcode;
 
 import Model.Settings;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -90,7 +91,7 @@ public class BeaconFinder {
     }
 
     /**
-     * method that listens for replies to the ping and updates the observableList
+     * listens for responses and updates the observableList until the socket is closed
      */
     private void listener() {
         DatagramPacket recv = new DatagramPacket(new byte[256], 256);
@@ -101,10 +102,9 @@ public class BeaconFinder {
                 InetAddress address = recv.getAddress();
                 if(!seenAddresses.contains(response)){
                     System.out.println(String.format("host %s found!", response));
-                    String[] components = response.split("\\|", 2);
                     observableList.add(new HostConnection(
                             address,
-                            components.length == 2 ? components[1] : address.getHostName(),
+                            response,
                             onGameStart));
                     seenAddresses.add(response);
                 }
@@ -114,6 +114,17 @@ public class BeaconFinder {
                 System.out.println("Beacon finder closed. thread terminating...");
             }
         }
+    }
+
+    /**
+     * Removes a connection from the observablelist
+     * @param connection the connection to be removed
+     */
+    public void removeConnection(HostConnection connection){
+        Platform.runLater(() -> {
+            observableList.remove(connection);
+            seenAddresses.remove(connection.getIdString());
+        });
     }
 
     /**

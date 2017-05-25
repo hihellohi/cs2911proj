@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
+ * A connection to the host. Represents the LocalMapModel present on the host machine
+ *
  * @author Kevin Ni
  */
 public class HostConnection implements MapModel {
@@ -18,6 +20,7 @@ public class HostConnection implements MapModel {
     private DataOutputStream out;
     private InetSocketAddress host;
     private String name;
+    private String id;
 
     private List<Consumer<MapUpdateInfo>> gameChangeListeners;
     private Consumer<HostConnection> startGameListener;
@@ -27,16 +30,36 @@ public class HostConnection implements MapModel {
     private int height;
     private int player;
 
-    public HostConnection(InetAddress host, String name, Consumer<HostConnection> startGame) {
+    /**
+     * Class constructor
+     *
+     * @param host the address of the host
+     * @param id the id of the host
+     * @param startGame callback that is invoked when the host signals that the game has started
+     */
+    HostConnection(InetAddress host, String id, Consumer<HostConnection> startGame) {
         super();
 
-        this.name = name;
+        this.id = id;
+        String[] components = id.split("\\|", 2);
+        if(components.length == 2){
+            name = components[1];
+        }
+        else{
+            name = host.getHostName();
+        }
+
         this.startGameListener = startGame;
         this.host = new InetSocketAddress(host, Settings.getInstance().getTCPPort());
 
         gameChangeListeners = new ArrayList<>();
     }
 
+    /**
+     * attempts to connect to the host address
+     *
+     * @throws IOException
+     */
     public void connect() throws IOException {
         try {
             socket = new Socket();
@@ -151,6 +174,10 @@ public class HostConnection implements MapModel {
 
     public String getHostName(){
         return name;
+    }
+
+    String getIdString(){
+        return id;
     }
 
     public boolean isConnected(){

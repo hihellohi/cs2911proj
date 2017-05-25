@@ -99,7 +99,7 @@ public class ClientConnection {
     }
 
     /**
-     * listen for input from the client
+     * listen for input from the client until the socket is closed
      */
     private void listen () {
         while(!socket.isClosed()){

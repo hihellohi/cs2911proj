@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * @author Kevin Ni
@@ -22,11 +23,14 @@ public class JoinGameItem extends ListCell<HostConnection> {
     private HostConnection currentModel;
     private Button joinButton;
     private Button leaveButton;
+    private Consumer<HostConnection> removeConnection;
 
-    public JoinGameItem(){
+    public JoinGameItem(Consumer<HostConnection> removeConnection){
         super();
 
         super.setPrefHeight(30);
+
+        this.removeConnection = removeConnection;
 
         hBox = new HBox();
         ipLabel = new Label();
@@ -55,24 +59,29 @@ public class JoinGameItem extends ListCell<HostConnection> {
     }
 
     private void onJoin(ActionEvent e){
-        try {
-            currentModel.connect();
-            hBox.getChildren().set(2, leaveButton);
-            currentModel.setConnectionInterruptedListener(() -> {
+        new Thread(() -> {
+            try {
+                currentModel.connect();
+                Platform.runLater(() -> hBox.getChildren().set(2, leaveButton));
+                currentModel.setConnectionInterruptedListener(() -> {
+                    //on kick
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                                String.format("You have been kicked from %s", currentModel.getHostName()));
+                        alert.setHeaderText(null);
+                        alert.showAndWait();
+                    });
+                    onLeave();
+                });
+            } catch (IOException ex) {
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                            String.format("You have been kicked from %s", currentModel.getHostName()));
+                    Alert alert = new Alert(Alert.AlertType.ERROR,"Unable to connect to host :(");
                     alert.setHeaderText(null);
                     alert.showAndWait();
                 });
-                onLeave();
-            });
-        }
-        catch(IOException ex){
-            currentModel = null;
-            hBox.getChildren().get(2).setVisible(false);
-            ((Label)hBox.getChildren().get(0)).setText("Unable to connect to host :(");
-        }
+                removeConnection.accept(currentModel);
+            }
+        }).start();
     }
 
     @Override protected void updateItem(HostConnection model, boolean empty){
@@ -85,7 +94,6 @@ public class JoinGameItem extends ListCell<HostConnection> {
         else{
             currentModel = model;
 
-            hBox.getChildren().get(2).setVisible(true);
             ipLabel.setText(currentModel.getHostName());
             if (model.isConnected()) {
                 hBox.getChildren().set(2, leaveButton);

@@ -44,7 +44,7 @@ public class JoinGameController{
 
         listView.setPlaceholder(new Label("You haven't found anyone :("));
         listView.setItems(finder.getObservable());
-        listView.setCellFactory((param) -> new JoinGameItem());
+        listView.setCellFactory((param) -> new JoinGameItem(finder::removeConnection));
 
         searchBtn.setOnAction(this::searchEvent);
         backBtn.setOnAction(this::backEvent);
