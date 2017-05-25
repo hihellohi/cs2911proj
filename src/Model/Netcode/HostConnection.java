@@ -58,7 +58,7 @@ public class HostConnection implements MapModel {
     /**
      * attempts to connect to the host address
      *
-     * @throws IOException
+     * @throws IOException if unable to connect to address
      */
     public void connect() throws IOException {
         try {
@@ -79,6 +79,9 @@ public class HostConnection implements MapModel {
         new Thread(this::listen).start();
     }
 
+    /**
+     * closes the socket and thread associated with this connetion
+     */
     public synchronized void close(){
         try {
             if(socket != null && !socket.isClosed()) {
@@ -91,8 +94,10 @@ public class HostConnection implements MapModel {
         }
     }
 
+    /**
+     * if the connection was closed on the other side run the listener
+     */
     private void onConnectionInterrupt(){
-        //if the connection was closed on the other side run the listener
         if(socket != null){
             if(connectionInterruptedListener != null){
                 connectionInterruptedListener.run();
