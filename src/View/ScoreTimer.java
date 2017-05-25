@@ -15,7 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Created by willi on 13/05/2017.
+ * Class to control the timer in the ScoreView.
+ *
  */
 public class ScoreTimer extends Label {
     private final static DateFormat TIME_FORMAT = new SimpleDateFormat("mm:ss");
@@ -25,12 +26,19 @@ public class ScoreTimer extends Label {
     private Timeline timeline;
     private long timeScore;
 
+    /**
+     * Initialise the timer to 0s and start the timer.
+     *
+     */
     public ScoreTimer() {
         super();
         initTimer();
         startTimer();
     }
 
+    /**
+     * Initialise the timer to 0s.
+     */
     public void initTimer() {
         time = Duration.ZERO;
         timeScore = 0;
@@ -46,21 +54,38 @@ public class ScoreTimer extends Label {
                 ));
     }
 
+    /**
+     * Reset the timer back to 0s, and start timing again.
+     *
+     */
     public void resetTimer() {
         stopTimer();
         initTimer();
         startTimer();
     }
 
+    /**
+     * Start the timer.
+     *
+     */
     public void startTimer() {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
 
+    /**
+     * Stop the timer.
+     *
+     */
     public void stopTimer() {
         timeline.stop();
     }
 
+    /**
+     * Convert the current time to string format - "mm:ss".
+     *
+     * @return time in "mm:ss"
+     */
     public String timeToString() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timeScore);

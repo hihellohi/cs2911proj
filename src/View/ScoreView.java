@@ -12,7 +12,8 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 /**
- * Created by willi on 13/05/2017.
+ * Class to keep track of and display the current score.
+ *
  */
 public class ScoreView extends BorderPane {
     private final static int SIDE_PANEL_SIZE = 150;
@@ -20,6 +21,10 @@ public class ScoreView extends BorderPane {
     private ScoreTimer timeLbl;
     private int score;
 
+    /**
+     * Initialise score and timer, and setup labels.
+     *
+     */
     public ScoreView() {
         super();
         score = 0;
@@ -42,6 +47,12 @@ public class ScoreView extends BorderPane {
         super.setTop(vbox);
     }
 
+    /**
+     * Update the score when certain parameters are met.
+     *
+     * @param updateInfo
+     * @pre updateInfo != null
+     */
     public void onMapChange(MapUpdateInfo updateInfo){
         if (updateInfo.isFinished()) {
             timeLbl.stopTimer();
@@ -56,14 +67,29 @@ public class ScoreView extends BorderPane {
         Platform.runLater(() -> scoreLbl.setText(String.valueOf(score)));
     };
 
+    /**
+     * Return the current score.
+     *
+     * @return score >= 0
+     */
     public int getScore() {
         return score;
     }
 
+    /**
+     * Return the current time as a string.
+     *
+     * @return time >= 0:00
+     */
     public String getTime() {
         return timeLbl.timeToString();
     }
 
+    /**
+     * Return the width of the ScoreView.
+     *
+     * @return SIDE_PANEL_SIZE
+     */
     public int sideWidth() {
         return SIDE_PANEL_SIZE;
     }

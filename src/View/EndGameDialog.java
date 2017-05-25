@@ -8,13 +8,20 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 /**
- * Created by willi on 16/05/2017.
+ * Display final score and time in a dialog when the game has ended.
+ *
  */
 public class EndGameDialog extends Dialog {
     private final static int DIALOG_WIDTH = 200;
     private final static int DIALOG_HEIGHT = 70;
     private final static int DIALOG_GAP = 20;
 
+    /**
+     * Setup the dialog from the score view.
+     *
+     * @param sv final state of the game that includes score and time
+     * @pre sv != null
+     */
     public EndGameDialog(ScoreView sv) {
         super();
         super.setTitle("Congratulations!");

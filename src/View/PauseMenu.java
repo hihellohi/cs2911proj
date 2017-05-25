@@ -17,7 +17,8 @@ import javafx.stage.Window;
 import java.io.IOException;
 
 /**
- * Created by willi on 16/05/2017.
+ * Display menu when game is paused.
+ *
  */
 public class PauseMenu extends Dialog {
     private final static int BUTTON_WIDTH = 200;
@@ -25,6 +26,15 @@ public class PauseMenu extends Dialog {
     private Window window;
     private Stage stage;
 
+    /**
+     * Setup the pause menu, certain functions are disabled when the map model
+     * is in tutorial mode or is the client in multiplayer.
+     *
+     * @param model
+     * @param leaveHandler
+     * @param tutorial
+     * @pre model != null
+     */
     public PauseMenu(MapModel model, EventHandler<ActionEvent> leaveHandler, boolean tutorial) {
         super();
         super.setTitle("Paused");
@@ -88,10 +98,21 @@ public class PauseMenu extends Dialog {
         super.getDialogPane().setContent(vbox);
     }
 
+    /**
+     * Set the PauseMenu's stage to be the same as the GameView's.
+     *
+     * @param stage
+     * @pre stage != null
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    /**
+     * Hide the window when "P" or "ESC" are pressed.
+     *
+     * @param e "P" or "ESC"
+     */
     private void hideWindow (KeyEvent e){
         KeyCode code = e.getCode();
         if(code == KeyCode.P || code == KeyCode.ESCAPE){
