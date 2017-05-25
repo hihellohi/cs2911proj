@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.net.BindException;
 
 /**
- * Created by willi on 9/05/2017.
+ * Class to control the main menu.
+ *
  */
 public class UIController {
 
@@ -32,6 +33,11 @@ public class UIController {
     private static final String HOST = "localhost";
     private Stage stage;
 
+    /**
+     * Load UIController as the controller for the menu.
+     *
+     * @throws IOException
+     */
     public UIController() throws IOException{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Menu.fxml"));
         loader.setController(this);
@@ -40,6 +46,10 @@ public class UIController {
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
     }
 
+    /**
+     * Bind the buttons to perform their functionality.
+     *
+     */
     @FXML
     public void initialize(){
         playGameBtn.setOnAction(this::switchToGame);
@@ -51,24 +61,45 @@ public class UIController {
         localBtn.setOnAction(this::switchToMultiplayer);
     }
 
+    /**
+     * Switch the current stage to the main menu.
+     *
+     * @param stage current stage
+     * @pre stage != null
+     */
     public void switchHere(Stage stage){
         this.stage = stage;
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Switch from the main menu to a single playergame.
+     *
+     * @param e button click event
+     */
     private void switchToGame (ActionEvent e) {
         LocalMapModel model = new LocalMapModel(1, false);
         new GameView(model).switchHere(stage);
         model.broadcastMap();
     }
 
+    /**
+     * Switch from the main menu to a local multiplayer game.
+     *
+     * @param e button click event
+     */
     private void switchToMultiplayer(ActionEvent e) {
         LocalMapModel model = new LocalMapModel(2, true);
         new GameView(model).switchHere(stage);
         model.broadcastMap();
     }
 
+    /**
+     * Switch to lobby screen as a host.
+     *
+     * @param e button click event
+     */
     private void startHost (ActionEvent e) {
         try {
             new LobbyController().switchHere(stage);
@@ -84,6 +115,11 @@ public class UIController {
         }
     }
 
+    /**
+     * Switch to lobby screen as a client.
+     *
+     * @param e button click event
+     */
     private void startClient (ActionEvent e) {
         try {
             new JoinGameController().switchHere(stage);
@@ -93,6 +129,11 @@ public class UIController {
         }
     }
 
+    /**
+     * Switch from main menu to the tutorial.
+     *
+     * @param e button click event
+     */
     private void startTutorial (ActionEvent e) {
         try {
             new TutorialController().switchHere(stage);
@@ -102,6 +143,11 @@ public class UIController {
         }
     }
 
+    /**
+     * Switch from main menu to the settings.
+     *
+     * @param e button click event
+     */
     private void switchToSettings  (ActionEvent e) {
         try {
             new SettingsController().switchHere(stage);
@@ -111,6 +157,11 @@ public class UIController {
         }
     }
 
+    /**
+     * Exit the game entirely.
+     *
+     * @param e button click event
+     */
     private void closeGame (ActionEvent e){
         Platform.exit();
     }

@@ -14,7 +14,8 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 
 /**
- * Created by Vivian on 13/5/17.
+ * Class to control the settings menu.
+ *
  */
 public class SettingsController {
     @FXML private ChoiceBox<String> choiceBox;
@@ -26,6 +27,11 @@ public class SettingsController {
     private Stage stage;
     private Scene scene;
 
+    /**
+     * Load SettingsController as the controller for the settings menu.
+     *
+     * @throws IOException
+     */
     public SettingsController() throws IOException{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Settings.fxml"));
         loader.setController(this);
@@ -34,6 +40,10 @@ public class SettingsController {
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
     }
 
+    /**
+     * Bind the buttons to perform their functionality.
+     *
+     */
     @FXML
     public void initialize(){
         choiceBox.setOnAction(this::chooseDifficulty);
@@ -45,6 +55,11 @@ public class SettingsController {
         nameField.setText(settings.getName());
     }
 
+    /**
+     * Updates the difficulty to the selected difficulty.
+     *
+     * @param e button click event
+     */
     private void chooseDifficulty (ActionEvent e) {
         string = choiceBox.getSelectionModel().getSelectedItem();
         if (string == null) {
@@ -67,6 +82,11 @@ public class SettingsController {
         Settings.getInstance().setDifficulty(difficulty);
     }
 
+    /**
+     * Exit the settings and return to the main menu.
+     *
+     * @param e button click event
+     */
     private void exitSettings (ActionEvent e) {
         Settings settings = Settings.getInstance();
         if(!settings.setTCPPort(tcpField.getText())){
@@ -86,12 +106,23 @@ public class SettingsController {
         }
     }
 
+    /**
+     * Switch the current stage to the settings menu.
+     *
+     * @param stage current stage
+     * @pre stage != null
+     */
     public void switchHere(Stage stage){
         this.stage = stage;
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Getter to return the difficulty selected.
+     *
+     * @return difficulty
+     */
     public static String getDifficulty() {
         return string;
     }

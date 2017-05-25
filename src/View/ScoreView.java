@@ -50,7 +50,7 @@ public class ScoreView extends BorderPane {
     /**
      * Update the score when certain parameters are met.
      *
-     * @param updateInfo
+     * @param updateInfo info on changes made to the modelmap
      * @pre updateInfo != null
      */
     public void onMapChange(MapUpdateInfo updateInfo){

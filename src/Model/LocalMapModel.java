@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import static Model.MapTile.MapItem.*;
 
 /**
+ * Creates a local model of the map.
+ *
  * @author Kevin Ni
  */
 public class LocalMapModel implements MapModel {
@@ -23,6 +25,13 @@ public class LocalMapModel implements MapModel {
     private Set<Consumer<MapUpdateInfo>> listeners;
     private boolean localMulti;
 
+    /**
+     * Create a new model of the map.
+     *
+     * @param nPlayers number of players planning to join the game
+     * @param localMulti indicate if the game is local multiplayer
+     * @pre nPlayers >= 0
+     */
     public LocalMapModel(int nPlayers, boolean localMulti){
         this.localMulti = localMulti;
         tutorial = false;
@@ -36,7 +45,8 @@ public class LocalMapModel implements MapModel {
         generateMap(new Random().nextInt());
     }
 
-    /** Used solely for the tutorial
+    /**
+     * Create a new map model from a text file, used solely for the tutorial.
      *
      * @param path path to file with the map
      */
@@ -46,16 +56,30 @@ public class LocalMapModel implements MapModel {
         loadFromFile(path);
     }
 
+    /**
+     * Generate a new map using a random seed.
+     *
+     */
     private void generateMap() {
         generateMap(new Random().nextInt());
     }
 
+    /**
+     * Generate a new map using a specified seed.
+     *
+     * @param seed used to generate a new map
+     */
     private void generateMap(int seed) {
         System.out.println(seed);
         MapGenerator generator = new MapGenerator(seed, Settings.getInstance().getDifficulty());
         setUpMap(generator.generateMap(livePlayers));
     }
 
+    /**
+     * Set the map to the specified map.
+     *
+     * @param map a valid map
+     */
     private void setUpMap(MapTile[][] map) {
         history = new Stack<>();
         playerHistory = new Stack<>();
@@ -76,6 +100,11 @@ public class LocalMapModel implements MapModel {
         this.startingMap = copyMap();
     }
 
+    /**
+     * Create a deep copy of the map.
+     *
+     * @return map
+     */
     private MapTile[][] copyMap() {
         MapTile[][] map = new MapTile[getHeight()][getWidth()];
         for (int y = 0; y < getHeight(); y++) {
@@ -86,6 +115,13 @@ public class LocalMapModel implements MapModel {
         return map;
     }
 
+    /**
+     * Read a map from a file.
+     *
+     * @param fin map in text file
+     * @throws FileNotFoundException
+     * @pre fin != "" and file exists
+     */
     private void loadFromFile(String fin) throws FileNotFoundException {
         Scanner sc = null;
         try{
@@ -142,6 +178,12 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Remove player p from the map.
+     *
+     * @param p the player to be killed
+     * @pre p >= 0
+     */
     public synchronized void killPlayer(int p){
         setMapAt(players[p], GROUND, -1);
         livePlayers.remove(p);
@@ -154,10 +196,20 @@ public class LocalMapModel implements MapModel {
         players[p] = null;
     }
 
+    /**
+     * Getter to return the local player.
+     *
+     * @return 0
+     */
     public int getPlayer(){
         return 0;
     }
 
+    /**
+     * Handle key presses from the user(s).
+     *
+     * @param e key press event
+     */
     public void handle(KeyEvent e) {
         //KEY EVENT HANDLER
         KeyCode p2 = localPlayer2(e.getCode());
@@ -183,6 +235,12 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Return the move player 2 in local multiplayer is making.
+     *
+     * @param k is W, A, S, or D
+     * @return directional equivalent
+     */
     private KeyCode localPlayer2(KeyCode k){
 
         if(!localMulti){
@@ -203,11 +261,19 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Update the position of each player.
+     *
+     */
     private void setUpPlayers() {
         Pair<Integer, Position> prevPlayers = playerHistory.pop();
         players[prevPlayers.first()] = prevPlayers.second();
     }
 
+    /**
+     * Update the map to the previous move.
+     *
+     */
     private void broadcastPrevMove() {
         MapUpdateInfo prev = history.pop();
         for (Pair<Position, MapTile> prevTile : prev.getCoordinates()) {
@@ -217,6 +283,10 @@ public class LocalMapModel implements MapModel {
         broadcast(prev);
     }
 
+    /**
+     * Undo the current move.
+     *
+     */
     public synchronized void undo() {
         if (history.size() < 1) {
             return;
@@ -225,11 +295,19 @@ public class LocalMapModel implements MapModel {
         broadcastPrevMove();
     }
 
+    /**
+     * Generate a new map.
+     *
+     */
     public synchronized void generateNewMap() {
         generateMap();
         broadcastMap();
     }
 
+    /**
+     * Broadcast the update of the map to the listeners.
+     *
+     */
     public synchronized void broadcastMap() {
         MapUpdateInfo info = new MapUpdateInfo(true, goalsLeft == 0);
         for (int y = 0; y < getHeight(); y++) {
@@ -242,11 +320,22 @@ public class LocalMapModel implements MapModel {
         broadcast(info);
     }
 
+    /**
+     * Reset the map to the initial state.
+     *
+     */
     public synchronized void reset() {
         setUpMap(startingMap);
         broadcastMap();
     }
 
+    /**
+     * Process input from keypress.
+     *
+     * @param k UP, LEFT, DOWN, RIGHT
+     * @param p the player making a move
+     * @pre p >= 0
+     */
     public synchronized void processInput(KeyCode k, int p){
         if(goalsLeft == 0){
             return;
@@ -280,7 +369,16 @@ public class LocalMapModel implements MapModel {
         makeMove(oldPosition, newPosition, lookAhead, newDirection, p);
     }
 
-
+    /**
+     * Update the map according to the move made.
+     *
+     * @param oldPosition the current position of the player
+     * @param newPosition the position the player wants to move to
+     * @param lookAhead the tile after the new position
+     * @param newDirection the direction the player will be facing
+     * @param p the player making a move
+     * @pre p >= 0
+     */
     private synchronized void makeMove(Position oldPosition,
                                        Position newPosition,
                                        Position lookAhead,
@@ -318,12 +416,26 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Broadcast updates to the subscribed listeners.
+     *
+     * @param info updates to the map
+     */
     private synchronized void broadcast(MapUpdateInfo info){
         for(Consumer<MapUpdateInfo> listener : listeners) {
             listener.accept(info);
         }
     }
 
+    /**
+     * Record the previous moves into a stack.
+     *
+     * @param oldPosition current position of the player
+     * @param newPosition the original tile of the position the player wants to move to
+     * @param lookAhead the original tile after the new position
+     * @param p the player making a move
+     * @pre p >= 0
+     */
     private synchronized void recordHistory(Position oldPosition,
                                             Position newPosition,
                                             Position lookAhead,
@@ -337,6 +449,13 @@ public class LocalMapModel implements MapModel {
         history.push(prevInfo);
     }
 
+    /**
+     * Check if a move is valid.
+     *
+     * @param newPos the position the player wants to move to
+     * @param lookAhead the tile after the new position
+     * @return isValid
+     */
     private synchronized boolean validMove(Position newPos, Position lookAhead) {
         MapTile item = getMapAt(newPos);
 
@@ -354,6 +473,13 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Set the tile at specified position.
+     *
+     * @param pos position of tile to be replaced
+     * @param item item of new tile
+     * @param player player making the move
+     */
     private synchronized void setMapAt(Position pos, MapTile.MapItem item, int player){
         MapTile tile = map[pos.getY()][pos.getX()];
 
@@ -367,27 +493,57 @@ public class LocalMapModel implements MapModel {
         }
     }
 
+    /**
+     * Return what tile is at specified position.
+     *
+     * @param pos position that player wants to see
+     * @return map[y][x]
+     */
     private MapTile getMapAt(Position pos){
         return map[pos.getY()][pos.getX()];
     }
 
+    /**
+     * Getter to return the height of the model.
+     *
+     * @return height
+     */
     public int getHeight(){
         return map.length;
     }
 
+    /**
+     * Getter to return the width of the model.
+     *
+     * @return width
+     */
     public int getWidth(){
         return getHeight() == 0 ? 0 : map[0].length;
     }
 
+    /**
+     * Subscribe a listener to a model's updates.
+     *
+     * @param listener view that needs information on model
+     */
     public synchronized void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         listeners.add(listener);
     }
 
+    /**
+     * Unsubscribe a listener from the model's updates.
+     *
+     * @param listener view that no longer needs information on model
+     */
     public synchronized void unSubscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         assert listeners.contains(listener);
         listeners.remove(listener);
     }
 
+    /**
+     * Broadcast nothing, close the model.
+     *
+     */
     public void close(){
         broadcast(null);
     }

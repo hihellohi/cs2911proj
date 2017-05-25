@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 
 
 /**
+ * This class creates a pane which contains all the elements of the game.
+ *
  * @author Kevin Ni
  */
 public class GameView extends StackPane {
@@ -32,6 +34,13 @@ public class GameView extends StackPane {
     private Region region;
     private boolean tutorial;
 
+    /**
+     * Create a new game view.
+     *
+     * @param model model of the map
+     * @param tutorial indicate if in tutorial mode
+     * @pre model != null
+     */
     public GameView(MapModel model, boolean tutorial) {
         super();
         this.tutorial = tutorial;
@@ -55,10 +64,22 @@ public class GameView extends StackPane {
         super.getChildren().addAll(bp, region);
     }
 
+    /**
+     * Create a new game view that is not the tutorial.
+     *
+     * @param model model of the map
+     * @pre model != null
+     */
     public GameView(MapModel model) {
         this(model, false);
     }
 
+    /**
+     * Switch the current stage to the game view.
+     *
+     * @param stage current stage
+     * @pre stage != null
+     */
     public void switchHere(Stage stage){
         this.stage = stage;
         menuBar.setStage(stage);
@@ -78,6 +99,11 @@ public class GameView extends StackPane {
         stage.show();
     }
 
+    /**
+     * Switch stages gracefully.
+     *
+     * @param e button click/press event
+     */
     private void onMapEnd (ActionEvent e){
         try {
             model.close();
@@ -89,6 +115,11 @@ public class GameView extends StackPane {
         }
     }
 
+    /**
+     * Show the pause menu.
+     *
+     * @param e key press event
+     */
     private void handleKey (KeyEvent e) {
         KeyCode code = e.getCode();
         if(code == KeyCode.P || code == KeyCode.ESCAPE){
@@ -96,6 +127,13 @@ public class GameView extends StackPane {
         }
     }
 
+    /**
+     *
+     * Update the game view from update info.
+     *
+     * @param updateInfo info on changes made to the model
+     * @pre updateInfo != null
+     */
     private void onMapChange (MapUpdateInfo updateInfo) {
         if (updateInfo != null){
             if(updateInfo.isFinished()) {

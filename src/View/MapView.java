@@ -7,6 +7,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 /**
+ * This class generates a view of the map using a provided model.
+ *
  * @author Kevin Ni
  */
 class MapView extends GridPane {
@@ -42,6 +44,12 @@ class MapView extends GridPane {
     private MapModel model;
     private ImageView[][] tiles;
 
+    /**
+     * Create a view of the map from the model.
+     *
+     * @param model model of the map
+     * @pre model != null
+     */
     MapView(MapModel model){
         super();
 
@@ -63,14 +71,30 @@ class MapView extends GridPane {
         }
     }
 
+    /**
+     * Getter to return the height of the map.
+     *
+     * @return mapHeight
+     */
     int mapHeight(){
         return (int) (GROUND.getHeight() * model.getHeight());
     }
 
+    /**
+     * Getter to return the width of the map.
+     *
+     * @return mapWidth
+     */
     int mapWidth(){
         return (int) (GROUND.getWidth() * model.getWidth());
     }
 
+    /**
+     * Update the map view from update info.
+     *
+     * @param updateInfo info on changes made to the model
+     * @pre updateInfo != null
+     */
     private void onMapChange (MapUpdateInfo updateInfo) {
         if(updateInfo == null){
             return;
@@ -84,6 +108,13 @@ class MapView extends GridPane {
         }
     }
 
+    /**
+     * Set a tile in map view.
+     *
+     * @param viewTile tile to be set
+     * @param mapTile item of tile to be set
+     * @pre viewTile != null, mapTile != null
+     */
     private void setTile(ImageView viewTile, MapTile mapTile){
         switch (mapTile.getItem()) {
             case WALL:
