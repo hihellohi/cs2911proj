@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class TutorialController {
     // Tutorial map represented in ASCII. This is loaded by LocalMapModel instead of generating a random map
-    private static final String TUTORIAL_FILE = "src/tutorial.txt";
+    private static final String TUTORIAL_FILE = "tutorial.txt";
 
     @FXML private Button exitBtn;
     @FXML private Button startTutorialBtn;
