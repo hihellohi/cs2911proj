@@ -6,3 +6,4 @@ mkdir bin
 cp -r src/images bin
 cp src/View/*.fxml bin/View 
 cp src/View/*.css bin/View 
+cp src/*.txt bin
