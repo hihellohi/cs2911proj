@@ -17,7 +17,7 @@ import javafx.stage.Window;
 import java.io.IOException;
 
 /**
- * Display menu when game is paused.
+ * Class to setup the pause menu.
  *
  */
 public class PauseMenu extends Dialog {
@@ -30,10 +30,10 @@ public class PauseMenu extends Dialog {
      * Setup the pause menu, certain functions are disabled when the map model
      * is in tutorial mode or is the client in multiplayer.
      *
-     * @param model
-     * @param leaveHandler
-     * @param tutorial
-     * @pre model != null
+     * @param model model of the map
+     * @param leaveHandler method reference which exits the stage gracefully
+     * @param tutorial indicate if in tutorial mode
+     * @pre model != null, leaveHandler != null
      */
     public PauseMenu(MapModel model, EventHandler<ActionEvent> leaveHandler, boolean tutorial) {
         super();
@@ -101,7 +101,7 @@ public class PauseMenu extends Dialog {
     /**
      * Set the PauseMenu's stage to be the same as the GameView's.
      *
-     * @param stage
+     * @param stage gameview's stage
      * @pre stage != null
      */
     public void setStage(Stage stage) {
