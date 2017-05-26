@@ -54,6 +54,7 @@ public class ClientConnection {
      * @param socket the socket to be used for this connection
      * @param onClientRemovedFromLobby callback invoked when the connection is closed before the game starts.
      *                                 Invoked with the connection that was closed.
+     * @pre socket != null
      */
     ClientConnection(Socket socket, Consumer<ClientConnection> onClientRemovedFromLobby){
         super();
@@ -85,6 +86,8 @@ public class ClientConnection {
      * @param model model to be attached to the connection
      * @param player player number of the client
      * @throws IOException if the connection has already been closed
+     *
+     * @pre model != null
      */
     void StartGame(LocalMapModel model, int player) throws IOException{
         out.writeInt(player);

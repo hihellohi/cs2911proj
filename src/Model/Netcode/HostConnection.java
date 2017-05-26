@@ -37,6 +37,10 @@ public class HostConnection implements MapModel {
      * @param id the id of the host
      * @param startGame callback that is invoked when the host signals that the game has started. Called with this
      *                  object.
+     *
+     * @pre host != null
+     * @pre id != null
+     * @pre startGame != null
      */
     HostConnection(InetAddress host, String id, Consumer<HostConnection> startGame) {
         super();

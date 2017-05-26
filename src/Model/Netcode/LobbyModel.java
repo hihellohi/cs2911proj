@@ -76,6 +76,8 @@ public class LobbyModel {
      * attaches a model to all established connections and signals to all clients that the game has started
      *
      * @param model the model to be attached
+     *
+     * @ore model != null
      */
     public void startGame(LocalMapModel model){
         int i = 1;

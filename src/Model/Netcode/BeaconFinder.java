@@ -44,6 +44,7 @@ public class BeaconFinder {
      * pings a host
      *
      * @param hostName the host to be pinged
+     * @pre hostname != null
      */
     public void target(String hostName) throws UnknownHostException {
         try {
@@ -120,6 +121,7 @@ public class BeaconFinder {
     /**
      * Removes a connection from the observablelist
      * @param connection the connection to be removed
+     * @pre connection != null
      */
     public void removeConnection(HostConnection connection){
         Platform.runLater(() -> {
