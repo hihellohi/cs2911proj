@@ -15,16 +15,24 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
+ * A cell in the listView in the join game scene
+ * represents a discovered host
+ *
  * @author Kevin Ni
  */
 public class JoinGameItem extends ListCell<HostConnection> {
     private HBox hBox;
     private Label ipLabel;
-    private HostConnection currentModel;
+    private HostConnection host;
     private Button joinButton;
     private Button leaveButton;
     private Consumer<HostConnection> removeConnection;
 
+    /**
+     * class constructor
+     *
+     * @param removeConnection callback that is invoked when
+     */
     public JoinGameItem(Consumer<HostConnection> removeConnection){
         super();
 
@@ -34,7 +42,7 @@ public class JoinGameItem extends ListCell<HostConnection> {
 
         hBox = new HBox();
         ipLabel = new Label();
-        currentModel = null;
+        host = null;
 
         Pane pane = new Pane();
         joinButton = new Button("Join");
@@ -43,7 +51,7 @@ public class JoinGameItem extends ListCell<HostConnection> {
         joinButton.setOnAction(this::onJoin);
 
         leaveButton.setOnAction((e) -> {
-            currentModel.close();
+            host.close();
             onLeave();
         });
 
@@ -53,21 +61,29 @@ public class JoinGameItem extends ListCell<HostConnection> {
         HBox.setHgrow(pane, Priority.ALWAYS);
     }
 
+    /**
+     * called when host disconnects from its host
+     */
     private void onLeave(){
         Platform.runLater(() -> hBox.getChildren().set(2, joinButton));
-        currentModel.setConnectionInterruptedListener(null);
+        host.setConnectionInterruptedListener(null);
     }
 
+    /**
+     * event handler for the join button
+     *
+     * @param e event that was generated
+     */
     private void onJoin(ActionEvent e){
         new Thread(() -> {
             try {
-                currentModel.connect();
+                host.connect();
                 Platform.runLater(() -> hBox.getChildren().set(2, leaveButton));
-                currentModel.setConnectionInterruptedListener(() -> {
+                host.setConnectionInterruptedListener(() -> {
                     //on kick
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                                String.format("You have been kicked from %s", currentModel.getHostName()));
+                                String.format("You have been kicked from %s", host.getHostName()));
                         alert.setHeaderText(null);
                         alert.showAndWait();
                     });
@@ -79,28 +95,34 @@ public class JoinGameItem extends ListCell<HostConnection> {
                     alert.setHeaderText(null);
                     alert.showAndWait();
                 });
-                removeConnection.accept(currentModel);
+                removeConnection.accept(host);
             }
         }).start();
     }
 
-    @Override protected void updateItem(HostConnection model, boolean empty){
-        super.updateItem(model, empty);
+    /**
+     * updates the item, called by the listview
+     *
+     * @param host the host that this cell will represent
+     * @param empty whether this cell is empty
+     */
+    @Override protected void updateItem(HostConnection host, boolean empty){
+        super.updateItem(host, empty);
 
-        if(empty || model == null){
-            currentModel = null;
+        if(empty || host == null){
+            this.host = null;
             Platform.runLater(() -> super.setGraphic(null));
         }
         else{
-            currentModel = model;
+            this.host = host;
 
-            ipLabel.setText(currentModel.getHostName());
-            if (model.isConnected()) {
+            ipLabel.setText(this.host.getHostName());
+            if (host.isConnected()) {
                 hBox.getChildren().set(2, leaveButton);
-                currentModel.setConnectionInterruptedListener(this::onLeave);
+                this.host.setConnectionInterruptedListener(this::onLeave);
             } else {
                 hBox.getChildren().set(2, joinButton);
-                currentModel.setConnectionInterruptedListener(null);
+                this.host.setConnectionInterruptedListener(null);
             }
 
             Platform.runLater(() -> super.setGraphic(hBox));

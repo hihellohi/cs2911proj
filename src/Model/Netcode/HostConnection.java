@@ -35,7 +35,8 @@ public class HostConnection implements MapModel {
      *
      * @param host the address of the host
      * @param id the id of the host
-     * @param startGame callback that is invoked when the host signals that the game has started
+     * @param startGame callback that is invoked when the host signals that the game has started. Called with this
+     *                  object.
      */
     HostConnection(InetAddress host, String id, Consumer<HostConnection> startGame) {
         super();
@@ -106,6 +107,9 @@ public class HostConnection implements MapModel {
         }
     }
 
+    /**
+     * listens for updates from the host until the socket is closed
+     */
     private void listen(){
         if(socket == null){
             return;
@@ -139,6 +143,11 @@ public class HostConnection implements MapModel {
         }
     }
 
+    /**
+     * broadcasts an update received from the host to all listeners registered with subscribeModelUpdate
+     *
+     * @throws IOException if socket is closed
+     */
     private void broadcast() throws IOException{
         MapUpdateInfo info = new MapUpdateInfo(in.readBoolean(), in.readBoolean());
         int n = in.readInt();
@@ -153,10 +162,20 @@ public class HostConnection implements MapModel {
         }
     }
 
+    /**
+     * gets the client's player number
+     *
+     * @return the client's player number
+     */
     public int getPlayer(){
         return player;
     }
 
+    /**
+     * handles a key pressed event and sends it to the host if it is an arrow key
+     *
+     * @param e the generated event
+     */
     public void handle(KeyEvent e){
         switch (e.getCode()){
             case UP:case DOWN:case LEFT: case RIGHT:
@@ -169,30 +188,68 @@ public class HostConnection implements MapModel {
         }
     }
 
+    /**
+     * gets the height (y dimension) of the map in tiles
+     *
+     * @return the height of the map in tiles
+     */
     public int getHeight(){
         return height;
     }
 
+    /**
+     * gets the width (x dimension) of the map in tiles
+     *
+     * @return the width of the map in tiles
+     */
     public int getWidth(){
         return width;
     }
 
+    /**
+     * gets the name of the host. If it is empty, get the server name that the host is running on. If that can't be
+     * found, return the ip address of the server that the host is running on
+     *
+     * @return the name of the host.
+     */
     public String getHostName(){
         return name;
     }
 
+    /**
+     * gets the unique id string of the host
+     *
+     * @return the id string of the host
+     */
     String getIdString(){
         return id;
     }
 
+    /**
+     * checks if this class has an established connection with the host
+     *
+     * @return true if the class has an established connection with the host
+     */
     public boolean isConnected(){
         return socket != null && socket.isConnected();
     }
 
+    /**
+     * Subscribes a listener that is called when an update from the host is received
+     *
+     * @param listener the callback that is to be invoked on receiving an update from the host. Invoked with
+     *                 a MapUpdateInfo object that was broadcasted by the host's LocalMapModel.
+     */
     public void subscribeModelUpdate(Consumer<MapUpdateInfo> listener){
         gameChangeListeners.add(listener);
     }
 
+    /**
+     * sets the callback that is invoked when the connection to the host is interrupted (if the host closes or
+     * resets the connection NOT when close is called on this object).
+     *
+     * @param listener the callback to be invoked on connection interrupt.
+     */
     public void setConnectionInterruptedListener(Runnable listener){
         connectionInterruptedListener = listener;
     }

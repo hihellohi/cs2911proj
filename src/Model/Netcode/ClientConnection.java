@@ -52,7 +52,8 @@ public class ClientConnection {
      * Class constructor
      *
      * @param socket the socket to be used for this connection
-     * @param onClientRemovedFromLobby callback invoked when the connection is closed in the lobby
+     * @param onClientRemovedFromLobby callback invoked when the connection is closed before the game starts.
+     *                                 Invoked with the connection that was closed.
      */
     ClientConnection(Socket socket, Consumer<ClientConnection> onClientRemovedFromLobby){
         super();
@@ -121,7 +122,7 @@ public class ClientConnection {
     /**
      * closes the connection
      */
-    private synchronized void close(){
+    public synchronized void close(){
         try {
             if(!socket.isClosed()) {
                 socket.close();

@@ -11,6 +11,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
+ * Represents a lobby. Keeps track of established connections and welcomes new ones
+ *
  * @author Kevin Ni
  */
 public class LobbyModel {
@@ -19,6 +21,11 @@ public class LobbyModel {
     private ObservableList<ClientConnection> connectionSockets;
     private HostBeacon beacon;
 
+    /**
+     * class constructor
+     *
+     * @throws IOException when port is already occupied
+     */
     public LobbyModel() throws IOException{
         super();
         connectionSockets = FXCollections.observableList(new ArrayList<>());
@@ -27,6 +34,10 @@ public class LobbyModel {
         new Thread(this::listen).start();
     }
 
+    /**
+     * listens for new incoming connections and creates new connection objects for them until the close is called on
+     * this object.
+     */
     private void listen() {
         while(!welcomingSocket.isClosed()){
             try{
@@ -46,6 +57,9 @@ public class LobbyModel {
         }
     }
 
+    /**
+     * closes the welcoming socket and stops any threads from listening for new connections
+     */
     public synchronized void close(){
         beacon.close();
         if(!welcomingSocket.isClosed()) {
@@ -58,6 +72,11 @@ public class LobbyModel {
         }
     }
 
+    /**
+     * attaches a model to all established connections and signals to all clients that the game has started
+     *
+     * @param model the model to be attached
+     */
     public void startGame(LocalMapModel model){
         int i = 1;
         for(ClientConnection connection : connectionSockets) {
@@ -71,15 +90,26 @@ public class LobbyModel {
         }
     }
 
+    /**
+     * closes the welcoming socket and closes all established connections
+     */
     public void abort(){
-        new ArrayList<>(connectionSockets).forEach(ClientConnection::closeAndRemoveFromModel);
+        new ArrayList<>(connectionSockets).forEach(ClientConnection::close);
         close();
     }
 
+    /**
+     * get an observableList containing all established connections
+     * @return observableList containing all established connections
+     */
     public ObservableList<ClientConnection> getObservable(){
         return connectionSockets;
     }
 
+    /**
+     * get the current number of established connections
+     * @return the current number of established connections
+     */
     public int nPlayers(){
         return connectionSockets.size();
     }

@@ -10,6 +10,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
 /**
+ * A cell in the listView in the join game scene
+ * represents a connection to a client
+ *
  * @author Kevin Ni
  */
 public class LobbyItem extends ListCell<ClientConnection> {
@@ -17,6 +20,9 @@ public class LobbyItem extends ListCell<ClientConnection> {
     private Label ipLabel;
     private ClientConnection currentConnection;
 
+    /**
+     * class constructor
+     */
     public LobbyItem(){
         super();
 
@@ -36,6 +42,12 @@ public class LobbyItem extends ListCell<ClientConnection> {
         button.setOnAction((e) -> currentConnection.closeAndRemoveFromModel());
     }
 
+    /**
+     * updates the item, called by the parent listview
+     *
+     * @param connection the connection that this cell will represent
+     * @param empty whether this cell is empty
+     */
     @Override protected void updateItem(ClientConnection connection, boolean empty){
         super.updateItem(connection, empty);
 

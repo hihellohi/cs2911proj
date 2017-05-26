@@ -27,7 +27,8 @@ public class BeaconFinder {
     /**
      * class constructor
      *
-     * @param onGameStart callback that is invoked when a connected host starts the game
+     * @param onGameStart callback that is invoked when a connected host starts the game. will be called with the
+     *                    connection that started the game.
      * @throws SocketException when desired socket is already occupied
      */
     public BeaconFinder(Consumer<HostConnection> onGameStart) throws SocketException {

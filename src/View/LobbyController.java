@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 /**
+ * Controller for the lobby screen
+ *
  * @author Kevin Ni
  */
 public class LobbyController {
@@ -32,6 +34,11 @@ public class LobbyController {
     private Scene scene;
     private Stage stage;
 
+    /**
+     * class constructor
+     *
+     * @throws IOException port already occupied or fxml fails to load
+     */
     public LobbyController() throws IOException {
 
         this.model = new LobbyModel();
@@ -42,6 +49,9 @@ public class LobbyController {
         scene.getStylesheets().add(getClass().getResource("stylesheet.css").toExternalForm());
     }
 
+    /**
+     * initialise fxml objects
+     */
     @FXML
     public void initialize(){
         listView.setPlaceholder(new Label("Nobody has joined :("));
@@ -52,6 +62,13 @@ public class LobbyController {
         backBtn.setOnAction(this::backEvent);
     }
 
+    /**
+     * EventHandler for when the start button is pressed.
+     * Closes the lobby and attaches all established connections with a new LocalMapModel
+     * switches to the game screen.
+     *
+     * @param event the generated event
+     */
     private void startEvent (ActionEvent event) {
         if (model.nPlayers() > MAX_PLAYERS){
             Alert alert = new Alert(Alert.AlertType.INFORMATION, String.format(
@@ -72,6 +89,12 @@ public class LobbyController {
         mapModel.broadcastMap();
     }
 
+    /**
+     * EventHandler for when the back button is pressed.
+     * Kicks all players, closes the lobby and switches to the menu.
+     *
+     * @param event the generated event
+     */
     private void backEvent (ActionEvent event) {
         try {
             model.abort();
@@ -83,7 +106,12 @@ public class LobbyController {
         }
     }
 
-    public void switchHere(Stage stage){
+    /**
+     * switches the stage to contain the scene controlled by this object
+     *
+     * @param stage the stage to be switched here.
+     */
+    void switchHere(Stage stage){
         this.stage = stage;
         stage.setOnCloseRequest((e) -> model.abort());
         stage.setScene(scene);
